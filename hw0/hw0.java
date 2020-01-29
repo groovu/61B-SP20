@@ -2,7 +2,7 @@ public class hw0 {
 	public static void main(String[] args) {
 		Test.maxTest();
 	}
-}
+
 	public static int max(int[] a) {
 		// check that array is not empty.
 		int max = 0;
@@ -12,5 +12,5 @@ public class hw0 {
 			}
 		}
 		return max;
-				
-			
+	}			
+}			
