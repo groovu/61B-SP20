@@ -1,3 +1,5 @@
+package hw0;
+
 public class hw0 {
   public static void main(String[] args) {
       //max(new int[] { 0, -5, 2, 14, 10 });
