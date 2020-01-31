@@ -4,7 +4,7 @@ import hw0.hw0;
 import ucb.junit.textui;
 
 /** Tests for hw0. 
- *  @author YOUR NAMES HERE
+ *  @author Cherish Truong
  */
 public class Tester {
 
