@@ -1,7 +1,7 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
 // needed?
-import hw0;
+import hw0.java;
 
 import ucb.junit.textui;
 
