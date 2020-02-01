@@ -63,6 +63,7 @@ public class IntList {
 
         // Creates a sample IntList.
         IntList L1 = list(1, 2, 3, 4, 5);
+        System.out.println(L1);//added
 
         //TODO:  Print out L1 using IntelliJ's 'sout' command.
     }
