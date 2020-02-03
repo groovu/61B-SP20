@@ -7,6 +7,14 @@ import org.junit.Test;
  * 3. Run the tests, it should pass.  Otherwise, return to 2.
  * 4. Refactor/improve the code, the output should still be the same
  * You refactor for readability/efficiency.
+ *
+ * Writing tests first is a good method because it checks to see if
+ * you understand what needs to be written.  But what happens if you
+ * start off with a bad idea of what a function is supposed to do?
+ * Could be screwing yourself.  Try to incorporate the given testings
+ * from assignments.  Or ask others about what is being specified.
+ * Don't start coding until you understand what is supposed to be output!
+ *
  */
 public class CompoundInterestTest {
 
@@ -21,6 +29,12 @@ public class CompoundInterestTest {
     @Test
     public void testFutureValue() {
         double tolerance = 0.01;
+        assertEquals(12.544,
+                CompoundInterest.futureValue(10,12, 2022),
+                tolerance);
+        assertEquals(259.37,
+                CompoundInterest.futureValue(100, 10, 2030),
+                tolerance);
     }
 
     @Test

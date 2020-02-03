@@ -23,7 +23,9 @@ public class CompoundInterest {
      *  then the futureValue will be 10*1.12*1.12 = 12.544. */
     static double futureValue(double presentValue, double rate,
                               int targetYear) {
-        return 0;
+        double futureVal;
+        futureVal = presentValue * Math.pow(1+(rate/100), numYears(targetYear));
+        return futureVal;
     }
 
     /** Returns returns the value, in THIS_YEAR dollars, of an asset
