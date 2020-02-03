@@ -1,11 +1,13 @@
 import static org.junit.Assert.*;
 import org.junit.Test;
+//lets you call Test methods using shorthand.
 
 public class ArithmeticJUnitTest {
 
     /** Tolerance for comparison of doubles. */
     static final double DELTA = 1e-15;
 
+    //@Test marks this method as a unit test.  Why is this needed/useful?
     @Test
     public void testProduct() {
         /* assertEquals for comparison of doubles takes three arguments:
@@ -31,6 +33,7 @@ public class ArithmeticJUnitTest {
     }
 
     /* Run the unit tests in this file. */
+    //So if I run this main, it will only run methods with @Test on them?
     public static void main(String... args) {
         System.exit(ucb.junit.textui.runClasses(ArithmeticJUnitTest.class));
     }
