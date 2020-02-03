@@ -11,7 +11,7 @@ public class CompoundInterest {
      *  should be 1. Throughout the assignment it is OK to assume that
      *  TARGETYEAR is >= THIS_YEAR. */
     static int numYears(int targetYear) {
-        return 0;
+        return targetYear - THIS_YEAR;
     }
 
     /** Suppose we have an asset worth PRESENTVALUE that appreciates
