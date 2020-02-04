@@ -12,10 +12,15 @@ public class MultiArr {
     {{1,3,4},{1},{5,6,7,8},{7,9}} prints:
     Rows: 4
     Columns: 4
+     Are there really 4 columns?  I can't index into [0][3]; right?
     */
     public static void printRowAndCol(int[][] arr) {
         //TODO: Your code here!
-    } 
+        System.out.println("Rows: " + arr.length);
+        //System.out.println("Columns: " + arr[i].length);
+        //Problem, you gotta find what i is.
+
+    }
 
     /**
     @param arr: 2d array

@@ -6,6 +6,8 @@ public class MultiArrTest {
     @Test
     public void testMaxValue() {
         //TODO: Your code here!
+        assertEquals(4, MultiArr.maxValue(new int[][] {{1,2},{3,4}}));
+//        System.out.println(twoD_arr[0][1]);
     }
 
     @Test
