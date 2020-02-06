@@ -63,6 +63,7 @@ public class IntDList {
      */
     public int get(int i) {
         // FIXME: Implement this method and return correct value
+        if (i >= 0)
         return 0;
     }
 
