@@ -193,7 +193,7 @@ public class ModelTests {
         checkSquare(s2, s2, null, null, 0, -1);
 
         assertTrue("These squares should be connectable.", s1.connect(s3));
-        checkSquare(s1, s1, null, s3, 0, 1);
+        checkSquare(s1, s1, null, s3, 0, 1); //maybe I need to fix connectable first.
         checkSquare(s3, s1, s1, null, 0, 1);
 
         assertFalse("Unnumbered squares in same group are not connectable.",

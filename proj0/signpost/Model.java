@@ -365,7 +365,13 @@ class Model implements Iterable<Model.Sq> {
     final class Sq {
         /** A square at (X0, Y0) with arrow in direction DIR (0 if not
          *  set), group number GROUP, sequence number SEQUENCENUM (0
-         *  if none initially assigned), which is fixed iff FIXED. */
+         *  if none initially assigned), which is fixed iff FIXED.
+         *  x,y are coordinates
+         *  pl is the place object inside of the square.
+         *      pl has what?
+     *      fixed if sq is generated with FIXED coordinated.  (who fixes them?)
+         *  this points to _head; is there a _tail?  this is not initialized
+         *  group is a group number.  Sq's with the same group num are in the same group*/
         Sq(int x0, int y0, int sequenceNum, boolean fixed, int dir, int group) {
             x = x0; y = y0;
             pl = pl(x, y);
@@ -520,15 +526,27 @@ class Model implements Iterable<Model.Sq> {
          *    they are not part of the same connected sequence.
          */
         boolean connectable(Sq s1) {
-            // FIXME
-            // use this. notation
-            /** this. connectable to s1 if
-             * s1 is the correct direction (Place.dirOf returns int != 0)
-             * s1 does not have a current predecessor (s1._predecessor = null)
-             * this Sq does not have a current successor. (this.__successor = null)
-             * if this and Sq are numbered,
-             * if s1 and sq do not have seq numbers, they are not in the same pair
-            */
+            //FIXME when do you need () after methods?
+            int dir = Place.dirOf(x, y, s1.x, s1.y); //compare this sq and s1 position, returns dir from this to s1.
+            // why is s1.x and s1.y red?  I can't ref x and y values?)
+            if (_dir != dir) //this._dir is not correct.  When do I use this. notation?)
+                { return false;
+            }
+            if (s1._predecessor != null &&
+                    this._successor != null && //s1 is not first cell && this is not last @333_f36 god bless
+                    s1._sequenceNum == 1 &&
+                    this._sequenceNum == 9) //this should be a n*n where n is the size of the board.  FIXME later.
+                { return false;
+            }
+            if (this._sequenceNum != 0 && s1._sequenceNum != 0) {
+                if (this._sequenceNum != s1._sequenceNum - 1)
+                { return false;
+                }
+            } if (s1._sequenceNum == 0 && this._sequenceNum == 0){
+                if (s1._group == this._group && s1._group != -1)
+                { return false;
+                }
+            }
             return true;
         }
 
@@ -544,20 +562,35 @@ class Model implements Iterable<Model.Sq> {
             _unconnected -= 1;
 
             // FIXME: Connect this square to its successor:
-            //        + Set this square's _successor field and S1's
+            //        +1 Set this square's _successor field and S1's
             //          _predecessor field.
-            //        + If this square has a number, number all its successors
+            //        +2 If this square has a number, number all its successors
             //          accordingly (if needed).
-            //        + If S1 is numbered, number this square and its
+            //        +3 If S1 is numbered, number this square and its
             //          predecessors accordingly (if needed).
-            //        + Set the _head fields of this square's successors this
+            //        +4 Set the _head fields of this square's successors this
             //          square's _head.
-            //        + If either of this square or S1 used to be unnumbered
+            //        +5 If either of this square or S1 used to be unnumbered
             //          and is now numbered, release its group of whichever
             //          was unnumbered, so that it can be reused.
-            //        + If both this square and S1 are unnumbered, set the
+            //        +6 If both this square and S1 are unnumbered, set the
             //          group of this square's head to the result of joining
             //          the two groups.
+            // +1
+            this._successor = s1;
+            s1._predecessor = this;
+            int thisSeqNumStart = this._sequenceNum; //used to compare later.
+            int s1SeqNumStart = s1._sequenceNum;
+            //+2
+            if (this._sequenceNum != 0) {
+                // update successor and successors
+            }
+            //+3
+            if (s1._sequenceNum != 0) {
+                // update predecessor and predecessors
+            }
+            //+4 WHAT
+            //+5.1
 
             return true;
         }
