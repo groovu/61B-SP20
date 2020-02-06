@@ -535,7 +535,7 @@ class Model implements Iterable<Model.Sq> {
             if (s1._predecessor != null &&
                     this._successor != null && //s1 is not first cell && this is not last @333_f36 god bless
                     s1._sequenceNum == 1 &&
-                    this._sequenceNum == 9) //this should be a n*n where n is the size of the board.  FIXME later.
+                    this._sequenceNum == size()) //this should be a n*n where n is the size of the board.
                 { return false;
             }
             if (this._sequenceNum != 0 && s1._sequenceNum != 0) {
@@ -582,16 +582,40 @@ class Model implements Iterable<Model.Sq> {
             int thisSeqNumStart = this._sequenceNum; //used to compare later.
             int s1SeqNumStart = s1._sequenceNum;
             //+2
-            if (this._sequenceNum != 0) {
-                // update successor and successors
+            if (this._sequenceNum != 0 && s1._sequenceNum == 0) { //only this has seq#; update s1
+                int thisSeqNum = this._sequenceNum;
+                Sq updaterPtr = s1;
+                while (updaterPtr != null) {
+                    updaterPtr._sequenceNum = thisSeqNum + 1;
+                    thisSeqNum += 1;
+                    updaterPtr = updaterPtr._successor;
+                }
+                //clear old groups if needed.
+            } //v only s1 has seq#
+            if (this._sequenceNum == 0 && s1._sequenceNum != 0) {
+                int s1SeqNum = s1._sequenceNum;
+                Sq updatePtr = this;
+                while (updatePtr != null) {
+                    updatePtr._sequenceNum = s1SeqNum - 1;
+                    s1SeqNum -= 1;
+                    updatePtr = updatePtr._predecessor;
+                }
+                //clear old groups if needed.
+            } //v NEITHER this or s1 have seq#; link and make new group.
+            if (this._sequenceNum == 0 && s1._sequenceNum == 0) {
+
             }
             //+3
-            if (s1._sequenceNum != 0) {
+            if (s1._sequenceNum != 0) { // implies this seqnum = 0 (therefore not in a group?); update this.seqnum to 1, then shift successors by +1.
                 // update predecessor and predecessors
             }
             //+4 WHAT
             //+5.1
-
+            //+5.2
+            //+6
+            if (this._sequenceNum == 0 && s1._sequenceNum == 0) {
+                //this joins whose group?  check out joinGroups()
+            }
             return true;
         }
 
