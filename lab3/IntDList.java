@@ -63,16 +63,35 @@ public class IntDList {
      */
     public int get(int i) {
         // FIXME: Implement this method and return correct value
+//        if (i >= 0) {
+//            DNode pointer = _front;
+//            while (i > 0) {
+//                pointer = pointer._next;
+//                i -= 1;
+//            }
+//        return pointer._val;
+//        } else {
+//            DNode pointer = _back;
+//            while (i < 0) {
+//                pointer = pointer._prev;
+//                i += 1;
+//            }
+//            return pointer._val;
+//        }
+//    }
         DNode pointer = _front;
-        if (i = 0) {
+        if (i == 0) {
             return pointer._val;
         } else if (i > 0) {
             pointer = pointer._next;
+            i -= 1;
         } else {
             pointer = pointer._prev;
+            i += 1;
         }
-        return pointer;
+        return pointer._val;
     }
+
 
     /**
      * @param d value to be inserted in the front
