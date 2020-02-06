@@ -63,8 +63,15 @@ public class IntDList {
      */
     public int get(int i) {
         // FIXME: Implement this method and return correct value
-        if (i >= 0)
-        return 0;
+        DNode pointer = _front;
+        if (i = 0) {
+            return pointer._val;
+        } else if (i > 0) {
+            pointer = pointer._next;
+        } else {
+            pointer = pointer._prev;
+        }
+        return pointer;
     }
 
     /**
