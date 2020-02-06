@@ -521,6 +521,14 @@ class Model implements Iterable<Model.Sq> {
          */
         boolean connectable(Sq s1) {
             // FIXME
+            // use this. notation
+            /** this. connectable to s1 if
+             * s1 is the correct direction (Place.dirOf returns int != 0)
+             * s1 does not have a current predecessor (s1._predecessor = null)
+             * this Sq does not have a current successor. (this.__successor = null)
+             * if this and Sq are numbered,
+             * if s1 and sq do not have seq numbers, they are not in the same pair
+            */
             return true;
         }
 

@@ -15,7 +15,7 @@ public class PlaceTests {
 
     private void checkSuccessors(Place[][] expected, PlaceList[] actual) {
         for (int dir = 8; dir >= 0; dir -= 1) {
-            assertSetEquals(msg("Mismatch sucessors at direction %d", dir),
+            assertSetEquals(msg("Mismatch successors at direction %d", dir),
                    Arrays.asList(expected[dir]), actual[dir]);
         }
     }
