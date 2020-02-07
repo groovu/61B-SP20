@@ -602,6 +602,7 @@ class Model implements Iterable<Model.Sq> {
                 }
                 //clear old groups if needed.
             } //v NEITHER this or s1 have seq#; link and make new group.
+            // implies this and s1 don't have
             if (this._sequenceNum == 0 && s1._sequenceNum == 0) {
 
             }
