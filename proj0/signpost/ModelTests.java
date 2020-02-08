@@ -1,6 +1,8 @@
 package signpost;
 
 import static java.util.Arrays.asList;
+
+import java.sql.SQLOutput;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.HashMap;
@@ -192,9 +194,16 @@ public class ModelTests {
         checkSquare(s1, s1, null, null, 0, -1);
         checkSquare(s2, s2, null, null, 0, -1);
 
+        System.out.println("s1 loc," + s1.pl + ", group:" + s1.group());
+        System.out.println("s3 loc," + s3.pl + ", group:" + s3.group());
         assertTrue("These squares should be connectable.", s1.connect(s3));
         checkSquare(s1, s1, null, s3, 0, 1); //maybe I need to fix connectable first.
         checkSquare(s3, s1, s1, null, 0, 1);
+        System.out.println("s1 loc," + s1.pl + ", group:" + s1.group());
+        System.out.println("s3 loc," + s3.pl + ", group:" + s3.group());
+        System.out.println(s1.successor().pl);
+        System.out.println("s1._succ (s3) loc," + s1.successor().pl + ", group:" + s1.successor().group());
+        System.out.println();
 
         assertFalse("Unnumbered squares in same group are not connectable.",
                     s3.connect(s1));

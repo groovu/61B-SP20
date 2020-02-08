@@ -532,19 +532,25 @@ class Model implements Iterable<Model.Sq> {
             if (_dir != dir) //this._dir is not correct.  When do I use this. notation?)
                 { return false;
             }
-            if (s1._predecessor != null &&
-                    this._successor != null && //s1 is not first cell && this is not last @333_f36 god bless
-                    s1._sequenceNum == 1 &&
-                    this._sequenceNum == size()) //this should be a n*n where n is the size of the board.
-                { return false;
+//            if (s1._predecessor != null &&
+//                    this._successor != null && //s1 is not first cell && this is not last @333_f36 god bless
+//                    s1._sequenceNum == 1 &&
+//                    this._sequenceNum == size()) //this should be a n*n where n is the size of the board.
+//                { return false;
+//            } // uh this should be split up, I'm sure.
+            if (s1._predecessor != null || this._successor != null) {
+                return false;
+            }
+            if (s1.sequenceNum() == 1 || this.sequenceNum() == size()) {  //see, why is this one ()???
+                return false;
             }
             if (this._sequenceNum != 0 && s1._sequenceNum != 0) {
                 if (this._sequenceNum != s1._sequenceNum - 1)
                 { return false;
                 }
-            } if (s1._sequenceNum == 0 && this._sequenceNum == 0){
-                if (s1._group == this._group && s1._group != -1)
-                { return false;
+            } if (s1._sequenceNum == 0 && this._sequenceNum == 0) {
+                if ((s1._head._group == this._head._group) && s1._group != -1) {
+                    return false;
                 }
             }
             return true;
@@ -581,6 +587,7 @@ class Model implements Iterable<Model.Sq> {
             s1._predecessor = this;
             int thisSeqNumStart = this._sequenceNum; //used to compare later.
             int s1SeqNumStart = s1._sequenceNum;
+            Sq headUpdatePtr = s1;
             //+2
             if (this._sequenceNum != 0 && s1._sequenceNum == 0) { //only this has seq#; update s1
                 int thisSeqNum = this._sequenceNum;
@@ -591,7 +598,8 @@ class Model implements Iterable<Model.Sq> {
                     updaterPtr = updaterPtr._successor;
                 }
                 //clear old groups if needed.
-            } //v only s1 has seq#
+            }
+            //+3 s1 is numbered, update Sq.this
             if (this._sequenceNum == 0 && s1._sequenceNum != 0) {
                 int s1SeqNum = s1._sequenceNum;
                 Sq updatePtr = this;
@@ -601,34 +609,35 @@ class Model implements Iterable<Model.Sq> {
                     updatePtr = updatePtr._predecessor;
                 }
                 //clear old groups if needed.
-            } //v NEITHER this or s1 have seq#; link and make new group.
-            // implies this and s1 don't have
-            if (this._sequenceNum == 0 && s1._sequenceNum == 0) {
-
             }
-            //+3
-            if (s1._sequenceNum != 0) { // implies this seqnum = 0 (therefore not in a group?); update this.seqnum to 1, then shift successors by +1.
-                // update predecessor and predecessors
+            // +4 updating heads?
+            while (headUpdatePtr != null) {
+                headUpdatePtr._head = this._head;
+                headUpdatePtr = headUpdatePtr._successor;
             }
-            //+4 WHAT
-            //+5.1
-            //+5.2
-            //+6
+            // +5 release s1 or this was unnumbered and now numbered, release group.  (numseq 0 to num; group num to 0)
+            if (this._sequenceNum != 0) {
+                releaseGroup(this._group);
+            }
+            if (s1._sequenceNum != 0) {
+                releaseGroup(s1._group);
+            }
+            // +6 put unnumbered into group.
             if (this._sequenceNum == 0 && s1._sequenceNum == 0) {
-                //this joins whose group?  check out joinGroups()
+                this._head._group = joinGroups(this._group, s1._group);
             }
             return true;
         }
 
         /** Disconnect this square from its current successor, if any. */
-        void disconnect() {
-            Sq next = _successor;
-            if (next == null) {
+        void disconnect() { //s1.disconnect(); s1 d/c's from successor.
+            Sq next = _successor; // next sq.
+            if (next == null) { // nothing to disconnect.
                 return;
             }
             _unconnected += 1;
-            next._predecessor = _successor = null;
-            if (_sequenceNum == 0) {
+            next._predecessor = _successor = null;  // clears next's predecessor, and this' successor.
+            if (_sequenceNum == 0) { //this._seqnum=0 means unnumbered.  => group == 1,2,...etc.
                 // FIXME: If both this and next are now one-element groups,
                 //        release their former group and set both group
                 //        numbers to -1.
@@ -637,6 +646,19 @@ class Model implements Iterable<Model.Sq> {
                 //        number.
                 //        Otherwise, the group has been split into two multi-
                 //        element groups.  Create a new group for next.
+                if (this._predecessor == null && next._successor == null) { //both one element; release all groups.
+                    releaseGroup(this._group);
+                    this._group = -1;
+                    releaseGroup(next._group); // is releasing both groups redundant?
+                    next._group = -1;
+                } else if (this._predecessor != null && next._successor == null){ //1 one element; release one ele group.
+                    next._group = -1;
+                } else if (this._predecessor == null && next._successor != null) { //1 one element; release one ele group.
+                    this._group = -1;
+                } else {
+                    next._group = newGroup();
+                }
+
             } else {
                 // FIXME: If neither this nor any square in its group that
                 //        precedes it has a fixed sequence number, set all
@@ -648,6 +670,17 @@ class Model implements Iterable<Model.Sq> {
                 //        their sequence numbers to 0 and create a new
                 //        group for them if next has a current successor
                 //        (otherwise set next's group to -1.)
+
+                //How do I check if a sequence has a fixed number?
+                Sq checkFixedNext = next;
+                Sq checkFixedThis = this; // is this pointer redundant?
+                while (checkFixedThis != null) {
+                    if (checkFixedThis._hasFixedNum == false) {
+                        checkFixedThis._sequenceNum = 0;
+                        checkFixedThis = checkFixedThis._predecessor;
+                    }
+                }
+
             }
             // FIXME: Set the _head of next and all squares in its group to
             //        next.
