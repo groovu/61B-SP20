@@ -113,6 +113,27 @@ class Model implements Iterable<Model.Sq> {
         // END DUMMY SETUP
 
         _board = new Sq[_width][_height];
+        for (int y = 0; y < _height; y += 1) { //@334_f102, worry about other fixed cells later
+            for (int x = 0; x < _width; x += 1) {
+                // default Sq values
+                boolean fixed = false;
+                int direction = 0; // still gotta figure this out
+                int sequenceNum = 0;
+                int group = -1;
+                if (solution[x][y] == 1 || solution[x][y] == size()) {
+                     fixed = true; direction = 0; sequenceNum = solution[x][y]; group = 0;
+                }
+                if (solution[x][y] == 1) { direction = 0; //FIXME 1st square has direction.
+                }
+                _board[x][y] = new Sq(x, y, sequenceNum, fixed, direction, group);
+                //_allSquares.add(_board[x][y]);
+            }
+        }
+        for (Sq[] col: _board) {
+            for (Sq sq : col) {
+                _allSquares.add(sq);
+            }
+        }
         // FIXME: Initialize _board so that _board[x][y] contains the Sq object
         //        representing the contents at cell (x, y), _allSquares
         //        contains the list of all Sq objects on the board, and

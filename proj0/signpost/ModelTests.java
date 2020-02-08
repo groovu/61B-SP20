@@ -188,6 +188,7 @@ public class ModelTests {
         Sq s4 = model.new Sq(1, 1, 4, true, 5, 0);
         Sq s5 = model.new Sq(0, 2, 8, true, 4, 0);
         Sq s6 = model.new Sq(0, 1, 1, true, 4, 0);
+        System.out.println(model);
 
         assertFalse("A square is not connectable to itself.", s1.connect(s1));
         checkSquare(s1, s1, null, null, 0, -1);
