@@ -178,7 +178,10 @@ public class ModelTests {
 
     @Test
     public void sqConnectTest() {
-        Model model = new Model(tr(SOLN1));
+        Model model = new Model(tr(SOLN0)); //originally SOLN1; changed SOLN0 for testing
+        for (Model.Sq s : model) {
+            System.out.println(s);
+        }
         Sq s1 = model.new Sq(0, 0, 0, false, 1, -1);
         Sq s2 = model.new Sq(2, 0, 0, false, 8, -1);
         Sq s3 = model.new Sq(2, 2, 0, false, 5, -1);
@@ -194,16 +197,14 @@ public class ModelTests {
         checkSquare(s1, s1, null, null, 0, -1);
         checkSquare(s2, s2, null, null, 0, -1);
 
-        System.out.println("s1 loc," + s1.pl + ", group:" + s1.group());
-        System.out.println("s3 loc," + s3.pl + ", group:" + s3.group());
         assertTrue("These squares should be connectable.", s1.connect(s3));
         checkSquare(s1, s1, null, s3, 0, 1); //maybe I need to fix connectable first.
         checkSquare(s3, s1, s1, null, 0, 1);
-        System.out.println("s1 loc," + s1.pl + ", group:" + s1.group());
-        System.out.println("s3 loc," + s3.pl + ", group:" + s3.group());
-        System.out.println(s1.successor().pl);
-        System.out.println("s1._succ (s3) loc," + s1.successor().pl + ", group:" + s1.successor().group());
-        System.out.println();
+
+        System.out.println(model.size());
+        for (Model.Sq s : model) {
+            System.out.println(s);
+        }
 
         assertFalse("Unnumbered squares in same group are not connectable.",
                     s3.connect(s1));
@@ -344,5 +345,13 @@ public class ModelTests {
         { 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 20} };
+
+    //I added this.
+    private static final int[][] SOLN0 = {
+            { 1, 2, 3 },
+            { 4, 5, 6 },
+            { 7, 8, 9 }
+            //What happens if you pass in a bad solution?
+    };
 
 }

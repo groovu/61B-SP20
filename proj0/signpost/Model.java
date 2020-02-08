@@ -95,23 +95,24 @@ class Model implements Iterable<Model.Sq> {
         // puzzle-generation software is complete.
         // FIXME: Remove everything down to and including
         // "// END DUMMY SETUP".
-        _board = new Sq[][] {
-            { new Sq(0, 0, 0, false, 2, -1), new Sq(0, 1, 0, false, 2, -1),
-              new Sq(0, 2, 0, false, 4, -1), new Sq(0, 3, 1, true, 2, 0) },
-            { new Sq(1, 0, 0, false, 2, -1), new Sq(1, 1, 0, false, 2, -1),
-              new Sq(1, 2, 0, false, 6, -1), new Sq(1, 3, 0, false, 2, -1) },
-            { new Sq(2, 0, 0, false, 6, -1), new Sq(2, 1, 0, false, 2, -1),
-              new Sq(2, 2, 0, false, 6, -1), new Sq(2, 3, 0, false, 2, -1) },
-            { new Sq(3, 0, 16, true, 0, 0), new Sq(3, 1, 0, false, 5, -1),
-              new Sq(3, 2, 0, false, 6, -1), new Sq(3, 3, 0, false, 4, -1) }
-        };
-        for (Sq[] col: _board) {
-            for (Sq sq : col) {
-                _allSquares.add(sq);
-            }
-        }
+//        _board = new Sq[][] {
+//            { new Sq(0, 0, 0, false, 2, -1), new Sq(0, 1, 0, false, 2, -1),
+//              new Sq(0, 2, 0, false, 4, -1), new Sq(0, 3, 1, true, 2, 0) },
+//            { new Sq(1, 0, 0, false, 2, -1), new Sq(1, 1, 0, false, 2, -1),
+//              new Sq(1, 2, 0, false, 6, -1), new Sq(1, 3, 0, false, 2, -1) },
+//            { new Sq(2, 0, 0, false, 6, -1), new Sq(2, 1, 0, false, 2, -1),
+//              new Sq(2, 2, 0, false, 6, -1), new Sq(2, 3, 0, false, 2, -1) },
+//            { new Sq(3, 0, 16, true, 0, 0), new Sq(3, 1, 0, false, 5, -1),
+//              new Sq(3, 2, 0, false, 6, -1), new Sq(3, 3, 0, false, 4, -1) }
+//        };
+//        for (Sq[] col: _board) {
+//            for (Sq sq : col) {
+//                _allSquares.add(sq);
+//            }
+//        }
         // END DUMMY SETUP
 
+        _board = new Sq[_width][_height];
         // FIXME: Initialize _board so that _board[x][y] contains the Sq object
         //        representing the contents at cell (x, y), _allSquares
         //        contains the list of all Sq objects on the board, and
@@ -708,7 +709,8 @@ class Model implements Iterable<Model.Sq> {
 
         @Override
         public String toString() {
-            return String.format("<Sq@%s, dir: %d>", pl, direction());
+            return String.format("<Sq@%s, dir: %d, seqN: %d, fixed: %s, group: %s>",
+                    pl, direction(), sequenceNum(), hasFixedNum(), group());
         }
 
         /** The coordinates of this square in the board. */
