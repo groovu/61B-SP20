@@ -47,8 +47,27 @@ public class IntDList {
      * @return The number of elements in this list.
      */
     public int size() {
-        // FIXME: Implement this method and return correct value
-        return 0;
+        int value = 0;
+//        DNode ptr = this._front;
+//        if (ptr._val == 0){
+//            return value;
+//        }
+//        while (ptr._next != null){
+//            value += 1;
+//            ptr = ptr._next;
+//        }
+        IntDList ptr = this;
+        DNode counter = this._front;
+        if (ptr._front == null && ptr._back == null){
+            return value;
+        } else {
+            value += 1;
+            while (counter._next != null){
+                value += 1;
+                counter = counter._next;
+            }
+        }
+        return value;
     }
 
     /**
@@ -83,13 +102,56 @@ public class IntDList {
         if (i == 0) {
             return pointer._val;
         } else if (i > 0) {
-            pointer = pointer._next;
-            i -= 1;
+            while (i > 0) {
+                pointer = pointer._next;
+                i -= 1;
+            }
         } else {
-            pointer = pointer._prev;
+            pointer = _back;
             i += 1;
+            while (i < 0) {
+                pointer = pointer._prev;
+                i += 1;
+            }
         }
         return pointer._val;
+    }
+
+    public DNode getIndex(int i) {
+        // FIXME: Implement this method and return correct value
+//        if (i >= 0) {
+//            DNode pointer = _front;
+//            while (i > 0) {
+//                pointer = pointer._next;
+//                i -= 1;
+//            }
+//        return pointer._val;
+//        } else {
+//            DNode pointer = _back;
+//            while (i < 0) {
+//                pointer = pointer._prev;
+//                i += 1;
+//            }
+//            return pointer._val;
+//        }
+//    }
+        DNode pointer = _front;
+        if (i == 0) {
+            return pointer;
+        } else if (i > 0) {
+            while (i > 0) {
+                pointer = pointer._next;
+                i -= 1;
+            }
+        } else {
+            pointer = _back;
+            i += 1;
+            while (i < 0) {
+                pointer = pointer._prev;
+                i += 1;
+            }
+        }
+        return pointer;
     }
 
 
@@ -97,14 +159,24 @@ public class IntDList {
      * @param d value to be inserted in the front
      */
     public void insertFront(int d) {
-        // FIXME: Implement this method
+        if (_front != null) {
+            _front = new DNode(null, d, _front);
+            _front._next._prev = _front;
+        } else {
+            _front = _back = new DNode(null, d, null);
+        }
     }
 
     /**
      * @param d value to be inserted in the back
      */
     public void insertBack(int d) {
-        // FIXME: Implement this method
+        if (_back != null) {
+            _back = new DNode(_back, d, null);
+            _back._prev._next = _back;
+        } else {
+            _back = _front = new DNode(null, d, null);
+        }
     }
 
     /**
@@ -119,6 +191,25 @@ public class IntDList {
      *              and -(size+1) <= index <= -1 for negative indices (including insertions at front and back).
      */
     public void insertAtIndex(int d, int index) {
+        if (this._front == null && this._back == null) {
+            DNode a = new DNode(null, d, null);
+            this._front = this._back = a;
+        } else if (index >= size()-1){
+            DNode insertEnd = new DNode(_back, d, null);
+            _back._next = insertEnd;
+            this._back = insertEnd;
+        } else {
+            DNode ptr = getIndex(index);
+            DNode insert = new DNode(ptr._prev, d, ptr);
+            if (ptr._prev != null) {
+                ptr._prev._next = insert;
+                ptr._prev = insert;
+            }
+            ptr._prev = insert;
+            if (index == 0){
+                this._front = insert;
+            }
+        }
         // FIXME: Implement this method
     }
 
@@ -128,8 +219,15 @@ public class IntDList {
      * @return the item that was deleted
      */
     public int deleteFront() {
-        // FIXME: Implement this method and return correct value
-        return 0;
+        int value = _front._val;
+        if (_front == _back) {
+            _front = null;
+            _back = null;
+        } else {
+            _front = _front._next;
+            _front._prev = null;
+        }
+        return value;
     }
 
     /**
@@ -138,8 +236,15 @@ public class IntDList {
      * @return the item that was deleted
      */
     public int deleteBack() {
-        // FIXME: Implement this method and return correct value
-        return 0;
+        int value = _back._val;
+        if (_front == _back) {
+            _front = null;
+            _back = null;
+        } else {
+            _back = _back._prev;
+            _back._next = null;
+        }
+        return value;
     }
 
     /**
@@ -167,8 +272,17 @@ public class IntDList {
      * System.out.println(a); //prints ab
      */
     public String toString() {
-        // FIXME: Implement this method to return correct value
-        return null;
+        String intDString = "[";
+        int loop = size();
+        int counter = 0;
+        if (size() == 0){
+            return "[]";
+        }
+        for (counter = 0; counter < loop - 1; counter += 1) {
+            intDString += get(counter) +", ";
+        }
+        intDString += get(counter) + "]";
+        return intDString;
     }
 
     /**

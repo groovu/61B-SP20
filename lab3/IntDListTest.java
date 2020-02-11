@@ -19,6 +19,7 @@ public class IntDListTest {
         d = new IntDList();
         assertEquals("Size of empty", 0, d.size());
         d = new IntDList(5);
+        System.out.println(d._front._val);
         assertEquals("Size of singleton", 1, d.size());
         d = new IntDList(5, 10, 15);
         assertEquals("Size of 3-element list", 3, d.size());
@@ -180,8 +181,11 @@ public class IntDListTest {
         assertEquals("Fourth to last element after insert should be 5", 5, d.get(-4));
         assertEquals("Fifth to last element after insert should be 1", 1, d.get(-5));
 
+
         d = new IntDList(5, 10, 15, 20);
+        System.out.println(d);
         d.insertAtIndex(13, 2);
+        System.out.println(d);
         assertEquals("Size after insert should be 5", 5, d.size());
         assertEquals("First element after insert should be 5", 5, d.get(0));
         assertEquals("Second element after insert should be 10", 10, d.get(1));
@@ -195,6 +199,7 @@ public class IntDListTest {
         assertEquals("Fifth to last element after insert should be 5", 5, d.get(-5));
 
         d = new IntDList(5, 10, 15, 20);
+        System.out.println(d.size());
         d.insertAtIndex(25, 4);
         assertEquals("Size after insert should be 5", 5, d.size());
         assertEquals("Front element after insert should be 5", 5, d.getFront());
