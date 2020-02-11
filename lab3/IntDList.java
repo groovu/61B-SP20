@@ -190,7 +190,7 @@ public class IntDList {
      *              i.e 0 <= index <= size for positive indices (including insertions at front and back)
      *              and -(size+1) <= index <= -1 for negative indices (including insertions at front and back).
      */
-    public void insertAtIndex(int d, int index) {
+    public void insertAtIndex2(int d, int index) {
         if (this._front == null && this._back == null) {
             DNode a = new DNode(null, d, null);
             this._front = this._back = a;
@@ -211,6 +211,49 @@ public class IntDList {
             }
         }
         // FIXME: Implement this method
+    }
+
+    public void insertAtIndex(int d, int index) {
+        if (this._front == null && this._back == null) {
+            this._front = this._back = new DNode(null, d, null);
+        }
+        DNode ptr = getIndex(index);
+        if (ptr == null) {
+            if (index >= size()){
+                DNode ptrr = this._back;
+                DNode insertEnd = new DNode(ptrr, d, null);
+                ptrr._next = insertEnd;
+                this._back = insertEnd;
+            } else {
+                DNode ptrr = this._front;
+                DNode insertEnd = new DNode(null, d, ptrr);
+                ptrr._prev = insertEnd;
+                this._front = insertEnd;
+            }
+        } else if (ptr._prev == null & ptr._next == null){ //x_x
+            DNode insertEnd = new DNode(null, d, ptr);
+            ptr._prev = insertEnd;
+        } else if ((ptr._prev != null && ptr._next == null) || index >= size()) { // o_x
+            DNode insertEnd = new DNode(ptr, d, null);
+            ptr._next = insertEnd;
+            //ptr._prev._next = insertEnd;
+            //ptr._prev = insertEnd;
+            this._back = insertEnd;
+        } else if (ptr._prev == null && ptr._next != null) { // x_o
+            DNode insertEnd = new DNode(null, d, ptr);
+            ptr._prev = insertEnd;
+            this._front = insertEnd;
+        } else {
+            if (index >= 0) {
+                DNode insertEnd = new DNode(ptr._prev, d, ptr);
+                ptr._prev._next = insertEnd;
+                ptr._prev = insertEnd;
+            } else {
+                DNode insertEnd = new DNode(ptr, d, ptr._next);
+                ptr._next._prev = insertEnd;
+                ptr._next = insertEnd;
+            }
+        }
     }
 
     /**
