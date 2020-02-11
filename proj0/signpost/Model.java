@@ -64,7 +64,7 @@ import static signpost.Utils.*;
  *  0) and all cells with fixed sequence numbers appear at the
  *  corresponding position in that sequence.
  *
- *  @author
+ *  @ Cherish Truong
  */
 class Model implements Iterable<Model.Sq> {
 
@@ -111,7 +111,7 @@ class Model implements Iterable<Model.Sq> {
 //            }
 //        }
         // END DUMMY SETUP
-
+        // START PROPER SETUP
         _board = new Sq[_width][_height];
         for (int y = 0; y < _height; y += 1) { //@334_f102, worry about other fixed cells later
             for (int x = 0; x < _width; x += 1) {
@@ -134,6 +134,7 @@ class Model implements Iterable<Model.Sq> {
                 _allSquares.add(sq);
             }
         }
+        // END PROPER SETUP
         // FIXME: Initialize _board so that _board[x][y] contains the Sq object
         //        representing the contents at cell (x, y), _allSquares
         //        contains the list of all Sq objects on the board, and
@@ -671,9 +672,9 @@ class Model implements Iterable<Model.Sq> {
                 if (this._predecessor == null && next._successor == null) { //both one element; release all groups.
                     releaseGroup(this._group);
                     this._group = -1;
-                    releaseGroup(next._group); // is releasing both groups redundant?
-                    next._group = -1;
-                } else if (this._predecessor != null && next._successor == null){ //1 one element; release one ele group.
+                    //releaseGroup(next._group); // is releasing both groups redundant?
+                    //next._group = -1;
+                } else if (this._predecessor != null && next._successor == null) { //1 one element; release one ele group.
                     next._group = -1;
                 } else if (this._predecessor == null && next._successor != null) { //1 one element; release one ele group.
                     this._group = -1;
@@ -692,20 +693,69 @@ class Model implements Iterable<Model.Sq> {
                 //        their sequence numbers to 0 and create a new
                 //        group for them if next has a current successor
                 //        (otherwise set next's group to -1.)
-
-                //How do I check if a sequence has a fixed number?
-                Sq checkFixedNext = next;
-                Sq checkFixedThis = this; // is this pointer redundant?
-                while (checkFixedThis != null) {
-                    if (checkFixedThis._hasFixedNum == false) {
-                        checkFixedThis._sequenceNum = 0;
-                        checkFixedThis = checkFixedThis._predecessor;
+                if (hasFixed(this) != true) { //this does not have fixed seqnum, update this and its group to seqnum 0 and put into new group
+                    Sq  ptr = this;
+                    while (ptr != null) {
+                        ptr._sequenceNum = 0;
+                        ptr = ptr._predecessor;
                     }
+                    this._group = 0;
+                } else {
+                    this._group = -1;
                 }
+                if (hasFixed(next) == false) { //next "" update next to seqnum 0 and create new group.
+                    Sq ptr = next;
+                    if (ptr._successor == null) {
+                        ptr._sequenceNum = 0;
+                        ptr._group = -1;
+                    } else if (ptr != null) {
+                        while (ptr != null) {
+                            ptr._sequenceNum = 0;
+                            ptr = ptr._successor;
+                        }
+                        next._group = newGroup();
+                    }
+                } else {
+                    next._group = -1; //redundant?
+                }}
+                // FIXME: Set the _head of next and all squares in its group to
+                //        next.
+                Sq nextHeadPtr = next;
+                if (nextHeadPtr._successor == null) {
+                    nextHeadPtr._head = nextHeadPtr;
+                }
+                while (nextHeadPtr != null) {
+                    nextHeadPtr._head = next;
+                    nextHeadPtr = nextHeadPtr._successor;
 
             }
-            // FIXME: Set the _head of next and all squares in its group to
-            //        next.
+        }
+
+        /** Given a square s1, check to see if any square in s1's group has a fixed num.
+         * It checks by traversing backwards to null and fowards to null.
+         *
+         * @param s1 Sq type.
+         * @return if there exists a fixedNum in the grouping.
+         */
+        public boolean hasFixed(Sq s1) {
+            Sq forward = s1.successor();
+            Sq backward = s1.predecessor();
+            if (s1.hasFixedNum()) {
+                return true;
+            }
+            while (forward != null) {
+                if (forward.hasFixedNum()) {
+                    return true;
+                }
+                forward = forward.successor();
+            }
+            while (backward != null) {
+                if (backward.hasFixedNum()) {
+                    return true;
+                }
+                backward = backward.predecessor();
+                }
+            return false;
         }
 
         @Override

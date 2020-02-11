@@ -296,8 +296,14 @@ public class ModelTests {
         checkSquare(s3, s3, null, null, 0, -1);
         checkSquare(s4, s4, null, null, 0, -1);
 
+        System.out.println(s6);
+        System.out.println(s7);
+        System.out.println(s8);
         s7.disconnect();
-        checkSquare(s6, s6, null, s7, 0, 1);
+        System.out.println(s6);
+        System.out.println(s7);
+        System.out.println(s8);
+        checkSquare(s6, s6, null, s7, 0, 1);  //!!! Disconnect only d/c's this and successor.  Leave predecessors alone!
         checkSquare(s7, s6, s6, null, 0, 1);
         checkSquare(s8, s8, null, s9, 8, 0);
         checkSquare(s9, s8, s8, null, 9, 0);
