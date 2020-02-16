@@ -15,7 +15,17 @@ class Arrays {
      *  the elements of B. */
     static int[] catenate(int[] A, int[] B) {
         /* *Replace this body with the solution. */
-        return null;
+        int lengthA = A.length;
+        int lengthB = B.length;
+        int[] combined = new int[lengthA+lengthB];
+
+        for (int i = 0; i < lengthA; i += 1) {
+            combined[i] = A[i];
+        }
+        for (int i = 0; i < lengthB; i += 1) {
+            combined[i + lengthA] = B[i];
+        }
+        return combined;
     }
 
     /* C2. */
@@ -23,7 +33,14 @@ class Arrays {
      *  beginning with item #START. */
     static int[] remove(int[] A, int start, int len) {
         /* *Replace this body with the solution. */
-        return null;
+        if (A.length == 0){
+            return A;
+        } else {
+            int[] removed = new int[A.length - len];
+            System.arraycopy(A, 0, removed, 0, start);
+            System.arraycopy(A, start + len, removed, start, A.length - (len + start));
+            return removed;
+        }
     }
 
     /* C3. */

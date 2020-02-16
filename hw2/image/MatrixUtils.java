@@ -55,7 +55,34 @@ public class MatrixUtils {
      */
 
     public static double[][] accumulateVertical(double[][] m) {
-        return null; //your code here
+        double[][] copy = copy(m);
+        for (int r = m.length-1; r > 0; r -= 1) {
+            for (int c = m[0].length-1; c > 0; c -= 1) {
+                // if first row, stop.
+                if (r == 0) {
+                    //do something
+                } else {
+                    double center = m[r-1][c];
+                    if (c-1 < 0) {
+                        double right = m[r-1][c+1];
+                        double smallest = Math.min(center, right);
+                        copy[r][c] = copy[r][c]+smallest;
+
+                    } else if (c+1 > m[0].length-1){
+                        double left = m[r-1][c+1];
+                        double smallest = Math.min(center, left);
+                        copy[r][c] = copy[r][c]+smallest;
+                    }else {
+                        double right = m[r-1][c+1];
+                        double left = m[r-1][c+1];
+                        double smallest = Math.min(center, Math.min(left, right));
+                        copy[r][c] = copy[r][c]+smallest;
+                    }
+                }
+            }
+
+        }
+        return copy;
     }
 
     /** Non-destructively accumulates a matrix M along the specified
