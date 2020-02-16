@@ -1,5 +1,6 @@
 package signpost;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
@@ -60,8 +61,8 @@ class PuzzleGenerator implements PuzzleSource {
 //            { 13, 11, 6, 3 },
 //            { 16, 12, 5, 4 }
 //        };
-//        boolean ok = findSolutionPathFrom(x0, y0);
-//        assert ok;
+        boolean ok = findSolutionPathFrom(x0, y0);
+        assert ok;
         return _vals;
     }
 
@@ -135,6 +136,29 @@ class PuzzleGenerator implements PuzzleSource {
      *  number in sequence). */
     static Sq findUniqueSuccessor(Model model, Sq start) {
         // FIXME: Fill in to satisfy the comment.
+        int numberOfSuccessors = 0;
+        ArrayList<Sq> possibleSuccessors = new ArrayList<>();
+        for (Sq sq : model) {
+            System.out.println(sq);
+            if (start.connectable(sq)) {
+                numberOfSuccessors += 1;
+                possibleSuccessors.add(sq);
+            }
+        }
+        if (numberOfSuccessors == 1) {
+            if (start.connectable(possibleSuccessors.get(0))) {
+                return possibleSuccessors.get(0);
+            }
+        }
+        if (start.sequenceNum() != 0) {
+            for (Sq sq : possibleSuccessors){
+                if (sq.sequenceNum() - start.sequenceNum() == 1) {
+                    if (start.connectable(sq)) {
+                        return sq;
+                    }
+                }
+            }
+        }
         return null;
     }
 
@@ -164,6 +188,28 @@ class PuzzleGenerator implements PuzzleSource {
      *  already finds the other cases of numbered, unconnected cells. */
     static Sq findUniquePredecessor(Model model, Sq end) {
         // FIXME: Replace the following to satisfy the comment.
+        int numberOfPredecessors = 0;
+        ArrayList<Sq> possiblePredecessor = new ArrayList<>();
+        for (Sq sq : model) {
+            if (sq.connectable(end)) {
+                numberOfPredecessors += 1;
+                possiblePredecessor.add(sq);
+            }
+        }
+        if (numberOfPredecessors == 1) {
+            if (possiblePredecessor.get(0).connectable(end)) {
+                return possiblePredecessor.get(0);
+            }
+        }
+        if (end.sequenceNum() != 0) {
+            for (Sq sq : possiblePredecessor){
+                if (end.sequenceNum() - sq.sequenceNum() == 1) {
+                    if (sq.connectable(end)) {
+                        return sq;
+                    }
+                }
+            }
+        }
         return null;
     }
 

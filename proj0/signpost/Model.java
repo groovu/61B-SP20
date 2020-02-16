@@ -323,6 +323,11 @@ class Model implements Iterable<Model.Sq> {
      *  this board was last initialized by the constructor. */
     void solve() {
         // FIXME
+        for (int i = 1; i < size(); i += 1){
+            Sq first = get(solnNumToPlace(i));
+            Sq next = get(solnNumToPlace(i+1));
+            first.connect(next);
+        }
         _unconnected = 0;
     }
 
