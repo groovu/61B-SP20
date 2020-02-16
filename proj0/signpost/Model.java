@@ -1,14 +1,8 @@
 package signpost;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Formatter;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Arrays;
+import java.util.*;
 
-import static signpost.Place.pl;
-import static signpost.Place.PlaceList;
+import static signpost.Place.*;
 import static signpost.Utils.*;
 
 /** The state of a Signpost puzzle.  Each cell has coordinates (x, y),
@@ -94,7 +88,7 @@ class Model implements Iterable<Model.Sq> {
         // This is a particular puzzle provided as a filler until the
         // puzzle-generation software is complete.
         // FIXME: Remove everything down to and including
-        // "// END DUMMY SETUP".
+//        // "// END DUMMY SETUP".
 //        _board = new Sq[][] {
 //            { new Sq(0, 0, 0, false, 2, -1), new Sq(0, 1, 0, false, 2, -1),
 //              new Sq(0, 2, 0, false, 4, -1), new Sq(0, 3, 1, true, 2, 0) },
@@ -110,36 +104,60 @@ class Model implements Iterable<Model.Sq> {
 //                _allSquares.add(sq);
 //            }
 //        }
-        // END DUMMY SETUP
+//        // END DUMMY SETUP
         // START PROPER SETUP
+        ArrayList<Integer> flatten = new ArrayList<Integer>();
         _board = new Sq[_width][_height];
         for (int y = 0; y < _height; y += 1) { //@334_f102, worry about other fixed cells later
             for (int x = 0; x < _width; x += 1) {
                 // default Sq values
                 boolean fixed = false;
-                int direction = 0; // still gotta figure this out
+                int direction = arrowDirection(x,y); // still gotta figure this out
                 int sequenceNum = 0;
                 int group = -1;
                 if (solution[x][y] == 1 || solution[x][y] == size()) {
                      fixed = true; direction = 0; sequenceNum = solution[x][y]; group = 0;
                 }
-                if (solution[x][y] == 1) { direction = 0; //FIXME 1st square has direction.
+                if (solution[x][y] == 1) { direction = arrowDirection(x,y);
                 }
                 _board[x][y] = new Sq(x, y, sequenceNum, fixed, direction, group);
+                flatten.add(solution[x][y]);
                 //_allSquares.add(_board[x][y]);
+            }
+        }
+        for (int i = 1; i < size(); i += 1) {
+            if (flatten.contains(i) == false) {
+                throw badArgs("Input solution doesn't not contain all numbers from 1 to size().  Check your solution input.");
             }
         }
         for (Sq[] col: _board) {
             for (Sq sq : col) {
                 _allSquares.add(sq);
+                //FIXME update successor and predecessor for each sq.  direction?
+                sq._successors = Place.successorCells(width(), height())[sq.x][sq.y][sq._dir];
+                sq._predecessors = Place.successorCells(width(), height())[sq.x][sq.y][0];
+                //_pred = Place list. look at successorCells in Place.java
             }
         }
+//        for (Sq sq : _allSquares) {
+////            sq._successors = Place.successorCells(width(), height())[sq.x][sq.y][sq._dir];
+////            sq._predecessors = Place.successorCells(width(), height())[sq.x][sq.y][0];
+//        }
+        _solnNumToPlace = new Place[size() + 1];
+        for (int x = 0; x < width(); x += 1){
+            for (int y = 0; y < height(); y += 1){
+                _solnNumToPlace[solution[x][y]] = Place.pl(x,y);
+            }
+        }
+        //System.out.println(flatten);
         // END PROPER SETUP
         // FIXME: Initialize _board so that _board[x][y] contains the Sq object
-        //        representing the contents at cell (x, y), _allSquares
+        //        representing the contents at cell (x, y),
+        //        _allSquares
         //        contains the list of all Sq objects on the board, and
         //        _solnNumToPlace[k] contains the Place in _solution that
-        //        contains sequence number k.  Check that all numbers from
+        //        contains sequence number k.
+        //        Check that all numbers from
         //        1 - last appear; else throw IllegalArgumentException (see
         //        badArgs utility).
 
@@ -176,7 +194,21 @@ class Model implements Iterable<Model.Sq> {
         //        position (4, 1) in this copy.  Be careful NOT to have
         //        any of these fields in the copy pointing at the old Sqs in
         //        MODEL.
+        _board = new Sq[_width][_height];
+        for (int y = 0; y < height(); y += 1){
+            for (int x = 0; x < width(); x += 1) {
+                _board[x][y] = new Sq(model._board[x][y]);
+                _board[x][y]._successor = get(model._board[x][y]._successor);
+                _board[x][y]._predecessor = get(model._board[x][y]._predecessor);
+                _board[x][y]._head = get(model._board[x][y]._head);  //Am I using get properly?
+                _allSquares.add(_board[x][y]);
+            }
+        }
+
+
     }
+    /** Returns list of all numbers on board.  */
+    final List<Integer> seqNumList() { return seqNumList; }
 
     /** Returns the width (number of columns of cells) of the board. */
     final int width() {
@@ -271,7 +303,20 @@ class Model implements Iterable<Model.Sq> {
      *  unconnected and are separated by a queen move.  Returns true iff
      *  any changes were made. */
     boolean autoconnect() {
-        return false; // FIXME
+        boolean change = false;
+
+        for (Sq sq : _allSquares) {
+            if (sq._sequenceNum != 0 && sq._successor == null) {
+                for (Place possibles : sq.successors()) {
+                    Sq possible = get(possibles);
+                    if (sq.connect(possible) && (possible._sequenceNum - sq._sequenceNum == 1)){
+                        sq.connect(possible);
+                        change = true;
+                    }
+                }
+            }
+        }
+        return change; // FIXME
     }
 
     /** Sets the numbers in this board's squares to the solution from which
@@ -286,6 +331,17 @@ class Model implements Iterable<Model.Sq> {
     private int arrowDirection(int x, int y) {
         int seq0 = _solution[x][y];
         // FIXME
+        if (seq0 == height() * width()) {
+            return 0;
+        } else {
+            for (int i = 0; i < width(); i += 1) {
+                for (int j = 0; j < height(); j += 1) {
+                    if (seq0 + 1 == _solution[i][j]) {
+                        return dirOf(x,y,i,j);
+                    }
+                }
+            }
+        }
         return 0;
     }
 
@@ -669,6 +725,10 @@ class Model implements Iterable<Model.Sq> {
                 //        number.
                 //        Otherwise, the group has been split into two multi-
                 //        element groups.  Create a new group for next.
+//                if (_predecessor == null && _successor == null && this._hasFixedNum == false){
+//                    releaseGroup(this._group);
+//                    this._group = -1;
+//                }
                 if (this._predecessor == null && next._successor == null) { //both one element; release all groups.
                     releaseGroup(this._group);
                     this._group = -1;
@@ -699,7 +759,7 @@ class Model implements Iterable<Model.Sq> {
                         ptr._sequenceNum = 0;
                         ptr = ptr._predecessor;
                     }
-                    this._group = 0;
+                    //this._group = 0; //Not needed?  Removing this helps me pass disconnect.
                 } else {
                     this._group = -1;
                 }
@@ -830,6 +890,8 @@ class Model implements Iterable<Model.Sq> {
     private int _width, _height;
     /** Contents of board, indexed by position. */
     private Sq[][] _board;
+    /** Contents list of all numbers on board. I added this. */
+    private List<Integer> seqNumList;
     /** Contents of board as a sequence of squares for convenient iteration. */
     private ArrayList<Sq> _allSquares = new ArrayList<>();
     /** _allSuccessors[x][y][dir] is a sequence of all queen moves possible
