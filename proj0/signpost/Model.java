@@ -138,6 +138,10 @@ class Model implements Iterable<Model.Sq> {
             }
         }
         _unconnected = last - 1;
+//        System.out.println(_board[0][0]._successors);
+//        for (Sq sq : _allSquares) {
+//            System.out.println(sq._head);
+//        }
     }
 
     /** Initializes a copy of MODEL. */
@@ -152,15 +156,35 @@ class Model implements Iterable<Model.Sq> {
         _board = new Sq[_width][_height];
         for (int y = 0; y < height(); y += 1) {
             for (int x = 0; x < width(); x += 1) {
-                Sq sq = _board[x][y] = new Sq(model._board[x][y]);
-                sq._successor = get(model._board[x][y]._successor);
-                sq._predecessor = get(model._board[x][y]._predecessor);
-                sq._group = model._board[x][y].group();
-                sq._head = get(model._board[x][y]._head);
-                _allSquares.add(sq);
+//                Sq sq = _board[x][y] = new Sq(model._board[x][y]);
+//                sq._successor = get(model._board[x][y]._successor);
+//                sq._predecessor = get(model._board[x][y]._predecessor);
+//                sq._group = model._board[x][y].group();
+//                if (model._board[x][y]._head == null) {
+//                    sq._head = sq;
+//                } else {
+//                    sq._head = get(model._board[x][y]._head);
+//                }
+//                _allSquares.add(sq);
+                Sq copy = model._board[x][y];
+                _board[x][y] = new Sq(copy);
+                _allSquares.add(_board[x][y]);
             }
         }
+        for (int y = 0; y < height(); y += 1) {
+            for (int x = 0; x < width(); x += 1) {
+                _board[x][y]._head = get(model._board[x][y]._head);
+                _board[x][y]._predecessor = get(model._board[x][y]._predecessor);
+                _board[x][y]._successor = get(model._board[x][y]._successor);
+            }
+        }
+//
+//        System.out.println("copy head print");
+        //System.out.println(_board[0][0]._successors);
 
+//        for (Sq sq : _allSquares) {
+//            System.out.println(sq._head);
+//        }
 
     }
     /** Returns list of all numbers on board.  */
@@ -444,6 +468,9 @@ class Model implements Iterable<Model.Sq> {
          *  an error if this square's number is not initially 0 or N. */
         void setFixedNum(int n) {
             if (n == 0 || (_sequenceNum != 0 && _sequenceNum != n)) {
+                System.out.println(this);
+                System.out.println(n);
+                System.out.println(_sequenceNum);
                 throw badArgs("sequence number may not be fixed");
             }
             _hasFixedNum = true;
@@ -591,7 +618,6 @@ class Model implements Iterable<Model.Sq> {
                 if (s1._head == null) {
                     System.out.println("s1 head is null");
                 }
-                System.out.println(s1);
                 if ((s1._head._group == this._head._group && s1._group != -1)) {
                         return false;
                 }
@@ -690,10 +716,14 @@ class Model implements Iterable<Model.Sq> {
                         }
                     }
                 } else {
-                    if (next._successor == null) {
+                    if (next._successor == null && hasFixed(next)) {
+                        next._group = 0;
+                    } else if (next._successor == null) {
                         next._sequenceNum = 0; next._group = -1;
                     }
-                    if (next._successor != null) {
+                    if (next._successor != null && hasFixed(next)) {
+                        // do nothing
+                    } else if (next._successor != null) {
                         Sq ptr = next;
                         int updateGroup = newGroup();
                         while (ptr != null) {
