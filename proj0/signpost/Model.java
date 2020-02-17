@@ -97,6 +97,7 @@ class Model implements Iterable<Model.Sq> {
                 int direction = arrowDirection(x, y);
                 int sequenceNum = 0;
                 int group = -1;
+
                 if (solution[x][y] == 1 || solution[x][y] == size()) {
                     fixed = true;
                     direction = 0;
@@ -154,6 +155,7 @@ class Model implements Iterable<Model.Sq> {
                 Sq sq = _board[x][y] = new Sq(model._board[x][y]);
                 sq._successor = get(model._board[x][y]._successor);
                 sq._predecessor = get(model._board[x][y]._predecessor);
+                sq._group = model._board[x][y].group();
                 sq._head = get(model._board[x][y]._head);
                 _allSquares.add(sq);
             }
@@ -264,7 +266,7 @@ class Model implements Iterable<Model.Sq> {
             if (sq._sequenceNum != 0 && sq._successor == null) {
                 for (Place possibles : sq.successors()) {
                     Sq pSq = get(possibles);
-                    if (sq.connect(pSq)
+                    if (sq.connectable(pSq)
                             && (pSq._sequenceNum - sq._sequenceNum == 1)) {
                         sq.connect(pSq);
                         change = true;
@@ -570,7 +572,9 @@ class Model implements Iterable<Model.Sq> {
             if (_dir != dir) {
                 return false;
             }
-
+            if (s1._sequenceNum == 1 && this._sequenceNum == size()) {
+                return false;
+            }
             if (s1._predecessor != null || this._successor != null) {
                 return false;
             }
@@ -583,8 +587,13 @@ class Model implements Iterable<Model.Sq> {
                 }
             }
             if (s1._sequenceNum == 0 && this._sequenceNum == 0) {
-                if ((s1._head._group == this._head._group) && s1._group != -1) {
-                    return false;
+                //System.out.println(s1._head._group);
+                if (s1._head == null) {
+                    System.out.println("s1 head is null");
+                }
+                System.out.println(s1);
+                if ((s1._head._group == this._head._group && s1._group != -1)) {
+                        return false;
                 }
             }
             return true;
@@ -604,8 +613,6 @@ class Model implements Iterable<Model.Sq> {
 
             this._successor = s1;
             s1._predecessor = this;
-            int thisSeqNumStart = this._sequenceNum;
-            int s1SeqNumStart = s1._sequenceNum;
             Sq headUpdatePtr = s1;
 
             if (this._sequenceNum != 0 && s1._sequenceNum == 0) {
