@@ -97,7 +97,6 @@ class Model implements Iterable<Model.Sq> {
                 int direction = arrowDirection(x, y);
                 int sequenceNum = 0;
                 int group = -1;
-
                 if (solution[x][y] == 1 || solution[x][y] == size()) {
                     fixed = true;
                     direction = 0;
@@ -138,10 +137,6 @@ class Model implements Iterable<Model.Sq> {
             }
         }
         _unconnected = last - 1;
-//        System.out.println(_board[0][0]._successors);
-//        for (Sq sq : _allSquares) {
-//            System.out.println(sq._head);
-//        }
     }
 
     /** Initializes a copy of MODEL. */
@@ -156,16 +151,6 @@ class Model implements Iterable<Model.Sq> {
         _board = new Sq[_width][_height];
         for (int y = 0; y < height(); y += 1) {
             for (int x = 0; x < width(); x += 1) {
-//                Sq sq = _board[x][y] = new Sq(model._board[x][y]);
-//                sq._successor = get(model._board[x][y]._successor);
-//                sq._predecessor = get(model._board[x][y]._predecessor);
-//                sq._group = model._board[x][y].group();
-//                if (model._board[x][y]._head == null) {
-//                    sq._head = sq;
-//                } else {
-//                    sq._head = get(model._board[x][y]._head);
-//                }
-//                _allSquares.add(sq);
                 Sq copy = model._board[x][y];
                 _board[x][y] = new Sq(copy);
                 _allSquares.add(_board[x][y]);
@@ -174,18 +159,11 @@ class Model implements Iterable<Model.Sq> {
         for (int y = 0; y < height(); y += 1) {
             for (int x = 0; x < width(); x += 1) {
                 _board[x][y]._head = get(model._board[x][y]._head);
-                _board[x][y]._predecessor = get(model._board[x][y]._predecessor);
+                _board[x][y]._predecessor = get(
+                        model._board[x][y]._predecessor);
                 _board[x][y]._successor = get(model._board[x][y]._successor);
             }
         }
-//
-//        System.out.println("copy head print");
-        //System.out.println(_board[0][0]._successors);
-
-//        for (Sq sq : _allSquares) {
-//            System.out.println(sq._head);
-//        }
-
     }
     /** Returns list of all numbers on board.  */
     final List<Integer> seqNumList() {
@@ -614,12 +592,11 @@ class Model implements Iterable<Model.Sq> {
                 }
             }
             if (s1._sequenceNum == 0 && this._sequenceNum == 0) {
-                //System.out.println(s1._head._group);
                 if (s1._head == null) {
                     System.out.println("s1 head is null");
                 }
                 if ((s1._head._group == this._head._group && s1._group != -1)) {
-                        return false;
+                    return false;
                 }
             }
             return true;
@@ -633,14 +610,8 @@ class Model implements Iterable<Model.Sq> {
                 return false;
             }
             int sgroup = s1.group();
-
             _unconnected -= 1;
-
-
-            this._successor = s1;
-            s1._predecessor = this;
-            Sq headUpdatePtr = s1;
-
+            this._successor = s1; s1._predecessor = this; Sq headUpdatePtr = s1;
             if (this._sequenceNum != 0 && s1._sequenceNum == 0) {
                 int thisSeqNum = this._sequenceNum;
                 Sq updaterPtr = s1;
@@ -650,7 +621,6 @@ class Model implements Iterable<Model.Sq> {
                     updaterPtr = updaterPtr._successor;
                 }
             }
-
             if (this._sequenceNum == 0 && s1._sequenceNum != 0) {
                 int s1SeqNum = s1._sequenceNum;
                 Sq updatePtr = this;
@@ -660,7 +630,6 @@ class Model implements Iterable<Model.Sq> {
                     updatePtr = updatePtr._predecessor;
                 }
             }
-
             while (headUpdatePtr != null) {
                 headUpdatePtr._head = this._head;
                 headUpdatePtr = headUpdatePtr._successor;
@@ -683,13 +652,11 @@ class Model implements Iterable<Model.Sq> {
             if (next == null) {
                 return;
             }
-            _unconnected += 1;
-            next._predecessor = _successor = null;
+            _unconnected += 1; next._predecessor = _successor = null;
             Sq thisPred = this._predecessor;
             if (_sequenceNum == 0) {
                 if (thisPred == null && next._successor == null) {
-                    releaseGroup(this._group);
-                    this._group = next._group = -1;
+                    releaseGroup(this._group); this._group = next._group = -1;
                 } else if (thisPred != null && next._successor == null) {
                     next._group = -1;
                 } else if (thisPred == null && next._successor != null) {
@@ -708,8 +675,7 @@ class Model implements Iterable<Model.Sq> {
                         this._sequenceNum = 0; this._group = -1;
                     }
                     if (this._predecessor != null) {
-                        Sq ptr = this;
-                        int updateGroup = newGroup();
+                        Sq ptr = this; int updateGroup = newGroup();
                         while (ptr != null) {
                             ptr._sequenceNum = 0;
                             ptr._group = updateGroup; ptr = ptr._predecessor;
@@ -722,7 +688,7 @@ class Model implements Iterable<Model.Sq> {
                         next._sequenceNum = 0; next._group = -1;
                     }
                     if (next._successor != null && hasFixed(next)) {
-                        // do nothing
+                        System.out.println();
                     } else if (next._successor != null) {
                         Sq ptr = next;
                         int updateGroup = newGroup();
@@ -738,8 +704,7 @@ class Model implements Iterable<Model.Sq> {
                 nextHeadPtr._head = nextHeadPtr;
             }
             while (nextHeadPtr != null) {
-                nextHeadPtr._head = next;
-                nextHeadPtr = nextHeadPtr._successor;
+                nextHeadPtr._head = next; nextHeadPtr = nextHeadPtr._successor;
             }
         }
         /** Given a square s1,
