@@ -446,9 +446,6 @@ class Model implements Iterable<Model.Sq> {
          *  an error if this square's number is not initially 0 or N. */
         void setFixedNum(int n) {
             if (n == 0 || (_sequenceNum != 0 && _sequenceNum != n)) {
-                System.out.println(this);
-                System.out.println(n);
-                System.out.println(_sequenceNum);
                 throw badArgs("sequence number may not be fixed");
             }
             _hasFixedNum = true;
@@ -592,9 +589,6 @@ class Model implements Iterable<Model.Sq> {
                 }
             }
             if (s1._sequenceNum == 0 && this._sequenceNum == 0) {
-                if (s1._head == null) {
-                    System.out.println("s1 head is null");
-                }
                 if ((s1._head._group == this._head._group && s1._group != -1)) {
                     return false;
                 }
@@ -630,18 +624,15 @@ class Model implements Iterable<Model.Sq> {
                     updatePtr = updatePtr._predecessor;
                 }
             }
-            while (headUpdatePtr != null) {
-                headUpdatePtr._head = this._head;
-                headUpdatePtr = headUpdatePtr._successor;
-            }
-            if (this._sequenceNum != 0) {
-                releaseGroup(this._group);
-            }
             if (s1._sequenceNum != 0) {
                 releaseGroup(s1._group);
             }
             if (this._sequenceNum == 0 && s1._sequenceNum == 0) {
-                this._head._group = joinGroups(this._group, s1._group);
+                this._head._group = joinGroups(this._head._group, s1._group);
+            }
+            while (headUpdatePtr != null) {
+                headUpdatePtr._head = this._head;
+                headUpdatePtr = headUpdatePtr._successor;
             }
             return true;
         }
