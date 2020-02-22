@@ -217,6 +217,14 @@ public class Table implements Iterable<Table.TableRow> {
         @Override
         public boolean hasNext() {
             if (_nextRow == null) {
+                if (_tableIter1.hasNext() == true) {
+                    if (_tableIter2.hasNext() == true) {
+                        _nextRow = TableRow.joinRows(_currRow1, _tableIter2.next());
+                        return true;
+                    }
+                    this._currRow1 = _tableIter1.next();
+                    this._tableIter2 = this._table2.iterator();
+                }
                 // FIXME: Fill in the hasNext method to update the _nextRow
                 //        variable to be the next joined row to be returned
                 //        by the iterator. The rows should be returned in the
