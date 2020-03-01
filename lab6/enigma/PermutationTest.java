@@ -100,6 +100,25 @@ public abstract class PermutationTest {
         Permutation p = getNewPermutation("(BACD)", getNewAlphabet("ABCD"));
         p.invert('F');
     }
-
+    @Test(expected = EnigmaException.class)
+    public void badCycle(){
+        Permutation p = getNewPermutation("(AB)(AC)", getNewAlphabet());
+        p.permute('A');
+    }
+    @Test
+    public void testPermuteInt() {
+        Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
+        assertEquals(0, p.permute(20));
+    }
+    @Test
+    public void testInvertInt() {
+        Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
+        assertEquals(0, p.invert(4));
+    }
+    @Test
+    public void testUndoInt() {
+        Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
+        assertEquals(0, p.invert(p.permute(0)));
+    }
     // FIXME: Add tests here that pass on a correct Permutation and fail on buggy Permutations.
 }
