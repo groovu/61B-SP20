@@ -90,7 +90,7 @@ public abstract class PermutationTest {
     }
     // from lab page
     @Test
-    public void testInvertChar() {
+    public void testInvertChar2() {
         Permutation p = getNewPermutation("(BACD)", getNewAlphabet("ABCD"));
         assertEquals('B', p.invert('A'));
     }
@@ -119,6 +119,21 @@ public abstract class PermutationTest {
     public void testUndoInt() {
         Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
         assertEquals(0, p.invert(p.permute(0)));
+    }
+    @Test
+    public void testPermuteChar() {
+        Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
+        assertEquals('B', p.permute('G'));
+    }
+    @Test
+    public void testInvertChar() {
+        Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
+        assertEquals('N', p.invert('P'));
+    }
+    @Test
+    public void testUndoChar() {
+        Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
+        assertEquals('T', p.invert(p.permute('T')));
     }
     // FIXME: Add tests here that pass on a correct Permutation and fail on buggy Permutations.
 }
