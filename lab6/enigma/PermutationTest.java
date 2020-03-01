@@ -85,12 +85,20 @@ public abstract class PermutationTest {
     @Test
     public void test1() {
         Permutation p = getNewPermutation("(HIG)(NF)(L)", getNewAlphabet("HILFNGR"));
+        assertEquals(p.permute('H'),'I');
         //wait
     }
+    // from lab page
     @Test
     public void testInvertChar() {
         Permutation p = getNewPermutation("(BACD)", getNewAlphabet("ABCD"));
         assertEquals('B', p.invert('A'));
+    }
+    // from lab page
+    @Test(expected = EnigmaException.class)
+    public void testNotInAlphabet() {
+        Permutation p = getNewPermutation("(BACD)", getNewAlphabet("ABCD"));
+        p.invert('F');
     }
 
     // FIXME: Add tests here that pass on a correct Permutation and fail on buggy Permutations.
