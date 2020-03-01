@@ -82,5 +82,16 @@ public abstract class PermutationTest {
         checkPerm("identity", UPPER_STRING, UPPER_STRING, perm, alpha);
     }
 
+    @Test
+    public void test1() {
+        Permutation p = getNewPermutation("(HIG)(NF)(L)", getNewAlphabet("HILFNGR"));
+        //wait
+    }
+    @Test
+    public void testInvertChar() {
+        Permutation p = getNewPermutation("(BACD)", getNewAlphabet("ABCD"));
+        assertEquals('B', p.invert('A'));
+    }
+
     // FIXME: Add tests here that pass on a correct Permutation and fail on buggy Permutations.
 }
