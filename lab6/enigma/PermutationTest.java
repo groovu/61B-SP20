@@ -121,6 +121,12 @@ public abstract class PermutationTest {
         assertEquals(0, p.invert(p.permute(0)));
     }
     @Test
+    public void testModInt() {
+        Permutation p = getNewPermutation("(ADCB)", getNewAlphabet("ABCD"));
+        assertEquals(0, p.permute(5));
+        assertEquals(3, p.permute(8));
+    }
+    @Test
     public void testPermuteChar() {
         Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
         assertEquals('B', p.permute('G'));
@@ -134,6 +140,19 @@ public abstract class PermutationTest {
     public void testUndoChar() {
         Permutation p = getNewPermutation("(AEIOU)(BCDFG)(HJKLM)(NPQRS)(TVWXYZ)", getNewAlphabet());
         assertEquals('T', p.invert(p.permute('T')));
+    }
+    @Test
+    public void testSinglets() {
+        Permutation p = getNewPermutation("(A)(B)(C)(D)(E)(F)(G)(H)(I)(J)(K)(L)(M)(N)(O)(P)(Q)(R)(S)(T)(U)(V)(W)(X)(Y)(Z)",
+                getNewAlphabet());
+        assertEquals('A', p.invert('A'));
+        assertEquals('A', p.permute('A'));
+        assertEquals('A', p.invert(p.permute('A')));
+        assertEquals('A', p.permute(p.invert('A')));
+        assertEquals(0, p.invert(0));
+        assertEquals(0, p.permute(0));
+        assertEquals(p.permute(0),p.invert(0));
+        assertEquals(0, p.permute(26));
     }
     // FIXME: Add tests here that pass on a correct Permutation and fail on buggy Permutations.
 }
