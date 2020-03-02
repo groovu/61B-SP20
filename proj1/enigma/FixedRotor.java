@@ -14,4 +14,8 @@ class FixedRotor extends Rotor {
     }
 
     // FIXME ?
+    // Fixed rotor doesn't move.
+    // Fixed rotor is super class for reflector.
+    // But it's only 1, what's the point.
+    // Do I need to fix the setting to 0?
 }

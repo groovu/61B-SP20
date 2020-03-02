@@ -13,8 +13,8 @@ import static enigma.TestUtils.*;
 public class PermutationTest {
 
     /** Testing time limit. */
-    @Rule
-    public Timeout globalTimeout = Timeout.seconds(5);
+    //@Rule
+    //public Timeout globalTimeout = Timeout.seconds(5);
 
     /* ***** TESTING UTILITIES ***** */
 
@@ -49,6 +49,15 @@ public class PermutationTest {
     public void checkIdTransform() {
         perm = new Permutation("", UPPER);
         checkPerm("identity", UPPER_STRING, UPPER_STRING);
+    }
+
+    @Test
+    public void permuteTest() {
+        Permutation a = new Permutation("(ABC)(EFG)", new Alphabet());
+        System.out.println(a.cycleObj());
+        assertEquals('B', a.permute('A'));
+        assertEquals('E', a.permute('G'));
+
     }
 
 }

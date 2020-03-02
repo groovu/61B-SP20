@@ -16,8 +16,8 @@ class Permutation {
     Permutation(String cycles, Alphabet alphabet) {
         //Permutation p = new Permutation("(CABD)(GHIF)", getNewAlphabet("ABCDEFGHI");
         _alphabet = alphabet;
-        Cycle cyc = new Cycle(cycles);
-        _cycles = cyc.get_cyclesarray();
+        _cyc = new Cycle(cycles);
+        _cycles = _cyc.get_cyclesarray();
     }
 
     /** Add the cycle c0->c1->...->cm->c0 to the permutation, where CYCLE is
@@ -43,7 +43,7 @@ class Permutation {
     /** Return the result of applying this permutation to the index of P
      *  in ALPHABET, and converting the result to a character of ALPHABET. */
     char permute(char p) {
-        char ret = 0; //0 works?
+        char ret = p; //0 works?
         for (int i = 0; i < _cycles.length; i += 1) {
             for (int j = 0; j < _cycles[i].length(); j += 1) {
                 if (_cycles[i].charAt(j) == p) {
@@ -67,7 +67,7 @@ class Permutation {
 
     /** Return the result of applying the inverse of this permutation to C. */
     char invert(char c) {
-        char ret = 0; //0 works?
+        char ret = c; //0 works?
         for (int i = 0; i < _cycles.length; i += 1) {
             for (int j = 0; j < _cycles[i].length(); j += 1) {
                 if (_cycles[i].charAt(j) == c) {
@@ -95,6 +95,16 @@ class Permutation {
         return _alphabet;
     }
 
+    /** Return the cycles of this Permutation. */
+    String[] cycles() {
+        return _cycles;
+    }
+
+    /** Return cycle object?  */
+    Cycle cycleObj() {
+        return _cyc;
+    }
+
     /** Return true iff this permutation is a derangement (i.e., a
      *  permutation for which no value maps to itself). */
     boolean derangement() {
@@ -106,6 +116,9 @@ class Permutation {
 
     /** Cycle of this permutation. */
     private String[] _cycles;
+
+    /** Cycle object of this perm */
+    private Cycle _cyc;
 
     // FIXME: ADDITIONAL FIELDS HERE, AS NEEDED
 }
