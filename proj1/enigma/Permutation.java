@@ -4,7 +4,7 @@ import static enigma.EnigmaException.*;
 
 /** Represents a permutation of a range of integers starting at 0 corresponding
  *  to the characters of an alphabet.
- *  @author
+ *  @author Cherish Truong
  */
 class Permutation {
 
@@ -14,14 +14,16 @@ class Permutation {
      *  alphabet that are not included in any cycle map to themselves.
      *  Whitespace is ignored. */
     Permutation(String cycles, Alphabet alphabet) {
+        //Permutation p = new Permutation("(CABD)(GHIF)", getNewAlphabet("ABCDEFGHI");
         _alphabet = alphabet;
-        // FIXME
+        Cycle cyc = new Cycle(cycles);
+        _cycles = cyc.get_cyclesarray();
     }
 
     /** Add the cycle c0->c1->...->cm->c0 to the permutation, where CYCLE is
      *  c0c1...cm. */
     private void addCycle(String cycle) {
-        // FIXME
+        // FIXME what is this for lol.
     }
 
     /** Return the value of P modulo the size of this permutation. */
@@ -35,31 +37,58 @@ class Permutation {
 
     /** Returns the size of the alphabet I permute. */
     int size() {
-        return 0; // FIXME
-    }
-
-    /** Return the result of applying this permutation to P modulo the
-     *  alphabet size. */
-    int permute(int p) {
-        return 0;  // FIXME
-    }
-
-    /** Return the result of applying the inverse of this permutation
-     *  to  C modulo the alphabet size. */
-    int invert(int c) {
-        return 0;  // FIXME
+        return _alphabet.size();
     }
 
     /** Return the result of applying this permutation to the index of P
      *  in ALPHABET, and converting the result to a character of ALPHABET. */
     char permute(char p) {
-        return 0;  // FIXME
+        char ret = 0; //0 works?
+        for (int i = 0; i < _cycles.length; i += 1) {
+            for (int j = 0; j < _cycles[i].length(); j += 1) {
+                if (_cycles[i].charAt(j) == p) {
+                    if (j+1 >= _cycles[i].length()) {
+                        ret =  _cycles[i].charAt(0);
+                    } else {
+                        ret =  _cycles[i].charAt(j+1);
+                    }// FIXME: Should you also be checking to see if the letter exists in alphabet?  how did you even get here if it didnt?
+                }
+            }
+        }
+        return ret;
+    }
+
+    /** Return the result of applying this permutation to P modulo the
+     *  alphabet size. */
+    int permute(int p) {
+        char x = _alphabet.toChar(wrap(p));
+        return permute(x);
     }
 
     /** Return the result of applying the inverse of this permutation to C. */
     char invert(char c) {
-        return 0;  // FIXME
+        char ret = 0; //0 works?
+        for (int i = 0; i < _cycles.length; i += 1) {
+            for (int j = 0; j < _cycles[i].length(); j += 1) {
+                if (_cycles[i].charAt(j) == c) {
+                    if (j-1 < 0) {
+                        ret =  _cycles[i].charAt(_cycles[i].length() - 1);
+                    } else {
+                        ret =  _cycles[i].charAt(j-1);
+                    }// FIXME: Should you also be checking to see if the letter exists in alphabet?  how did you even get here if it didnt?
+                }
+            }
+        }
+        return ret;
     }
+
+    /** Return the result of applying the inverse of this permutation
+     *  to  C modulo the alphabet size. */
+    int invert(int c) {
+        char x = _alphabet.toChar(wrap(c));
+        return invert(x);
+    }
+
 
     /** Return the alphabet used to initialize this Permutation. */
     Alphabet alphabet() {
@@ -74,6 +103,9 @@ class Permutation {
 
     /** Alphabet of this permutation. */
     private Alphabet _alphabet;
+
+    /** Cycle of this permutation. */
+    private String[] _cycles;
 
     // FIXME: ADDITIONAL FIELDS HERE, AS NEEDED
 }
