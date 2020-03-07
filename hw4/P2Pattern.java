@@ -8,16 +8,16 @@ public class P2Pattern {
     //([0[1-9]|1[0-2])\/([0-3][0-9])\/(19[0-9][0-9]|20[0-9][0-9])
 
     /** Pattern to match 61b notation for literal IntLists. */
-    public static String P2 = "\\(\\d*(\\, +\\d*) +\\)"; //FIXME: Add your regex here
+    public static String P2 = "\\(\\d+(\\,\\s+\\d+)*\\)"; //FIXME: Add your regex here
     //\(\d*\,\d*\)
 
     /* Pattern to match a valid domain name. Eg: www.support.facebook-login.com */
-    public static String P3 = ""; //FIXME: Add your regex here
+    public static String P3 = "([a-z]{3}\\.(([a-z]+\\.)+([a-z]{3}))|([a-z]{1}\\.[a-z]+))"; //FIXME: Add your regex here
 
     /* Pattern to match a valid java variable name. Eg: _child13$ */
-    public static String P4 = ""; //FIXME: Add your regex here
+    public static String P4 = "(\\_|\\$|[a-z])(\\_|\\$|[a-z]|\\d)*"; //FIXME: Add your regex here
 
     /* Pattern to match a valid IPv4 address. Eg: 127.0.0.1 */
-    public static String P5 = "";; //FIXME: Add your regex here
+    public static String P5 = "(\\d?\\d?\\d\\.){3}\\d?\\d?\\d";; //FIXME: Add your regex here
 
 }
