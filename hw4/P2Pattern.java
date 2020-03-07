@@ -12,7 +12,7 @@ public class P2Pattern {
     //\(\d*\,\d*\)
 
     /* Pattern to match a valid domain name. Eg: www.support.facebook-login.com */
-    public static String P3 = "([a-z]{3}\\.(([a-z]+\\.)+([a-z]{3}))|([a-z]{1}\\.[a-z]+))"; //FIXME: Add your regex here
+    public static String P3 = "(([a-z]+)+(\\.|\\-))+([a-z]{1,6})"; //FIXME: Add your regex here
 
     /* Pattern to match a valid java variable name. Eg: _child13$ */
     public static String P4 = "(\\_|\\$|[a-z])(\\_|\\$|[a-z]|\\d)*"; //FIXME: Add your regex here
