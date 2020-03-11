@@ -11,7 +11,7 @@ import java.util.Scanner;
 import static enigma.EnigmaException.*;
 
 /** Enigma simulator.
- *  @author
+ *  @author Cherish Truong
  */
 public final class Main {
 

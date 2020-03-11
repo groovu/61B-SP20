@@ -30,7 +30,8 @@ public class PermutationTest {
         int N = fromAlpha.length();
         assertEquals(testId + " (wrong length)", N, perm.size());
         for (int i = 0; i < N; i += 1) {
-            char c = fromAlpha.charAt(i), e = toAlpha.charAt(i);
+            char c = fromAlpha.charAt(i),
+                    e = toAlpha.charAt(i);
             assertEquals(msg(testId, "wrong translation of '%c'", c),
                          e, perm.permute(c));
             assertEquals(msg(testId, "wrong inverse of '%c'", e),
@@ -50,6 +51,19 @@ public class PermutationTest {
         perm = new Permutation("", UPPER);
         checkPerm("identity", UPPER_STRING, UPPER_STRING);
     }
+    @Test
+    public void debugCheckIdTransform() {
+        perm = new Permutation("", UPPER);
+        String fromAlpha = UPPER_STRING;
+        String toAlpha = UPPER_STRING;
+        char c = fromAlpha.charAt(0);
+        char e = toAlpha.charAt(0);
+        int ci = alpha.indexOf(c);
+        int ei = alpha.indexOf(e);
+        int cp = perm.permute(ci);
+        System.out.println(cp);
+        System.out.println(ci);
+    }
 
     @Test
     public void permuteTest() {
@@ -57,6 +71,17 @@ public class PermutationTest {
         System.out.println(a.cycleObj());
         assertEquals('B', a.permute('A'));
         assertEquals('E', a.permute('G'));
+    }
+    @Test
+    public void multiplePermuteTest() {
+        Permutation a = new Permutation("(AB)(CD)", new Alphabet());
+        Permutation b = new Permutation("(BE)", new Alphabet());
+        assertEquals('E', b.permute(a.permute('A')));
+    }
+    @Test
+    public void permuteNonAlpha() {
+        Permutation a = new Permutation("(!@)(#$)(*8A)", new Alphabet("!@#$%^&*()ABCDEFG"));
+        assertEquals('$', a.permute('#'));
 
     }
 

@@ -60,8 +60,8 @@ class Alphabet {
     }
     @Override
     public String toString() {
-        System.out.println(_alphabet);
-        return "";
+        String print = new String(_alphabet);
+        return print;
     }
     private char[] _alphabet;
 }

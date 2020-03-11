@@ -61,8 +61,8 @@ class Permutation {
     /** Return the result of applying this permutation to P modulo the
      *  alphabet size. */
     int permute(int p) {
-        char x = _alphabet.toChar(wrap(p));
-        return permute(x);
+        char i = _alphabet.toChar(wrap(p));
+        return _alphabet.toInt(permute(i));
     }
 
     /** Return the result of applying the inverse of this permutation to C. */
@@ -85,8 +85,8 @@ class Permutation {
     /** Return the result of applying the inverse of this permutation
      *  to  C modulo the alphabet size. */
     int invert(int c) {
-        char x = _alphabet.toChar(wrap(c));
-        return invert(x);
+        char i = _alphabet.toChar(wrap(c));
+        return _alphabet.toInt(invert(i));
     }
 
 

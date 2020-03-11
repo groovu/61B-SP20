@@ -19,6 +19,5 @@ public class CycleTest {
     public void cycleMaker() {
         String a = "(ABC)(DEF) (KIL)   ";
         Cycle cyc = new Cycle(a);
-        System.out.println(cyc);
     }
 }
