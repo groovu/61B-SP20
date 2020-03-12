@@ -13,6 +13,8 @@ public class RotorsTest {
         Permutation p = new Permutation("", new Alphabet());
         Rotor a = new Rotor("TEST", p);
         assertEquals("TEST", a.name());
+        Rotor[] b = new Rotor[1];
+        System.out.println(b[0]);
     }
     Alphabet abc = new Alphabet();
     Rotor d = new Rotor ("I", new Permutation(NAVALA.get("I"), abc));

@@ -1,7 +1,6 @@
 package enigma;
 
-import java.util.HashMap;
-import java.util.Collection;
+import java.util.*;
 
 import static enigma.EnigmaException.*;
 
@@ -17,13 +16,12 @@ class Machine {
         _numRotors = numRotors;
         _alphabet = alpha;
         _numPawls = pawls;
-        _availRotors = availRotors;
-        _rotors = new Rotor[_numRotors];
+        _availRotors = new HashMap<>();
         for (Rotor r : availRotors) {
-            _availRotors.put()
+            _availRotors.put(r.name().toUpperCase(), r);
         }
-
-        // FIXME
+        _rotors = new LinkedHashMap<>();
+        _plug = new Permutation("", alpha);
     }
 
     /** Return the number of rotor slots I have. */
@@ -40,25 +38,57 @@ class Machine {
      *  available rotors (ROTORS[0] names the reflector).
      *  Initially, all rotors are set at their 0 setting. */
     void insertRotors(String[] rotors) {
-
-        // FIXME
+        _rotors.clear();
+        if (_availRotors.get(rotors[0]).reflecting() == false) {
+            throw error ("First rotor is not reflector.");
+        }
+        for (String r : rotors) {
+            if (_availRotors.containsKey(r) == false) {
+                throw error("Rotor does not exist in available Rotors.");
+            }
+            _rotors.put(r.toUpperCase(), _availRotors.get(r.toUpperCase()));
+        }
+        int pawls = 0;
+        for (Map.Entry<String, Rotor> r : _rotors.entrySet()) {
+            if (r.getValue().rotates()) {
+                pawls += 1;
+            }
+        }
+        if (pawls != numPawls()) {
+            throw error ("Pawl count does not match machine setting.");
+        }
+        if (_rotors.size() != _numRotors) {
+            throw error("Number of rotors does not match.");
+        }
     }
 
     /** Set my rotors according to SETTING, which must be a string of
      *  numRotors()-1 characters in my alphabet. The first letter refers
      *  to the leftmost rotor setting (not counting the reflector).  */
     void setRotors(String setting) {
-        // FIXME
+        if (setting.length() != _rotors.size()) {
+            throw error ("Number of settings do not match number of rotors.");
+        }
+        for (int i = 0; i < numRotors() - 1; i += 1) {
+            if (_alphabet.contains(setting.charAt(i)) == false) {
+                throw error("Setting is not in alphabet");
+            }
+        }
+        Set<String> rotors = _rotors.keySet();
+        int i = 0;
+        for(String r : rotors) {
+            _rotors.get(r).set(setting.charAt(i));
+            i += 1;
+        }
     }
 
     /** Set the plugboard to PLUGBOARD. */
     void setPlugboard(Permutation plugboard) {
-        // FIXME
+        _plug = plugboard;
     }
 
     /** Returns the result of converting the input character C (as an
      *  index in the range 0..alphabet size - 1), after first advancing
-
      *  the machine. */
     int convert(int c) {
         return 0; // FIXME
@@ -79,11 +109,14 @@ class Machine {
     /** Number of pawls in machine. */
     private int _numPawls;
 
-    /** Hashmap of Rotors. */
-    private HashMap<> _availRotors;
+    /** HashMap of all Rotors. */
+    private HashMap<String, Rotor> _availRotors;
 
-    /** Rotors being used by machine */
-    private Rotor[] _rotors;
+    /** LinkedHashMap of Rotors used by Machine */
+    private LinkedHashMap<String, Rotor> _rotors;
+
+    /** Plugboard of machine */
+    private Permutation _plug;
 
     // FIXME: ADDITIONAL FIELDS HERE, IF NEEDED.
 }

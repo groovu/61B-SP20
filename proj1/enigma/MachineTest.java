@@ -25,6 +25,7 @@ public class MachineTest {
         happy.put("c", 88);
         System.out.println(happy);
         System.out.println(NAVALA.get("II"));
+
     }
 
 
