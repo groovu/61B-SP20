@@ -11,7 +11,6 @@ class Rotor {
     Rotor(String name, Permutation perm) {
         _name = name;
         _permutation = perm;
-        // FIXME
     }
 
     /** Return my name. */
@@ -51,7 +50,8 @@ class Rotor {
 
     /** Set setting() to POSN.  */
     void set(int posn) {
-        _setting = posn;
+        _setting = permutation().wrap(posn);
+        // do I need to wrap this?
     }
 
     /** Set setting() to character CPOSN. */
@@ -65,7 +65,7 @@ class Rotor {
         int start = permutation().wrap(_setting + p);
         int permute = permutation().permute(start);
         int result = permutation().wrap(permute - _setting);
-        return result;  // FIXME
+        return result;
     }
 
     /** Return the conversion of E (an integer in the range 0..size()-1)

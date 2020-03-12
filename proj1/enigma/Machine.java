@@ -6,33 +6,41 @@ import java.util.Collection;
 import static enigma.EnigmaException.*;
 
 /** Class that represents a complete enigma machine.
- *  @author
+ *  @author Cherish Truong
  */
 class Machine {
 
     /** A new Enigma machine with alphabet ALPHA, 1 < NUMROTORS rotor slots,
-     *  and 0 <= PAWLS < NUMROTORS pawls.  ALLROTORS contains all the
+     *  and 0 <= PAWLS < NUMROTORS pawls.  AVAILROTORS contains all the
      *  available rotors. */
-    Machine(Alphabet alpha, int numRotors, int pawls,
-            Collection<Rotor> allRotors) {
+    Machine(Alphabet alpha, int numRotors, int pawls, Collection<Rotor> availRotors) {
+        _numRotors = numRotors;
         _alphabet = alpha;
+        _numPawls = pawls;
+        _availRotors = availRotors;
+        _rotors = new Rotor[_numRotors];
+        for (Rotor r : availRotors) {
+            _availRotors.put()
+        }
+
         // FIXME
     }
 
     /** Return the number of rotor slots I have. */
     int numRotors() {
-        return 0; // FIXME
+        return _numRotors;
     }
 
     /** Return the number pawls (and thus rotating rotors) I have. */
     int numPawls() {
-        return 0; // FIXME
+        return _numPawls;
     }
 
     /** Set my rotor slots to the rotors named ROTORS from my set of
      *  available rotors (ROTORS[0] names the reflector).
      *  Initially, all rotors are set at their 0 setting. */
     void insertRotors(String[] rotors) {
+
         // FIXME
     }
 
@@ -64,6 +72,18 @@ class Machine {
 
     /** Common alphabet of my rotors. */
     private final Alphabet _alphabet;
+
+    /** Number of rotors in machine. */
+    private int _numRotors;
+
+    /** Number of pawls in machine. */
+    private int _numPawls;
+
+    /** Hashmap of Rotors. */
+    private HashMap<> _availRotors;
+
+    /** Rotors being used by machine */
+    private Rotor[] _rotors;
 
     // FIXME: ADDITIONAL FIELDS HERE, IF NEEDED.
 }
