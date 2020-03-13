@@ -84,11 +84,24 @@ public final class Main {
         }
         String settings = readIn;
         setUp(enigma, settings);
-        readIn = _input.next();
+        String converted = "";
+        //readIn = _input.nextLine(); //should be the first line after settings. *
+        //while (readIn.charAt(0) != '*') {
+        while (_input.hasNext()) {
+            readIn = _input.nextLine();
+            if (readIn.charAt(0) == '*') {
+                throw error("Pass settings, but '*' found at beginning.");
+            }
+            String readInput = "";
+            Scanner readScan = new Scanner(readIn);
 
-
-
-
+            while (readScan.hasNext() == true) {
+                String next = readScan.next();
+                readInput = readInput + next;
+            }
+            converted = converted + enigma.convert(readInput);
+            System.out.println(converted);
+        }
         // FIXME
     }
 
@@ -96,12 +109,12 @@ public final class Main {
      *  file _config. */
     private Machine readConfig() {
         try {
-            int numRotors; int numPawls;
+            //int numRotors; int numPawls;
             _alphabet = new Alphabet(_config.next());
             numRotors = _config.nextInt();
             numPawls = _config.nextInt();
             //HashMap<String, Rotor> availRotors = new HashMap<>();
-            Collection<Rotor> availRotors = new ArrayList<>();
+            availRotors = new ArrayList<>();
             while (_config.hasNext()) {
                 Rotor addRot = readRotor();
                 availRotors.add(addRot);
@@ -153,14 +166,26 @@ public final class Main {
     private void setUp(Machine M, String settings) {
         Scanner scanset = new Scanner(settings);
         String read = scanset.next(); //star
+        String[] insertRotors = new String[numRotors];
         if (settings.charAt(0) != '*') {
             throw error("Settings does not start with *.");
         }
-        read = scanset.next(); // rotor id
-
-
-        // FIXME
-
+        int i = 0;
+        while (i < numRotors) {
+            String name = scanset.next();
+            insertRotors[i] = name;
+        } // sanity check
+        String rotSettings = scanset.next(); // AXLE
+        if (availRotors.contains(rotSettings) == true) {
+            throw error("This read is a rotor, not the rotor settings.");
+        }
+        String plugboard = "";
+        while (scanset.hasNext()) {
+            plugboard = plugboard + scanset.next();
+        }
+        M.setPlugboard(new Permutation(plugboard, _alphabet));
+        M.insertRotors(insertRotors);
+        M.setRotors(rotSettings);
     }
 
 
@@ -182,4 +207,12 @@ public final class Main {
     /** File for encoded/decoded messages. */
     private PrintStream _output;
 
+    /** Number of rotors from settings*/
+    private int numRotors;
+
+    /** Number of pawls from settings*/
+    private int numPawls;
+
+    /** Collection of available Rotors*/
+    private Collection<Rotor> availRotors;
 }
