@@ -38,7 +38,7 @@ class Machine {
      *  available rotors (ROTORS[0] names the reflector).
      *  Initially, all rotors are set at their 0 setting. */
     void insertRotors(String[] rotors) {
-        _rotors.clear();
+        //_rotors.clear();
         if (_availRotors.get(rotors[0]).reflecting() == false) {
             throw error ("First rotor is not reflector.");
         }
@@ -46,8 +46,8 @@ class Machine {
             throw error ("Last rotor does not rotate.");
         }
         for (String r : rotors) {
-            if (_availRotors.containsKey(r) == false) {
-                throw error("Trying to add rotor that does not exist.");
+            if (_availRotors.containsKey(r.toUpperCase()) == false) {
+                throw error("Trying to add rotor that does not exist." + r);
             }
             _rotors.add(_availRotors.get(r.toUpperCase()));
         }
@@ -74,7 +74,10 @@ class Machine {
      *  numRotors()-1 characters in my alphabet. The first letter refers
      *  to the leftmost rotor setting (not counting the reflector).  */
     void setRotors(String setting) {
-        if (setting.length() != _rotors.size()) {
+//        System.out.println(setting);
+//        System.out.println(setting.length());
+//        System.out.println(_rotors.size());
+        if (setting.length() != _rotors.size() - 1) {
             throw error ("Number of settings do not match number of rotors.");
         }
         for (int i = 0; i < numRotors() - 1; i += 1) {
@@ -88,10 +91,16 @@ class Machine {
 //            _rotors.get(r).set(setting.charAt(i));
 //            i += 1;
 //        }
-        int i = 0;
+        int i = -1;
         for (Rotor r : _rotors) {
-            r.set(setting.charAt(i));
-            i += 1;
+            if (i == -1) {
+                r.set(0);
+                i += 1;
+            } else {
+                r.set(setting.charAt(i));
+                System.out.println("Set " + r.name() + " " + i);
+                i += 1;
+            }
         }
     }
 

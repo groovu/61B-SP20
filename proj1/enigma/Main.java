@@ -78,29 +78,32 @@ public final class Main {
      *  results to _output. */
     private void process() {
         Machine enigma = readConfig();
-        String readIn = _input.next();
-        if (readIn.charAt(0) != '*') {
-            throw error("Input file does not start with *.");
-        }
-        String settings = readIn;
-        setUp(enigma, settings);
-        String converted = "";
-        //readIn = _input.nextLine(); //should be the first line after settings. *
-        //while (readIn.charAt(0) != '*') {
+        String readIn = _input.nextLine();
         while (_input.hasNext()) {
-            readIn = _input.nextLine();
-            if (readIn.charAt(0) == '*') {
-                throw error("Pass settings, but '*' found at beginning.");
+            if (readIn.charAt(0) != '*') {
+                throw error("Input file does not start with *.");
             }
-            String readInput = "";
-            Scanner readScan = new Scanner(readIn);
+            String settings = readIn;
+            setUp(enigma, settings);
+            readIn = _input.next();
+            //readIn = _input.nextLine(); //should be the first line after settings. *
+            //while (readIn.charAt(0) != '*') {
+            while (readIn.charAt(0) != '*') {
+                String converted = "";
+                //readIn = _input.nextLine();
+//            if (readIn.charAt(0) == '*') {
+//                throw error("Pass settings, but '*' found at beginning.");
+//            }
+                String readInput = "";
+                Scanner readScan = new Scanner(readIn);
 
-            while (readScan.hasNext() == true) {
-                String next = readScan.next();
-                readInput = readInput + next;
+                while (readScan.hasNext() == true) {
+                    String next = readScan.next();
+                    readInput = readInput + next;
+                }
+                converted = converted + enigma.convert(readInput);
+                System.out.println("Converted" + converted);
             }
-            converted = converted + enigma.convert(readInput);
-            System.out.println(converted);
         }
         // FIXME
     }
@@ -115,9 +118,12 @@ public final class Main {
             numPawls = _config.nextInt();
             //HashMap<String, Rotor> availRotors = new HashMap<>();
             availRotors = new ArrayList<>();
-            while (_config.hasNext()) {
+            namePass = "";
+            //System.out.println(_config.hasNext());
+            while (_config.hasNext() == true) {
                 Rotor addRot = readRotor();
                 availRotors.add(addRot);
+                System.out.println("Rotor added to avail" + addRot.name());
                 //availRotors.put(addRot.name(), addRot);
             }
             return new Machine(_alphabet, numRotors, numPawls, availRotors);
@@ -134,17 +140,29 @@ public final class Main {
         String perms = "";
         String read = "";
         try {
-            name = _config.next();
-            notches = _config.next();
-            notchesonly = notches.substring(1);
-            read = _config.next();
-            while (_config.hasNext()) {
-                if (read.charAt(0) != '(') {
-                    throw error("'(' missing from next read segment.)");
-                }
-                perms = perms + read;
-                read = _config.next();
+            if (namePass == "") {
+                name = _config.next();
+            } else {
+                name = namePass;
             }
+            notches = _config.next();
+            notchesonly = notches.substring(1); //Q
+            read = _config.next();
+            while (read.charAt(0) == '(') {
+//                System.out.println(read);
+//                read = _config.next();
+//                System.out.println(read);
+//                if (read.charAt(0) != '(') {
+//                    throw error("'(' missing from next read segment.)" + read);
+//                }
+                perms = perms + read;
+                if (_config.hasNext() == false) {
+                    break;
+                }
+                read = _config.next();
+
+            }
+            namePass = read;
             Permutation toPerm = new Permutation(perms, _alphabet);
             if (notches.charAt(0) == 'M') {
                 return new MovingRotor(name, toPerm, notchesonly);
@@ -153,11 +171,10 @@ public final class Main {
             } else if (notches.charAt(0) == 'R') {
                 return new Reflector(name, toPerm);
             } else {
-                throw error("Incorrect Rotor type M/N/R");
+                throw error("Incorrect Rotor type M/N/R" + notches);
             }
         } catch (NoSuchElementException excp) {
-            System.out.println(read);
-            throw error("bad rotor description");
+            throw error("bad rotor description" + read);
         }
     }
 
@@ -165,15 +182,16 @@ public final class Main {
      *  which must have the format specified in the assignment. */
     private void setUp(Machine M, String settings) {
         Scanner scanset = new Scanner(settings);
-        String read = scanset.next(); //star
+        String setread = scanset.next(); //star
         String[] insertRotors = new String[numRotors];
         if (settings.charAt(0) != '*') {
             throw error("Settings does not start with *.");
         }
         int i = 0;
         while (i < numRotors) {
-            String name = scanset.next();
-            insertRotors[i] = name;
+            setread = scanset.next();
+            insertRotors[i] = setread;
+            i += 1;
         } // sanity check
         String rotSettings = scanset.next(); // AXLE
         if (availRotors.contains(rotSettings) == true) {
@@ -215,4 +233,7 @@ public final class Main {
 
     /** Collection of available Rotors*/
     private Collection<Rotor> availRotors;
+
+    /** Name of rotor */
+    private String namePass;
 }
