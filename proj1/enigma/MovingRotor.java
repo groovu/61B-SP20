@@ -16,21 +16,23 @@ class MovingRotor extends Rotor {
         super(name, perm);
         _notches = notches;
         set(0);
-        // FIXME
     }
     @Override
+
     public boolean rotates() {
         return true;
     }
 
     @Override
     public boolean atNotch() {
-        if (setting() == alphabet().toInt(_notches.charAt(0))) {
-            return true;
+        for (int i = 0; i < _notches.length(); i += 1) {
+            char c = _notches.charAt(i);
+            if (setting() == alphabet().toInt(c)) {
+                return true;
+            }
         }
-        return false; // place holder
+        return false;
     }
-    // FIXME?
 
     @Override
     void advance() {

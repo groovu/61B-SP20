@@ -1,12 +1,12 @@
 package enigma;
 
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.util.*;
 
 import static enigma.EnigmaException.*;
 
@@ -77,6 +77,18 @@ public final class Main {
      *  file _config and apply it to the messages in _input, sending the
      *  results to _output. */
     private void process() {
+        Machine enigma = readConfig();
+        String readIn = _input.next();
+        if (readIn.charAt(0) != '*') {
+            throw error("Input file does not start with *.");
+        }
+        String settings = readIn;
+        setUp(enigma, settings);
+        readIn = _input.next();
+
+
+
+
         // FIXME
     }
 
@@ -84,9 +96,18 @@ public final class Main {
      *  file _config. */
     private Machine readConfig() {
         try {
-            // FIXME
-            _alphabet = new Alphabet();
-            return new Machine(_alphabet, 2, 1, null);
+            int numRotors; int numPawls;
+            _alphabet = new Alphabet(_config.next());
+            numRotors = _config.nextInt();
+            numPawls = _config.nextInt();
+            //HashMap<String, Rotor> availRotors = new HashMap<>();
+            Collection<Rotor> availRotors = new ArrayList<>();
+            while (_config.hasNext()) {
+                Rotor addRot = readRotor();
+                availRotors.add(addRot);
+                //availRotors.put(addRot.name(), addRot);
+            }
+            return new Machine(_alphabet, numRotors, numPawls, availRotors);
         } catch (NoSuchElementException excp) {
             throw error("configuration file truncated");
         }
@@ -94,9 +115,35 @@ public final class Main {
 
     /** Return a rotor, reading its description from _config. */
     private Rotor readRotor() {
+        String name = "";
+        String notches = "";
+        String notchesonly = "";
+        String perms = "";
+        String read = "";
         try {
-            return null; // FIXME
+            name = _config.next();
+            notches = _config.next();
+            notchesonly = notches.substring(1);
+            read = _config.next();
+            while (_config.hasNext()) {
+                if (read.charAt(0) != '(') {
+                    throw error("'(' missing from next read segment.)");
+                }
+                perms = perms + read;
+                read = _config.next();
+            }
+            Permutation toPerm = new Permutation(perms, _alphabet);
+            if (notches.charAt(0) == 'M') {
+                return new MovingRotor(name, toPerm, notchesonly);
+            } else if (notches.charAt(0) == 'N') {
+                return new FixedRotor(name, toPerm);
+            } else if (notches.charAt(0) == 'R') {
+                return new Reflector(name, toPerm);
+            } else {
+                throw error("Incorrect Rotor type M/N/R");
+            }
         } catch (NoSuchElementException excp) {
+            System.out.println(read);
             throw error("bad rotor description");
         }
     }
@@ -104,8 +151,18 @@ public final class Main {
     /** Set M according to the specification given on SETTINGS,
      *  which must have the format specified in the assignment. */
     private void setUp(Machine M, String settings) {
+        Scanner scanset = new Scanner(settings);
+        String read = scanset.next(); //star
+        if (settings.charAt(0) != '*') {
+            throw error("Settings does not start with *.");
+        }
+        read = scanset.next(); // rotor id
+
+
         // FIXME
+
     }
+
 
     /** Print MSG in groups of five (except that the last group may
      *  have fewer letters). */
@@ -124,4 +181,5 @@ public final class Main {
 
     /** File for encoded/decoded messages. */
     private PrintStream _output;
+
 }

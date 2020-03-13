@@ -20,7 +20,7 @@ class Machine {
         for (Rotor r : availRotors) {
             _availRotors.put(r.name().toUpperCase(), r);
         }
-        _rotors = new LinkedHashMap<>();
+        _rotors = new LinkedList<>();
         _plug = new Permutation("", alpha);
     }
 
@@ -42,15 +42,23 @@ class Machine {
         if (_availRotors.get(rotors[0]).reflecting() == false) {
             throw error ("First rotor is not reflector.");
         }
+        if (_availRotors.get(rotors[rotors.length - 1]).rotates() == false) {
+            throw error ("Last rotor does not rotate.");
+        }
         for (String r : rotors) {
             if (_availRotors.containsKey(r) == false) {
-                throw error("Rotor does not exist in available Rotors.");
+                throw error("Trying to add rotor that does not exist.");
             }
-            _rotors.put(r.toUpperCase(), _availRotors.get(r.toUpperCase()));
+            _rotors.add(_availRotors.get(r.toUpperCase()));
         }
         int pawls = 0;
-        for (Map.Entry<String, Rotor> r : _rotors.entrySet()) {
-            if (r.getValue().rotates()) {
+//        for (Map.Entry<String, Rotor> r : _rotors.entrySet()) {
+//            if (r.getValue().rotates()) {
+//                pawls += 1;
+//            }
+//        }
+        for (Rotor r: _rotors) {
+            if (r.rotates()) {
                 pawls += 1;
             }
         }
@@ -74,10 +82,15 @@ class Machine {
                 throw error("Setting is not in alphabet");
             }
         }
-        Set<String> rotors = _rotors.keySet();
+//        Set<String> rotors = _rotors.keySet();
+//        int i = 0;
+//        for(String r : rotors) {
+//            _rotors.get(r).set(setting.charAt(i));
+//            i += 1;
+//        }
         int i = 0;
-        for(String r : rotors) {
-            _rotors.get(r).set(setting.charAt(i));
+        for (Rotor r : _rotors) {
+            r.set(setting.charAt(i));
             i += 1;
         }
     }
@@ -91,13 +104,53 @@ class Machine {
      *  index in the range 0..alphabet size - 1), after first advancing
      *  the machine. */
     int convert(int c) {
-        return 0; // FIXME
+        //forward pass (going right to left)
+        char x = _alphabet.toChar(c);
+        if (_alphabet.contains(x) == false) {
+            throw error("Input int c is not in machine's alphabet.");
+        }
+        int first = _rotors.size() - 1;
+        boolean advanced = true;
+        boolean atNotch = _rotors.get(first).atNotch();
+        Rotor currentRot;
+        currentRot = _rotors.get(first);
+        currentRot.advance();
+        for (int i = first - 1; i >= first - _numPawls; i -= 1) {
+            Rotor nextRot = _rotors.get(i);
+            if ((atNotch && advanced) || (advanced && nextRot.atNotch())) {
+                nextRot.advance();
+                advanced = true;
+                atNotch = nextRot.atNotch();
+            } else {
+                advanced = false;
+                atNotch = nextRot.atNotch();
+            }
+        }
+        c = _plug.permute(c);
+        for (int i = first; i >= 0; i -= 1) {
+            Rotor nextRot = _rotors.get(i);
+            c = nextRot.convertForward(c);
+        }
+        //backwards
+        for (int i = 1; i < first + 1; i += 1) {
+            Rotor nextRot = _rotors.get(i);
+            c = nextRot.convertBackward(c);
+        }
+        return c; //
     }
 
     /** Returns the encoding/decoding of MSG, updating the state of
      *  the rotors accordingly. */
     String convert(String msg) {
-        return ""; // FIXME
+        String str = "";
+        for (int i = 0; i < msg.length(); i += 1) {
+            char c = msg.charAt(i);
+            int x = _alphabet.toInt(c);
+            int convertX = convert(x);
+            char convertXtoChar = _alphabet.toChar(convertX);
+            str = str + convertXtoChar;
+        }
+        return str;
     }
 
     /** Common alphabet of my rotors. */
@@ -112,8 +165,8 @@ class Machine {
     /** HashMap of all Rotors. */
     private HashMap<String, Rotor> _availRotors;
 
-    /** LinkedHashMap of Rotors used by Machine */
-    private LinkedHashMap<String, Rotor> _rotors;
+    /** LinkedList of Rotors used by Machine */
+    private LinkedList<Rotor> _rotors;
 
     /** Plugboard of machine */
     private Permutation _plug;
