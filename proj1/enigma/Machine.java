@@ -142,6 +142,7 @@ class Machine {
             Rotor nextRot = _rotors.get(i);
             c = nextRot.convertBackward(c);
         }
+        c = _plug.permute(c);
         return c; //
     }
 

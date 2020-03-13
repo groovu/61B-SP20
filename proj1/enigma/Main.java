@@ -209,6 +209,7 @@ public final class Main {
         while (scanset.hasNext()) {
             plugboard = plugboard + scanset.next();
         }
+        //System.out.println(plugboard);
         M.setPlugboard(new Permutation(plugboard, _alphabet));
         M.insertRotors(insertRotors);
         M.setRotors(rotSettings);
