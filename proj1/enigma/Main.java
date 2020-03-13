@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 import static enigma.EnigmaException.*;
@@ -77,9 +78,12 @@ public final class Main {
      *  file _config and apply it to the messages in _input, sending the
      *  results to _output. */
     private void process() {
+        //five = 0;
         Machine enigma = readConfig();
         String readIn = _input.nextLine();
         while (_input.hasNext()) {
+            five = 0;
+            //System.out.println(readIn);
             if (readIn.charAt(0) != '*') {
                 throw error("Input file does not start with *.");
             }
@@ -97,27 +101,36 @@ public final class Main {
                     readInput = readInput + next;
                 }
                 converted = converted + enigma.convert(readInput);
-                readIn = _input.nextLine();
-                int five = 0;
                 for (char c : converted.toCharArray()) {
+                    //System.out.println(five);
                     if (five == 5) {
+                        //System.out.println("output before" + _output);
                         _output.append(' ');
+                        //System.out.println(_output);
                         five = 0;
                     }
                     _output.append(c);
                     five += 1;
                 }
+                if (_input.hasNext()) {
+                readIn = _input.nextLine();
+                } else {
+                    break;
+                }
+                //readIn = _input.nextLine();
             }
-            readIn = _input.nextLine();
+            //readIn = _input.nextLine();
+            if (_input.hasNext()) {
+                _output.append("\n");
+            }
+            //_output.append("\n");
         }
-        // FIXME
     }
 
     /** Return an Enigma machine configured from the contents of configuration
      *  file _config. */
     private Machine readConfig() {
         try {
-            //int numRotors; int numPawls;
             _alphabet = new Alphabet(_config.next());
             numRotors = _config.nextInt();
             numPawls = _config.nextInt();
@@ -177,6 +190,7 @@ public final class Main {
     private void setUp(Machine M, String settings) {
         Scanner scanset = new Scanner(settings);
         String setread = scanset.next();
+        numRotors = M.numRotors();
         String[] insertRotors = new String[numRotors];
         if (settings.charAt(0) != '*') {
             throw error("Settings does not start with *.");
@@ -237,4 +251,7 @@ public final class Main {
 
     /** Name of rotor */
     private String namePass;
+
+    /** Five tracker */
+    private int five;
 }

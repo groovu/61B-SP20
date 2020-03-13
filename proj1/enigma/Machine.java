@@ -38,15 +38,15 @@ class Machine {
      *  available rotors (ROTORS[0] names the reflector).
      *  Initially, all rotors are set at their 0 setting. */
     void insertRotors(String[] rotors) {
-        //_rotors.clear();
-        if (_availRotors.get(rotors[0]).reflecting() == false) {
+        _rotors.clear();
+        if (!_availRotors.get(rotors[0]).reflecting()) {
             throw error ("First rotor is not reflector.");
         }
-        if (_availRotors.get(rotors[rotors.length - 1]).rotates() == false) {
+        if (!_availRotors.get(rotors[rotors.length - 1]).rotates()) {
             throw error ("Last rotor does not rotate.");
         }
         for (String r : rotors) {
-            if (_availRotors.containsKey(r.toUpperCase()) == false) {
+            if (!_availRotors.containsKey(r.toUpperCase())) {
                 throw error("Trying to add rotor that does not exist." + r);
             }
             _rotors.add(_availRotors.get(r.toUpperCase()));
@@ -59,14 +59,15 @@ class Machine {
 //        }
         for (Rotor r: _rotors) {
             if (r.rotates()) {
+                //System.out.println(r.name() + " rotates? " + r.rotates());
                 pawls += 1;
             }
         }
         if (pawls != numPawls()) {
-            throw error ("Pawl count does not match machine setting.");
+            throw error ("pawls "+ pawls + " != numPawls()" + numPawls());
         }
         if (_rotors.size() != _numRotors) {
-            throw error("Number of rotors does not match.");
+            throw error("_rotorssize "+_rotors.size()  + " != _numRotors"+  _numRotors);
         }
     }
 
