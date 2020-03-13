@@ -74,9 +74,6 @@ class Machine {
      *  numRotors()-1 characters in my alphabet. The first letter refers
      *  to the leftmost rotor setting (not counting the reflector).  */
     void setRotors(String setting) {
-//        System.out.println(setting);
-//        System.out.println(setting.length());
-//        System.out.println(_rotors.size());
         if (setting.length() != _rotors.size() - 1) {
             throw error ("Number of settings do not match number of rotors.");
         }
@@ -98,7 +95,6 @@ class Machine {
                 i += 1;
             } else {
                 r.set(setting.charAt(i));
-                System.out.println("Set " + r.name() + " " + i);
                 i += 1;
             }
         }

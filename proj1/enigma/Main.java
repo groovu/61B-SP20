@@ -86,14 +86,9 @@ public final class Main {
             String settings = readIn;
             setUp(enigma, settings);
             readIn = _input.next();
-            //readIn = _input.nextLine(); //should be the first line after settings. *
-            //while (readIn.charAt(0) != '*') {
+
             while (readIn.charAt(0) != '*') {
                 String converted = "";
-                //readIn = _input.nextLine();
-//            if (readIn.charAt(0) == '*') {
-//                throw error("Pass settings, but '*' found at beginning.");
-//            }
                 String readInput = "";
                 Scanner readScan = new Scanner(readIn);
 
@@ -102,8 +97,18 @@ public final class Main {
                     readInput = readInput + next;
                 }
                 converted = converted + enigma.convert(readInput);
-                System.out.println("Converted" + converted);
+                readIn = _input.nextLine();
+                int five = 0;
+                for (char c : converted.toCharArray()) {
+                    if (five == 5) {
+                        _output.append(' ');
+                        five = 0;
+                    }
+                    _output.append(c);
+                    five += 1;
+                }
             }
+            readIn = _input.nextLine();
         }
         // FIXME
     }
@@ -116,15 +121,11 @@ public final class Main {
             _alphabet = new Alphabet(_config.next());
             numRotors = _config.nextInt();
             numPawls = _config.nextInt();
-            //HashMap<String, Rotor> availRotors = new HashMap<>();
             availRotors = new ArrayList<>();
             namePass = "";
-            //System.out.println(_config.hasNext());
             while (_config.hasNext() == true) {
                 Rotor addRot = readRotor();
                 availRotors.add(addRot);
-                System.out.println("Rotor added to avail" + addRot.name());
-                //availRotors.put(addRot.name(), addRot);
             }
             return new Machine(_alphabet, numRotors, numPawls, availRotors);
         } catch (NoSuchElementException excp) {
@@ -149,18 +150,11 @@ public final class Main {
             notchesonly = notches.substring(1); //Q
             read = _config.next();
             while (read.charAt(0) == '(') {
-//                System.out.println(read);
-//                read = _config.next();
-//                System.out.println(read);
-//                if (read.charAt(0) != '(') {
-//                    throw error("'(' missing from next read segment.)" + read);
-//                }
                 perms = perms + read;
                 if (_config.hasNext() == false) {
                     break;
                 }
                 read = _config.next();
-
             }
             namePass = read;
             Permutation toPerm = new Permutation(perms, _alphabet);
@@ -182,7 +176,7 @@ public final class Main {
      *  which must have the format specified in the assignment. */
     private void setUp(Machine M, String settings) {
         Scanner scanset = new Scanner(settings);
-        String setread = scanset.next(); //star
+        String setread = scanset.next();
         String[] insertRotors = new String[numRotors];
         if (settings.charAt(0) != '*') {
             throw error("Settings does not start with *.");
@@ -192,8 +186,8 @@ public final class Main {
             setread = scanset.next();
             insertRotors[i] = setread;
             i += 1;
-        } // sanity check
-        String rotSettings = scanset.next(); // AXLE
+        }
+        String rotSettings = scanset.next();
         if (availRotors.contains(rotSettings) == true) {
             throw error("This read is a rotor, not the rotor settings.");
         }
@@ -210,7 +204,14 @@ public final class Main {
     /** Print MSG in groups of five (except that the last group may
      *  have fewer letters). */
     private void printMessageLine(String msg) {
-        // FIXME
+        int five = 0;
+        for (char c : msg.toCharArray()) {
+            if (five == 5) {
+                System.out.print(" ");
+                five = 0;
+            }
+            System.out.print(c);
+        }
     }
 
     /** Alphabet used in this machine. */
