@@ -89,9 +89,9 @@ public final class Main {
             }
             String settings = readIn;
             setUp(enigma, settings);
-            readIn = _input.next();
-
+            readIn = _input.nextLine();
             while (readIn.charAt(0) != '*') {
+                //System.out.println("ReadIn is " + readIn);
                 String converted = "";
                 String readInput = "";
                 Scanner readScan = new Scanner(readIn);
@@ -113,16 +113,34 @@ public final class Main {
                     five += 1;
                 }
                 if (_input.hasNext()) {
-                readIn = _input.nextLine();
+                    readIn = _input.nextLine();
+                    _output.append('\n');
+                    five = 0;
                 } else {
                     break;
                 }
                 //readIn = _input.nextLine();
+                //System.out.println("Last Readin: " +readIn);
+//                if (readIn.charAt(0) =) {
+//                    if (_input.hasNext()) {
+//                        readIn = _input.nextLine();
+//                    }
+//                }
+                try {
+                    readIn.charAt(0);
+                } catch (StringIndexOutOfBoundsException e) {
+                    if (_input.hasNext()) {
+                        _output.append("\n");
+                        readIn = _input.nextLine();
+                    } else {
+                        break;
+                    }
+                }
             }
             //readIn = _input.nextLine();
-            if (_input.hasNext()) {
-                _output.append("\n");
-            }
+//            if (_input.hasNext()) {
+//                _output.append("\n");
+//            }
             //_output.append("\n");
         }
     }

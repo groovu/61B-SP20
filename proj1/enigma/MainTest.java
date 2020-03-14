@@ -29,6 +29,33 @@ public class MainTest {
         read = scanset.next();
         System.out.println(read);
     }
+    @Test
+    public void whiteSpace() {
+        String str =
+                "   AND HINGES\n" +
+                        "TILL IT LOOKED ALL SQUARES \n" +
+                        "   AND OBLONGS\n" +
+                        "LIKE A COMPLICATED FIGURE\n" +
+                        "IN THE SECOND BOOK OF EUCLID\n" +
+                        "\n" +
+                        "* B Beta III IV I AXLE\n" +
+                        "HYIHL BKOML IUYDC MPPSF SZW\n" +
+                        "SQCNJ EXNUO JYRZE KTCNB DGU\n" +
+                        "FLIIE GEPGR SJUJT CALGX SNCTM KUF\n" +
+                        "WMFCK WIPRY SODJC VCFYQ LV\n" +
+                        "QLMBY UQRIR XEPOV EUHFI RIF\n" +
+                        "KCGVS FPBGP KDRFY RTVMW GFU\n" +
+                        "NMXEH FHVPQ IDOAC GUIWG TNM\n" +
+                        "KVCKC FDZIO PYEVX NTBXY AHAO\n" +
+                        "BMQOP GTZX\n" +
+                        "VXQXO LEDRW YCMMW AONVU KQ\n" +
+                        "OUFAS RHACK \n" +
+                        "KXOMZ TDALH UNVXK PXBHA VQ\n" +
+                        "XVXEP UNUXT XYNIF FMDYJ VKH";
+        Scanner scan = new Scanner(str);
+        String test = scan.next();
+        System.out.println(test);
+    }
 
     private Scanner _config = new Scanner(""
             + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
