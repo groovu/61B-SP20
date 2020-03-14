@@ -133,6 +133,7 @@ public final class Main {
                         _output.append("\n");
                         readIn = _input.nextLine();
                     } else {
+                        _output.append("\n");
                         break;
                     }
                 }
@@ -217,7 +218,7 @@ public final class Main {
         int i = 0;
         while (i < numRotors) {
             setread = scanset.next();
-            insertRotors[i] = setread;
+            insertRotors[i] = setread.toUpperCase();
             i += 1;
         }
         String rotSettings = scanset.next();

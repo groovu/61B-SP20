@@ -39,7 +39,7 @@ class Machine {
      *  Initially, all rotors are set at their 0 setting. */
     void insertRotors(String[] rotors) {
         _rotors.clear();
-        if (!_availRotors.get(rotors[0]).reflecting()) {
+        if (!_availRotors.get(rotors[0].toUpperCase()).reflecting()) {
             throw error ("First rotor is not reflector.");
         }
         if (!_availRotors.get(rotors[rotors.length - 1].toUpperCase()).rotates()) {
