@@ -63,5 +63,6 @@ class Alphabet {
         String print = new String(_alphabet);
         return print;
     }
+    /** Array that contains alphabet. */
     private char[] _alphabet;
 }

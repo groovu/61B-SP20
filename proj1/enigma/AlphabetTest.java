@@ -1,10 +1,6 @@
 package enigma;
-import net.sf.saxon.style.XSLOutput;
-import org.junit.Test;
-import org.junit.Rule;
-import org.junit.rules.Timeout;
-import org.w3c.dom.ls.LSOutput;
 
+import org.junit.Test;
 import static org.junit.Assert.*;
 
 import static enigma.TestUtils.*;

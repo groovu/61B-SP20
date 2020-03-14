@@ -13,10 +13,10 @@ import static enigma.TestUtils.*;
 public class PermutationTest {
 
     /** Testing time limit. */
-    //@Rule
-    //public Timeout globalTimeout = Timeout.seconds(5);
+    @Rule
+    public Timeout globalTimeout = Timeout.seconds(5);
 
-    /* ***** TESTING UTILITIES ***** */
+    /****** TESTING UTILITIES ***** */
 
     private Permutation perm;
     private String alpha = UPPER_STRING;
@@ -44,7 +44,7 @@ public class PermutationTest {
         }
     }
 
-    /* ***** TESTS ***** */
+    /****** TESTS ******/
 
     @Test
     public void checkIdTransform() {
@@ -80,7 +80,8 @@ public class PermutationTest {
     }
     @Test
     public void permuteNonAlpha() {
-        Permutation a = new Permutation("(!@)(#$)(*8A)", new Alphabet("!@#$%^&*()ABCDEFG"));
+        Permutation a = new Permutation("(!@)(#$)(*8A)",
+                new Alphabet("!@#$%^&*()ABCDEFG"));
         assertEquals('$', a.permute('#'));
 
     }

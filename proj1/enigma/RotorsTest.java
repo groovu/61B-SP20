@@ -1,8 +1,6 @@
 package enigma;
 
 import org.junit.Test;
-import org.junit.Rule;
-import org.junit.rules.Timeout;
 import static org.junit.Assert.*;
 
 import static enigma.TestUtils.*;
@@ -11,13 +9,12 @@ public class RotorsTest {
     @Test
     public void rotorInit() {
         Permutation p = new Permutation("", new Alphabet());
-        Rotor a = new Rotor("TEST", p);
-        assertEquals("TEST", a.name());
-        Rotor[] b = new Rotor[1];
-        System.out.println(b[0]);
+        Rotor aa = new Rotor("TEST", p);
+        assertEquals("TEST", aa.name());
+        Rotor[] bb = new Rotor[1];
     }
     Alphabet abc = new Alphabet();
-    Rotor d = new Rotor ("I", new Permutation(NAVALA.get("I"), abc));
+    Rotor d = new Rotor("I", new Permutation(NAVALA.get("I"), abc));
     Rotor a = new MovingRotor("I", new Permutation(NAVALA.get("I"), abc), "Q");
     Rotor b = new FixedRotor("Beta", new Permutation(NAVALA.get("Beta"), abc));
     Rotor r = new Reflector("B", new Permutation(NAVALA.get("B"), abc));

@@ -1,13 +1,14 @@
 package enigma;
 
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-
-import java.sql.SQLOutput;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 import static enigma.EnigmaException.*;
 
@@ -78,10 +79,8 @@ public final class Main {
      *  file _config and apply it to the messages in _input, sending the
      *  results to _output. */
     private void process() {
-        //five = 0;
         Machine enigma = readConfig();
         String readIn = _input.nextLine();
-        //System.out.println(readIn);
         if (readIn == null) {
             throw error("Input file is empty.");
         }
@@ -90,30 +89,22 @@ public final class Main {
         }
         while (_input.hasNext()) {
             five = 0;
-            //System.out.println(readIn);
-//            if (readIn.charAt(0) != '*') {
-//                throw error("Input file does not start with *.");
-//            }
             String settings = readIn;
             setUp(enigma, settings);
             readIn = _input.nextLine();
             while (readIn.charAt(0) != '*') {
-                //System.out.println("ReadIn is " + readIn);
                 String converted = "";
                 String readInput = "";
                 Scanner readScan = new Scanner(readIn);
 
-                while (readScan.hasNext() == true) {
+                while (readScan.hasNext()) {
                     String next = readScan.next();
                     readInput = readInput + next;
                 }
                 converted = converted + enigma.convert(readInput);
                 for (char c : converted.toCharArray()) {
-                    //System.out.println(five);
                     if (five == 5) {
-                        //System.out.println("output before" + _output);
                         _output.append(' ');
-                        //System.out.println(_output);
                         five = 0;
                     }
                     _output.append(c);
@@ -126,13 +117,6 @@ public final class Main {
                 } else {
                     break;
                 }
-                //readIn = _input.nextLine();
-                //System.out.println("Last Readin: " +readIn);
-//                if (readIn.charAt(0) =) {
-//                    if (_input.hasNext()) {
-//                        readIn = _input.nextLine();
-//                    }
-//                }
                 try {
                     readIn.charAt(0);
                 } catch (StringIndexOutOfBoundsException e) {
@@ -145,13 +129,7 @@ public final class Main {
                     }
                 }
             }
-            //readIn = _input.nextLine();
-//            if (_input.hasNext()) {
-//                _output.append("\n");
-//            }
-            //_output.append("\n");
         }
-        //_output.append("\n");
     }
 
     /** Return an Enigma machine configured from the contents of configuration
@@ -161,11 +139,10 @@ public final class Main {
             _alphabet = new Alphabet(_config.next());
             numRotors = _config.nextInt();
             numPawls = _config.nextInt();
-            //System.out.println(_alphabet + " " + numRotors + " " + numPawls);
             availRotors = new ArrayList<>();
             hashRotors = new LinkedHashMap<>();
             namePass = "";
-            while (_config.hasNext() == true) {
+            while (_config.hasNext()) {
                 Rotor addRot = readRotor();
                 availRotors.add(addRot);
                 hashRotors.put(addRot.name().toUpperCase(), addRot);
@@ -184,13 +161,13 @@ public final class Main {
         String perms = "";
         String read = "";
         try {
-            if (namePass == "") {
+            if (namePass.equals("")) {
                 name = _config.next();
             } else {
                 name = namePass;
             }
             notches = _config.next();
-            notchesonly = notches.substring(1); //Q
+            notchesonly = notches.substring(1);
             read = _config.next();
             while (read.charAt(0) == '(') {
                 perms = perms + read;
@@ -242,7 +219,6 @@ public final class Main {
         while (scanset.hasNext()) {
             plugboard = plugboard + scanset.next();
         }
-        //System.out.println(plugboard);
         M.setPlugboard(new Permutation(plugboard, _alphabet));
         M.insertRotors(insertRotors);
         M.setRotors(rotSettings);
@@ -250,13 +226,13 @@ public final class Main {
 
 
     /** Print MSG in groups of five (except that the last group may
-     *  have fewer letters). */
+     *  have fewer letters).  Unsure what this does though. */
     private void printMessageLine(String msg) {
-        int five = 0;
+        int fif = 0;
         for (char c : msg.toCharArray()) {
-            if (five == 5) {
+            if (fif == 5) {
                 System.out.print(" ");
-                five = 0;
+                fif = 0;
             }
             System.out.print(c);
         }
@@ -274,21 +250,21 @@ public final class Main {
     /** File for encoded/decoded messages. */
     private PrintStream _output;
 
-    /** Number of rotors from settings*/
+    /** Number of rotors from settings. */
     private int numRotors;
 
-    /** Number of pawls from settings*/
+    /** Number of pawls from settings. */
     private int numPawls;
 
-    /** Collection of available Rotors*/
+    /** Collection of available Rotors. */
     private Collection<Rotor> availRotors;
 
-    /** Name of rotor */
+    /** Name of rotor. */
     private String namePass;
 
-    /** Five tracker */
+    /** Five tracker. */
     private int five;
 
-    /** Hash of Avail Rotors */
+    /** Hash of Avail Rotors. */
     private LinkedHashMap<String, Rotor> hashRotors;
 }

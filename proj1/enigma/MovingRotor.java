@@ -39,7 +39,7 @@ class MovingRotor extends Rotor {
         set(permutation().wrap(setting() + 1));
     }
 
-    // FIXME: ADDITIONAL FIELDS HERE, AS NEEDED
+    /** The notches of the moving rotor. */
     private String _notches;
 
 }

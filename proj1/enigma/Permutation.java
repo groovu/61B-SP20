@@ -1,7 +1,5 @@
 package enigma;
 
-import static enigma.EnigmaException.*;
-
 /** Represents a permutation of a range of integers starting at 0 corresponding
  *  to the characters of an alphabet.
  *  @author Cherish Truong
@@ -14,16 +12,14 @@ class Permutation {
      *  alphabet that are not included in any cycle map to themselves.
      *  Whitespace is ignored. */
     Permutation(String cycles, Alphabet alphabet) {
-        //Permutation p = new Permutation("(CABD)(GHIF)", getNewAlphabet("ABCDEFGHI");
         _alphabet = alphabet;
         _cyc = new Cycle(cycles);
-        _cycles = _cyc.get_cyclesarray();
+        _cycles = _cyc.getCyclesArray();
     }
 
     /** Add the cycle c0->c1->...->cm->c0 to the permutation, where CYCLE is
      *  c0c1...cm. */
     private void addCycle(String cycle) {
-        // FIXME what is this for lol.
     }
 
     /** Return the value of P modulo the size of this permutation. */
@@ -43,15 +39,15 @@ class Permutation {
     /** Return the result of applying this permutation to the index of P
      *  in ALPHABET, and converting the result to a character of ALPHABET. */
     char permute(char p) {
-        char ret = p; //0 works?
+        char ret = p;
         for (int i = 0; i < _cycles.length; i += 1) {
             for (int j = 0; j < _cycles[i].length(); j += 1) {
                 if (_cycles[i].charAt(j) == p) {
-                    if (j+1 >= _cycles[i].length()) {
+                    if (j + 1 >= _cycles[i].length()) {
                         ret =  _cycles[i].charAt(0);
                     } else {
-                        ret =  _cycles[i].charAt(j+1);
-                    }// FIXME: Should you also be checking to see if the letter exists in alphabet?  how did you even get here if it didnt?
+                        ret =  _cycles[i].charAt(j + 1);
+                    }
                 }
             }
         }
@@ -67,15 +63,15 @@ class Permutation {
 
     /** Return the result of applying the inverse of this permutation to C. */
     char invert(char c) {
-        char ret = c; //0 works?
+        char ret = c;
         for (int i = 0; i < _cycles.length; i += 1) {
             for (int j = 0; j < _cycles[i].length(); j += 1) {
                 if (_cycles[i].charAt(j) == c) {
-                    if (j-1 < 0) {
+                    if (j - 1 < 0) {
                         ret =  _cycles[i].charAt(_cycles[i].length() - 1);
                     } else {
-                        ret =  _cycles[i].charAt(j-1);
-                    }// FIXME: Should you also be checking to see if the letter exists in alphabet?  how did you even get here if it didnt?
+                        ret =  _cycles[i].charAt(j - 1);
+                    }
                 }
             }
         }
@@ -108,7 +104,7 @@ class Permutation {
     /** Return true iff this permutation is a derangement (i.e., a
      *  permutation for which no value maps to itself). */
     boolean derangement() {
-        return true;  // FIXME
+        return true;
     }
 
     /** Alphabet of this permutation. */
@@ -117,8 +113,6 @@ class Permutation {
     /** Cycle of this permutation. */
     private String[] _cycles;
 
-    /** Cycle object of this perm */
+    /** Cycle object of this perm. */
     private Cycle _cyc;
-
-    // FIXME: ADDITIONAL FIELDS HERE, AS NEEDED
 }

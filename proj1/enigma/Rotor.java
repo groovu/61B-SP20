@@ -51,7 +51,6 @@ class Rotor {
     /** Set setting() to POSN.  */
     void set(int posn) {
         _setting = permutation().wrap(posn);
-        // do I need to wrap this?
     }
 
     /** Set setting() to character CPOSN. */
@@ -98,9 +97,6 @@ class Rotor {
     /** The permutation implemented by this rotor in its 0 position. */
     private Permutation _permutation;
 
-    /** My current setting */
+    /** My current setting. */
     private int _setting;
-
-    // FIXME: ADDITIONAL FIELDS HERE, AS NEEDED
-
 }

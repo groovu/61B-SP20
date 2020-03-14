@@ -1,6 +1,9 @@
 package enigma;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedList;
+
 
 import static enigma.EnigmaException.*;
 
@@ -12,7 +15,8 @@ class Machine {
     /** A new Enigma machine with alphabet ALPHA, 1 < NUMROTORS rotor slots,
      *  and 0 <= PAWLS < NUMROTORS pawls.  AVAILROTORS contains all the
      *  available rotors. */
-    Machine(Alphabet alpha, int numRotors, int pawls, Collection<Rotor> availRotors) {
+    Machine(Alphabet alpha, int numRotors,
+            int pawls, Collection<Rotor> availRotors) {
         _numRotors = numRotors;
         _alphabet = alpha;
         _numPawls = pawls;
@@ -40,10 +44,11 @@ class Machine {
     void insertRotors(String[] rotors) {
         _rotors.clear();
         if (!_availRotors.get(rotors[0].toUpperCase()).reflecting()) {
-            throw error ("First rotor is not reflector.");
+            throw error("First rotor is not reflector.");
         }
-        if (!_availRotors.get(rotors[rotors.length - 1].toUpperCase()).rotates()) {
-            throw error ("Last rotor does not rotate.");
+        if (!_availRotors.get(
+                rotors[rotors.length - 1].toUpperCase()).rotates()) {
+            throw error("Last rotor does not rotate.");
         }
         for (String r : rotors) {
             if (!_availRotors.containsKey(r.toUpperCase())) {
@@ -52,22 +57,18 @@ class Machine {
             _rotors.add(_availRotors.get(r.toUpperCase()));
         }
         int pawls = 0;
-//        for (Map.Entry<String, Rotor> r : _rotors.entrySet()) {
-//            if (r.getValue().rotates()) {
-//                pawls += 1;
-//            }
-//        }
+
         for (Rotor r: _rotors) {
             if (r.rotates()) {
-                //System.out.println(r.name() + " rotates? " + r.rotates());
                 pawls += 1;
             }
         }
         if (pawls != numPawls()) {
-            throw error ("pawls "+ pawls + " != numPawls()" + numPawls());
+            throw error("pawls " + pawls + " != numPawls()" + numPawls());
         }
         if (_rotors.size() != _numRotors) {
-            throw error("_rotorssize "+_rotors.size()  + " != _numRotors"+  _numRotors);
+            throw error("_rotorssize "
+                    + _rotors.size() + " != _numRotors" +  _numRotors);
         }
     }
 
@@ -75,20 +76,14 @@ class Machine {
      *  numRotors()-1 characters in my alphabet. The first letter refers
      *  to the leftmost rotor setting (not counting the reflector).  */
     void setRotors(String setting) {
-        if (setting.length() != _rotors.size() - 1) { //FIXME -1 or 0?
-            throw error ("Number of settings do not match number of rotors.");
+        if (setting.length() != _rotors.size() - 1) {
+            throw error("Number of settings do not match number of rotors.");
         }
         for (int i = 0; i < numRotors() - 1; i += 1) {
-            if (_alphabet.contains(setting.charAt(i)) == false) {
+            if (!_alphabet.contains(setting.charAt(i))) {
                 throw error("Setting is not in alphabet");
             }
         }
-//        Set<String> rotors = _rotors.keySet();
-//        int i = 0;
-//        for(String r : rotors) {
-//            _rotors.get(r).set(setting.charAt(i));
-//            i += 1;
-//        }
         int i = -1;
         for (Rotor r : _rotors) {
             if (i == -1) {
@@ -110,9 +105,8 @@ class Machine {
      *  index in the range 0..alphabet size - 1), after first advancing
      *  the machine. */
     int convert(int c) {
-        //forward pass (going right to left)
         char x = _alphabet.toChar(c);
-        if (_alphabet.contains(x) == false) {
+        if (!_alphabet.contains(x)) {
             throw error("Input int c is not in machine's alphabet.");
         }
         int first = _rotors.size() - 1;
@@ -137,13 +131,12 @@ class Machine {
             Rotor nextRot = _rotors.get(i);
             c = nextRot.convertForward(c);
         }
-        //backwards
         for (int i = 1; i < first + 1; i += 1) {
             Rotor nextRot = _rotors.get(i);
             c = nextRot.convertBackward(c);
         }
         c = _plug.permute(c);
-        return c; //
+        return c;
     }
 
     /** Returns the encoding/decoding of MSG, updating the state of
@@ -172,11 +165,9 @@ class Machine {
     /** HashMap of all Rotors. */
     private HashMap<String, Rotor> _availRotors;
 
-    /** LinkedList of Rotors used by Machine */
+    /** LinkedList of Rotors used by Machine. */
     private LinkedList<Rotor> _rotors;
 
-    /** Plugboard of machine */
+    /** Plugboard of machine. */
     private Permutation _plug;
-
-    // FIXME: ADDITIONAL FIELDS HERE, IF NEEDED.
 }
