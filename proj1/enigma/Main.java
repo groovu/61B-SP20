@@ -81,7 +81,7 @@ public final class Main {
         //five = 0;
         Machine enigma = readConfig();
         String readIn = _input.nextLine();
-        System.out.println(readIn);
+        //System.out.println(readIn);
         if (readIn == null) {
             throw error("Input file is empty.");
         }
