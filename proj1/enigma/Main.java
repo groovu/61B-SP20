@@ -81,12 +81,19 @@ public final class Main {
         //five = 0;
         Machine enigma = readConfig();
         String readIn = _input.nextLine();
+        System.out.println(readIn);
+        if (readIn == null) {
+            throw error("Input file is empty.");
+        }
+        if (readIn.charAt(0) != '*') {
+            throw error("Input file does not start with *.");
+        }
         while (_input.hasNext()) {
             five = 0;
             //System.out.println(readIn);
-            if (readIn.charAt(0) != '*') {
-                throw error("Input file does not start with *.");
-            }
+//            if (readIn.charAt(0) != '*') {
+//                throw error("Input file does not start with *.");
+//            }
             String settings = readIn;
             setUp(enigma, settings);
             readIn = _input.nextLine();
