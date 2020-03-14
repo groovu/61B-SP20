@@ -151,6 +151,7 @@ public final class Main {
 //            }
             //_output.append("\n");
         }
+        _output.append("\n");
     }
 
     /** Return an Enigma machine configured from the contents of configuration
