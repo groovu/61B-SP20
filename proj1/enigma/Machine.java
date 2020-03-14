@@ -75,7 +75,7 @@ class Machine {
      *  numRotors()-1 characters in my alphabet. The first letter refers
      *  to the leftmost rotor setting (not counting the reflector).  */
     void setRotors(String setting) {
-        if (setting.length() != _rotors.size() - 1) {
+        if (setting.length() != _rotors.size() - 1) { //FIXME -1 or 0?
             throw error ("Number of settings do not match number of rotors.");
         }
         for (int i = 0; i < numRotors() - 1; i += 1) {

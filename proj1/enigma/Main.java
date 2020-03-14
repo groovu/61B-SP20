@@ -163,10 +163,12 @@ public final class Main {
             numPawls = _config.nextInt();
             //System.out.println(_alphabet + " " + numRotors + " " + numPawls);
             availRotors = new ArrayList<>();
+            hashRotors = new LinkedHashMap<>();
             namePass = "";
             while (_config.hasNext() == true) {
                 Rotor addRot = readRotor();
                 availRotors.add(addRot);
+                hashRotors.put(addRot.name().toUpperCase(), addRot);
             }
             return new Machine(_alphabet, numRotors, numPawls, availRotors);
         } catch (NoSuchElementException excp) {
@@ -192,7 +194,7 @@ public final class Main {
             read = _config.next();
             while (read.charAt(0) == '(') {
                 perms = perms + read;
-                if (_config.hasNext() == false) {
+                if (!_config.hasNext()) {
                     break;
                 }
                 read = _config.next();
@@ -225,12 +227,15 @@ public final class Main {
         }
         int i = 0;
         while (i < numRotors) {
-            setread = scanset.next();
-            insertRotors[i] = setread.toUpperCase();
+            setread = scanset.next().toUpperCase();
+            if (!hashRotors.containsKey(setread)) {
+                throw error("Inserting rotor that does not exist in avail.");
+            }
+            insertRotors[i] = setread;
             i += 1;
         }
         String rotSettings = scanset.next();
-        if (availRotors.contains(rotSettings) == true) {
+        if (availRotors.contains(rotSettings)) {
             throw error("This read is a rotor, not the rotor settings.");
         }
         String plugboard = "";
@@ -283,4 +288,7 @@ public final class Main {
 
     /** Five tracker */
     private int five;
+
+    /** Hash of Avail Rotors */
+    private LinkedHashMap<String, Rotor> hashRotors;
 }
