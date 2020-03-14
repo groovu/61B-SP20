@@ -119,7 +119,7 @@ public final class Main {
                     _output.append(c);
                     five += 1;
                 }
-                if (_input.hasNext()) {
+                if (_input.hasNextLine()) {
                     readIn = _input.nextLine();
                     _output.append('\n');
                     five = 0;
@@ -151,7 +151,7 @@ public final class Main {
 //            }
             //_output.append("\n");
         }
-        _output.append("\n");
+        //_output.append("\n");
     }
 
     /** Return an Enigma machine configured from the contents of configuration
