@@ -42,7 +42,7 @@ class Machine {
         if (!_availRotors.get(rotors[0]).reflecting()) {
             throw error ("First rotor is not reflector.");
         }
-        if (!_availRotors.get(rotors[rotors.length - 1]).rotates()) {
+        if (!_availRotors.get(rotors[rotors.length - 1].toUpperCase()).rotates()) {
             throw error ("Last rotor does not rotate.");
         }
         for (String r : rotors) {

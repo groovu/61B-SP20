@@ -152,6 +152,7 @@ public final class Main {
             _alphabet = new Alphabet(_config.next());
             numRotors = _config.nextInt();
             numPawls = _config.nextInt();
+            //System.out.println(_alphabet + " " + numRotors + " " + numPawls);
             availRotors = new ArrayList<>();
             namePass = "";
             while (_config.hasNext() == true) {
