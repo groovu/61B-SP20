@@ -25,7 +25,9 @@ public class Nybbles {
         if (k < 0 || k >= _n) {
             throw new IndexOutOfBoundsException();
         } else {
-            return 0; // REPLACE WITH SOLUTION
+            int i = _data[k / 8];
+            int j = (k % 8) * 4;
+            return (i << j ) >> 28;
         }
     }
 
