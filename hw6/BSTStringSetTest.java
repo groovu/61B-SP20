@@ -30,10 +30,12 @@ public class BSTStringSetTest  {
 
         assertEquals(true, test.contains("A"));
         assertEquals(true, test.contains("B"));
+        assertFalse(test.contains("Z"));
 //        assertEquals("C", it.next());
 //        assertEquals("A", it.next());
 //        assertEquals("B", it.next());
 //        assertEquals(false, test.contains("A"));
     }
+
     String ABC = "ABC";
 }

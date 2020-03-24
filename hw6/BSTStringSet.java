@@ -155,9 +155,18 @@ public class BSTStringSet implements StringSet, Iterable<String> {
 
     public static class BSTIteratorRange implements Iterator<String> {
         private Stack<Node> _toDo = new Stack<>();
-        BSTIteratorRange(Node node, String low, String high) { addTree(node); }
+        private String low;
+        private String high;
+        BSTIteratorRange(Node node, String low, String high) {
+            this.low = low;
+            this.high = high;
+            addTree(node);
+        }
         @Override
-        public boolean hasNext() { return !_toDo.empty(); }
+        public boolean hasNext() {
+            return !_toDo.empty();
+        }
+
         @Override
         public String next() {
             if (!hasNext()) {
@@ -165,6 +174,10 @@ public class BSTStringSet implements StringSet, Iterable<String> {
             }
             Node node = _toDo.pop();
             addTree(node.right);
+            while (node.s.compareTo(low) < 0) {
+                node = _toDo.pop();
+                addTree(node.right);
+            }
             return node.s;
 
         }
@@ -175,7 +188,9 @@ public class BSTStringSet implements StringSet, Iterable<String> {
 
         private void addTree(Node node) {
             while (node != null) {
-                _toDo.push(node);
+                if (node.s.compareTo(high) < 0) {
+                    _toDo.push(node);
+                }
                 node = node.left;
             }
         }
