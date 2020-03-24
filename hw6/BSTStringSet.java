@@ -17,16 +17,76 @@ public class BSTStringSet implements StringSet, Iterable<String> {
     @Override
     public void put(String s) {
         // FIXME: PART A
+        System.out.println("putting " + s + "in");
+        nodePut(s, _root);
     }
+
+    private Node nodePut(String str, Node n) {
+        if (_root == null) {
+            _root = new Node(str);
+        } else {
+            System.out.println("Entered Else");
+            System.out.println(str.compareTo(n.s));
+            if (str.compareTo(n.s) == 0) {
+                System.out.println("Element already exists");
+                return n;
+            } else if (str.compareTo(n.s) < 0) { //go left
+                System.out.println("going left");
+                if (n.left == null) {
+                    n.left = new Node(str);
+                } else {
+                    nodePut(str, n.left);
+                }
+            } else if (str.compareTo(n.s) > 0) {
+                System.out.println("Going right");
+                if (n.right == null) {
+                    n.right = new Node(str);
+                } else {
+                    nodePut(str, n.right);
+                }
+            }
+        }
+        return _root;
+    }
+
 
     @Override
     public boolean contains(String s) {
-        return false; // FIXME: PART A
+        if (_root.s == s) {
+            return true;
+        } else if (_root == null) {
+            return false;
+        }
+        return containsHelper(s, _root); // FIXME: PART A
     }
 
+    private boolean containsHelper(String s, Node n) {
+        System.out.println("Helper, s: " + s + ", node.s: " + n.s);
+        if (s == n.s) {
+            return true;
+        } else if (s.compareTo(n.s) < 0) {
+            if (n.left == null) {
+                return false;
+            } else {
+                return containsHelper(s, n.left);
+            }
+        } else if (s.compareTo(n.s) > 0) {
+            if (n.right == null) {
+                return false;
+            } else {
+                return containsHelper(s, n.right);
+            }
+        }
+        return false;
+    }
     @Override
     public List<String> asList() {
-        return null; // FIXME: PART A
+        List<String> list = new ArrayList<String>();
+        Iterator<String> it = iterator();
+        while (it.hasNext()) {
+            list.add(it.next());
+        }
+        return list; // FIXME: PART A
     }
 
 
@@ -96,9 +156,36 @@ public class BSTStringSet implements StringSet, Iterable<String> {
     }
 
     // FIXME: UNCOMMENT THE NEXT LINE FOR PART B
-    // @Override
     public Iterator<String> iterator(String low, String high) {
-        return null;  // FIXME: PART B
+        return new BSTIteratorRange(_root, low, high);  // FIXME: PART B
+    }
+
+    public static class BSTIteratorRange implements Iterator<String> {
+        private Stack<Node> _toDo = new Stack<>();
+        BSTIteratorRange(Node node, String low, String high) { addTree(node); }
+        @Override
+        public boolean hasNext() { return !_toDo.empty(); }
+        @Override
+        public String next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            Node node = _toDo.pop();
+            addTree(node.right);
+            return node.s;
+
+        }
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        private void addTree(Node node) {
+            while (node != null) {
+                _toDo.push(node);
+                node = node.left;
+            }
+        }
     }
 
 
