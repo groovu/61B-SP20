@@ -25,17 +25,25 @@ public class BSTStringSetTest  {
         test.put("C");
         ArrayList<String> woo = new ArrayList<String>(Arrays.asList("A", "B", "C"));
         assertEquals(woo, test.asList());
+        test.put("D");
         //
         //Iterator<String> it = test.iterator();
 
         assertEquals(true, test.contains("A"));
         assertEquals(true, test.contains("B"));
         assertFalse(test.contains("Z"));
+        assertTrue(test.contains("D"));
 //        assertEquals("C", it.next());
 //        assertEquals("A", it.next());
 //        assertEquals("B", it.next());
 //        assertEquals(false, test.contains("A"));
     }
+
+    @Test
+    public void largeTest() {
+
+    }
+
 
     String ABC = "ABC";
 }

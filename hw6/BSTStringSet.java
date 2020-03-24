@@ -25,7 +25,7 @@ public class BSTStringSet implements StringSet, Iterable<String> {
             _root = new Node(str);
         } else {
             if (str.compareTo(n.s) == 0) {
-                return n;
+                return _root;
             } else if (str.compareTo(n.s) < 0) { //go left
                 if (n.left == null) {
                     n.left = new Node(str);
@@ -46,10 +46,14 @@ public class BSTStringSet implements StringSet, Iterable<String> {
 
     @Override
     public boolean contains(String s) {
+        if (_root == null) {
+            return false;
+        }
         if (_root.s == s) {
             return true;
-        } else if (_root == null) {
-            return false;
+//        } else if (_root == null) {
+//            return false;
+//        }
         }
         return containsHelper(s, _root); // FIXME: PART A
     }
