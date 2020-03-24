@@ -17,7 +17,6 @@ public class BSTStringSet implements StringSet, Iterable<String> {
     @Override
     public void put(String s) {
         // FIXME: PART A
-        System.out.println("putting " + s + "in");
         nodePut(s, _root);
     }
 
@@ -25,20 +24,15 @@ public class BSTStringSet implements StringSet, Iterable<String> {
         if (_root == null) {
             _root = new Node(str);
         } else {
-            System.out.println("Entered Else");
-            System.out.println(str.compareTo(n.s));
             if (str.compareTo(n.s) == 0) {
-                System.out.println("Element already exists");
                 return n;
             } else if (str.compareTo(n.s) < 0) { //go left
-                System.out.println("going left");
                 if (n.left == null) {
                     n.left = new Node(str);
                 } else {
                     nodePut(str, n.left);
                 }
             } else if (str.compareTo(n.s) > 0) {
-                System.out.println("Going right");
                 if (n.right == null) {
                     n.right = new Node(str);
                 } else {
@@ -61,7 +55,6 @@ public class BSTStringSet implements StringSet, Iterable<String> {
     }
 
     private boolean containsHelper(String s, Node n) {
-        System.out.println("Helper, s: " + s + ", node.s: " + n.s);
         if (s == n.s) {
             return true;
         } else if (s.compareTo(n.s) < 0) {
