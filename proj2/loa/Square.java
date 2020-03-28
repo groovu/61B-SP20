@@ -143,7 +143,7 @@ final class Square {
     private Square(int col, int row) {
         _row = row;
         _col = col;
-        _str = String.format("%c%d", (char) ('a' + _col), 1 + _row);
+        _str = String.format("%c%d`", (char) ('a' + _col), 1 + _row);
     }
 
     @Override

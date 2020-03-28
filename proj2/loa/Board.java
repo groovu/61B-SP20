@@ -52,6 +52,12 @@ class Board {
     /** Set my state to CONTENTS with SIDE to move. */
     void initialize(Piece[][] contents, Piece side) {
         // FIXME
+        for (int r = 0; r < BOARD_SIZE; r += 1) {
+            for (int c = 0; c < BOARD_SIZE; c += 1) {
+                _board[(r << 3) + c] = contents[r][c];
+                set(sq(c, r), contents[r][c]);
+            }
+        }
         _turn = side;
         _moveLimit = DEFAULT_MOVE_LIMIT;
     }
@@ -77,7 +83,13 @@ class Board {
     /** Set the square at SQ to V and set the side that is to move next
      *  to NEXT, if NEXT is not null. */
     void set(Square sq, Piece v, Piece next) {
-        // FIXME
+        //Piece setter = get(sq);
+        Piece setter = v;
+        _board[sq.index()] = setter;
+        // FIXME?
+        if (next != null) {
+            _turn = next;
+        }
     }
 
     /** Set the square at SQ to V, without modifying the side that
@@ -117,6 +129,23 @@ class Board {
     /** Return true iff FROM - TO is a legal move for the player currently on
      *  move. */
     boolean isLegal(Square from, Square to) {
+        if (from == null) {
+            return false;
+        }
+        if (to == null) {
+            return false;
+        }
+        if (from == to) {
+            return false;
+        }
+        int[] fromRC = new int[2], toRC = new int[2];
+        fromRC[0] = from.row();
+        fromRC[1] = from.col();
+        toRC[0] = to.row();
+        toRC[1] = to.col();
+
+
+
         return true;   // FIXME
     }
 
@@ -224,6 +253,18 @@ class Board {
     }
 
     // FIXME: Other methods, variables?
+    /** Takes in index and returns coordinates */
+    public int[] indexToRC(int i) {
+        int[] ret = new int[2];
+        ret[1] = i >> 3;
+        ret[0] = i - ret[1] * 8;
+        return ret;
+    };
+
+    /** Takes in RC coordinates and returns index. */
+    public int rctoIndex(int r, int c) {
+        return (c << 3) + r;
+    };
 
     /** The standard initial configuration for Lines of Action (bottom row
      *  first). */
@@ -238,8 +279,21 @@ class Board {
         { EMP, BP,  BP,  BP,  BP,  BP,  BP,  EMP }
     };
 
+    /** The nonstandard initial configuration for Lines of Action (bottom row
+     *  first). */
+    static final Piece[][] INITIAL_PIECES2 = {
+            { WP, BP,  BP,  BP,  BP,  BP,  BP,  EMP },
+            { BP,  EMP, EMP, EMP, EMP, EMP, EMP, WP  },
+            { WP,  EMP, EMP, EMP, EMP, EMP, EMP, WP  },
+            { WP,  EMP, EMP, EMP, EMP, EMP, EMP, WP  },
+            { WP,  EMP, EMP, EMP, EMP, EMP, EMP, WP  },
+            { WP,  EMP, EMP, EMP, EMP, EMP, EMP, WP  },
+            { WP,  EMP, EMP, EMP, EMP, EMP, EMP, WP  },
+            { EMP, BP,  BP,  BP,  BP,  BP,  BP,  EMP }
+    };
     /** Current contents of the board.  Square S is at _board[S.index()]. */
-    private final Piece[] _board = new Piece[BOARD_SIZE  * BOARD_SIZE];
+    // FIXME change back to private.
+    public final Piece[] _board = new Piece[BOARD_SIZE  * BOARD_SIZE];
 
     /** List of all unretracted moves on this board, in order. */
     private final ArrayList<Move> _moves = new ArrayList<>();
@@ -260,4 +314,7 @@ class Board {
     private final ArrayList<Integer>
         _whiteRegionSizes = new ArrayList<>(),
         _blackRegionSizes = new ArrayList<>();
+
+    /** Pieces on board */
+    private Piece[][] _pob;
 }

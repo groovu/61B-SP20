@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import static loa.Piece.*;
 import static loa.Square.sq;
 import static loa.Move.mv;
+import static loa.Board.*;
 
 /** Tests of the Board class API.
  *  @author
@@ -64,11 +65,40 @@ public class BoardTest {
         + "Next move: black\n"
         + "===";
 
-    /** Test display */
+    /** Board init. */
+    @Test
+    public void coordTest() {
+        Board test = new Board(Board.INITIAL_PIECES2, BP);
+//        for (Piece b : test._board) {
+//            System.out.println(b);
+//        }
+        int i = (2 << 3) + 1;
+        int y = i >> 3;
+        int x = i - y * 8;
+        int out = (y << 3) + x;
+        assertEquals(2, y);
+        assertEquals(1, x);
+        assertEquals(17, out);
+        // 56...       63
+        // ...
+        // 16 ...      23
+        // 8 ...       15
+        // 0 1 2 3 ... 7
+    }
+
+    /** Test display (which also checks to see if initializer is working properly.) */
     @Test
     public void toStringTest() {
-        assertEquals(BOARD1_STRING, new Board(BOARD1, BP).toString());
+        Board test = new Board(BOARD1, BP);
+        Board initial = new Board(Board.INITIAL_PIECES, WP);
+        assertEquals(BOARD1_STRING, test.toString().replaceAll("\\r\\n", "\n"));
+        System.out.println(test.toString());
+        System.out.println(initial.toString());
     }
+
+
+    //@Test
+    //public void distance
 
     /** Test legal moves. */
     @Test
