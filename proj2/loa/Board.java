@@ -55,6 +55,7 @@ class Board {
         for (int r = 0; r < BOARD_SIZE; r += 1) {
             for (int c = 0; c < BOARD_SIZE; c += 1) {
                 _board[(r << 3) + c] = contents[r][c];
+                sq(c,r)._contains = contents[r][c];
                 set(sq(c, r), contents[r][c]);
             }
         }

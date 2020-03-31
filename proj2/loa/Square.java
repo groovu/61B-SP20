@@ -209,4 +209,7 @@ final class Square {
     /** My String denotation. */
     private final String _str;
 
+    /** Currently contains this piece in square. */
+    public Piece _contains;
+
 }
