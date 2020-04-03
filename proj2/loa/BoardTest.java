@@ -149,9 +149,12 @@ public class BoardTest {
     //** Test numContig. */
     @Test
     public void testNumContig() {
-        Board test = new Board(BOARD1, BP);
+        Board test = new Board(Board.INITIAL_PIECES, BP);
         boolean[][] v = new boolean[BOARD_SIZE][BOARD_SIZE];
-        int x = test.numContig(sq(7,7),v,WP, 0);
+        Square boo = sq(7,7);
+        System.out.println(test);
+        System.out.println(boo._contains);
+        int x = test.numContig(boo,v,WP, 0);
         System.out.println(x);
     }
 

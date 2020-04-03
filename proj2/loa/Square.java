@@ -125,9 +125,8 @@ final class Square {
     /** Return the (unique) Square denoting COL ROW. */
     static Square sq(int col, int row) {
         if (!exists(row, col)) {
-            //error(1, "row or column out of bounds");
-            //FIXME I want to be able to retrieve bad squares.
-            return null;
+            error(1, "row or column out of bounds");
+
         }
         return SQUARES[col][row];
     }

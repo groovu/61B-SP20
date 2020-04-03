@@ -245,7 +245,11 @@ class Board {
     Piece winner() {
         if (!_winnerKnown) {
             // FIXME
-            _winnerKnown = true;
+            //_winnerKnown = true;
+            if (piecesContiguous(WP) || piecesContiguous(BP)) {
+                _winnerKnown = true;
+                _winner = _turn.opposite();
+            }
         }
         return _winner;
     }
@@ -294,6 +298,33 @@ class Board {
      *  have already been processed or are in different clusters.  Update
      *  VISITED to reflect squares counted. */
     int numContig(Square sq, boolean[][] visited, Piece p, int count) {
+//        if (sq == null) {
+//            return 0;
+//        }
+//        int c = sq.col();
+//        int r = sq.row();
+//        if (visited[c][r] == true) {
+//            return 0;
+//        }
+//        if (p == EMP) {
+//            visited[c][r] = true;
+//            return 0;
+//        }
+//        visited[c][r] = true;
+//        Square[] checkSq = new Square[8];
+//        for (int i = 0; i < 8; i += 1) {
+//            int cc = Square.DIR[i][0];
+//            int cr = Square.DIR[i][1];
+//            checkSq[i] = sq(c + cc, r + cr);
+//        }
+//        for (int j = 0; j < 8; j += 1) {
+//            System.out.print(checkSq[j]);
+//        }
+//        System.out.println(" ");
+//        for (int j = 0; j < 8; j += 1) {
+//            count += numContig(checkSq[j], visited, p, count);
+//            System.out.println(count);
+//        }
         if (sq == null) {
             return 0;
         }
@@ -302,26 +333,28 @@ class Board {
         if (visited[c][r] == true) {
             return 0;
         }
-        if (p == EMP) {
-            visited[c][r] = true;
-            return 0;
-        }
         visited[c][r] = true;
-        Square[] checkSq = new Square[8];
+        if (sq._contains == p) {
+            count += 1;
+        }
+        Square[] around = new Square[8];
         for (int i = 0; i < 8; i += 1) {
-            int cc = Square.DIR[i][0];
-            int cr = Square.DIR[i][1];
-            checkSq[i] = sq(c + cc, r + cr);
+            int nextc = c + Square.DIR[i][0];
+            int nextr = r + Square.DIR[i][1];
+            if ((nextc > 7) || (nextr > 7) || (nextc < 0) || (nextr < 0)) {
+                continue;
+            } else if (sq(nextc, nextr)._contains == p) {
+                around[i] = sq(nextc, nextr);
+            }
         }
-        for (int j = 0; j < 8; j += 1) {
-            System.out.print(checkSq[j]);
+        int newcount = 0;
+        for (int x = 0; x < 8; x += 1) {
+            if (around[x] != null) {
+                newcount += numContig(around[x], visited, p, 0);
+            }
         }
-        System.out.println(" ");
-        for (int j = 0; j < 8; j += 1) {
-            count += numContig(checkSq[j], visited, p, count);
-            System.out.println(count);
-        }
-        return count;  // FIXME
+
+        return count + newcount;  // FIXME
     }
 
     private int match(Square from, Square to) {
@@ -338,7 +371,7 @@ class Board {
         // FIXME
         boolean[][] visited = new boolean[BOARD_SIZE][BOARD_SIZE];
         for (int c = 0; c < BOARD_SIZE; c += 1) {
-            for (int r = 0; c < BOARD_SIZE; r += 1) {
+            for (int r = 0; r < BOARD_SIZE; r += 1) {
                 Piece curr = sq(c,r)._contains;
                 if (curr == EMP) {
                     visited[c][r] = true;
