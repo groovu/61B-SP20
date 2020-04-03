@@ -121,6 +121,19 @@ class Board {
      *  the capturing move. */
     void makeMove(Move move) {
         assert isLegal(move);
+        Square from = move.getFrom();
+        Square to = move.getTo();
+        if (get(from) != get(to)) {
+            Move.mv(from, to, true);
+            _moves.add(Move.mv(from, to, true));
+        } else {
+            Move.mv(from, to, false);
+            _moves.add(Move.mv(from, to, false));
+        }
+        set(to, get(from));
+        set(from, EMP);
+        _turn = turn().opposite();
+
         // FIXME
     }
 
@@ -128,6 +141,17 @@ class Board {
      *  that move.  Requires that movesMade () > 0. */
     void retract() {
         assert movesMade() > 0;
+        Move undo = _moves.remove(_moves.size() - 1);
+        Square from = undo.getFrom();
+        Square to = undo.getTo();
+        set(from, get(to));
+        if (undo.isCapture()) {
+            set(to, get(to).opposite());
+        } else {
+            set(to, EMP);
+        }
+        _turn = turn().opposite();
+        _subsetsInitialized = false;
         // FIXME
     }
 
@@ -290,7 +314,7 @@ class Board {
     /** Return true if a move from FROM to TO is blocked by an opposing
      *  piece or by a friendly piece on the target square. */
     private boolean blocked(Square from, Square to) {
-        return false; // FIXME
+        return false; // FIXME I made my own block method.
     }
 
     /** Return the size of the as-yet unvisited cluster of squares

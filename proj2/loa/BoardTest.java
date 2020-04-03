@@ -152,10 +152,13 @@ public class BoardTest {
         Board test = new Board(Board.INITIAL_PIECES, BP);
         boolean[][] v = new boolean[BOARD_SIZE][BOARD_SIZE];
         Square boo = sq(7,7);
-        System.out.println(test);
-        System.out.println(boo._contains);
         int x = test.numContig(boo,v,WP, 0);
-        System.out.println(x);
+        assertEquals(6, x);
+        Board test2 = new Board(BOARD1, BP);
+        System.out.println(test2);
+        boolean[][] z = new boolean[8][8];
+        assertEquals(2, test2.numContig(sq(2, 4), z, WP, 0));
+        assertEquals(3, test2.numContig(sq(2, 7), z, BP, 0));
     }
 
     /** Test contiguity. */
