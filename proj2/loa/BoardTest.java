@@ -96,6 +96,21 @@ public class BoardTest {
         System.out.println(initial.toString());
     }
 
+    /** Test to see if counting actions works. */
+    @Test
+    public void testActions() {
+        int c = Square.DIR[0][0];
+        int r = Square.DIR[0][1];
+        Board test = new Board(BOARD1, BP);
+        System.out.println(test);
+        System.out.println(test.actions(sq(1,7),0));
+        assertEquals(5, test.actions(sq(0,0),0));
+        assertEquals(3, test.actions(sq(7,7), 4));
+        assertEquals(4, test.actions(sq(5,2), 0));
+        assertEquals(2, test.actions(sq(0, 1), 2));
+        assertEquals(4, test.actions(sq(0, 4), 2));
+
+    }
 
     //@Test
     //public void distance

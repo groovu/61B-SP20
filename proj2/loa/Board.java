@@ -74,6 +74,14 @@ class Board {
             return;
         }
         // FIXME
+        for (int r = 0; r < BOARD_SIZE; r += 1) {
+            for (int c = 0; c < BOARD_SIZE; c += 1) {
+                _board[(r << 3) + c] = board.get(sq(c, r));
+            }
+        }
+
+        _turn = board._turn;
+        _moveLimit = DEFAULT_MOVE_LIMIT;
     }
 
     /** Return the contents of the square at SQ. */
@@ -87,7 +95,6 @@ class Board {
         //Piece setter = get(sq);
         Piece setter = v;
         _board[sq.index()] = setter;
-        // FIXME?
         if (next != null) {
             _turn = next;
         }
@@ -132,6 +139,9 @@ class Board {
     /** Return true iff FROM - TO is a legal move for the player currently on
      *  move. */
     boolean isLegal(Square from, Square to) {
+        if (!from.isValidMove(to)) {
+            return false;
+        }
         if (from == null) {
             return false;
         }
@@ -146,10 +156,62 @@ class Board {
         fromRC[1] = from.col();
         toRC[0] = to.row();
         toRC[1] = to.col();
+        int dist = from.distance(to);
+        int dir = from.direction(to);
+        if (dist != moves(from, dir)) {
+            return false;
+        }
+        for (int i = 0; i > 2; i += 1) {
+        }
+
 
 
 
         return true;   // FIXME
+    }
+    int moves(Square sq, int dir) {
+        int ret = 0;
+        for (int i = 0; i < 8; i += 1) {
+            if (sq.moveDest(dir, i) != null) {
+                ret += 1;
+            }
+        }
+        return ret;
+    }
+    int actions(Square from, int direction) {
+        int dir = direction % 4;
+        int ret = 0;
+        int fromR = from.row();
+        int fromC = from.col();
+        if (sq(fromC, fromR)._contains != EMP) {
+            ret += 1;
+        }
+        if (dir == 0) {
+            // going up
+            for (int rUp = fromR + 1; rUp < BOARD_SIZE; rUp += 1) {
+                if (sq(fromC, rUp)._contains != EMP) {
+                    ret += 1;
+                }
+            }
+            for (int rDn = fromR - 1; rDn >= 0; rDn -= 1) {
+                if (sq(fromC, rDn)._contains != EMP) {
+                    ret += 1;
+                }
+            }
+        } else if (dir == 2) {
+            for (int cRt = fromC + 1; cRt < BOARD_SIZE; cRt += 1) {
+                if (sq(cRt, fromR)._contains != EMP) {
+                    ret += 1;
+                }
+            }
+            for (int cLt = fromC - 1; cLt >= 0; cLt -= 1) {
+                if (sq(cLt, fromR)._contains != EMP) {
+                    ret += 1;
+                }
+            }
+        }
+
+        return ret;
     }
 
     /** Return true iff MOVE is legal for the player currently on move.

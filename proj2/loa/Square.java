@@ -59,7 +59,8 @@ final class Square {
     /** Definitions of directions.  DIR[k] = (dcol, drow)
      *  means that to going one step from (col, row) in direction k,
      *  brings us to (col + dcol, row + drow). */
-    private static final int[][] DIR = {
+    //FIXME change back to private
+    public static final int[][] DIR = {
         { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 },
         { -1, -1 }, { -1, 0 }, { -1, 1 }
     };
