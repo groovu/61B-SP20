@@ -125,9 +125,16 @@ final class Square {
     /** Return the (unique) Square denoting COL ROW. */
     static Square sq(int col, int row) {
         if (!exists(row, col)) {
-            error(1, "row or column out of bounds");
+            //error(1, "row or column out of bounds");
+            //FIXME I want to be able to retrieve bad squares.
+            return null;
         }
         return SQUARES[col][row];
+    }
+
+    /** Return unique Square using alphabet position */
+    static Square sq(char a, int row) {
+        return sq(a - 97, row - 1);
     }
 
     /** Return the (unique) Square denoting the position in POSN, in the

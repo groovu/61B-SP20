@@ -142,77 +142,81 @@ class Board {
         if (!from.isValidMove(to)) {
             return false;
         }
-        if (from == null) {
-            return false;
-        }
-        if (to == null) {
+        if ((from == null) || (to == null)) {
             return false;
         }
         if (from == to) {
             return false;
         }
-        int[] fromRC = new int[2], toRC = new int[2];
-        fromRC[0] = from.row();
-        fromRC[1] = from.col();
-        toRC[0] = to.row();
-        toRC[1] = to.col();
-        int dist = from.distance(to);
-        int dir = from.direction(to);
-        if (dist != moves(from, dir)) {
+        if (from._contains == to._contains) {
             return false;
         }
-        for (int i = 0; i > 2; i += 1) {
+//        int fromR, fromC, toR, toC;
+//        fromC = from.col(); fromR = from.row();
+//        toC = from.row(); toR = to.row();
+        int dist = from.distance(to);
+        int dir = from.direction(to);
+        int actions = actions(from, dir);
+        if (dist != actions) {
+            return false;
         }
-
-
-
-
+        int blockDist = blocked(from, dir);
+        if (blockDist < actions && blockDist != 0) {
+            System.out.println("blockDist < actions");
+            return false;
+        }
         return true;   // FIXME
     }
-    int moves(Square sq, int dir) {
-        int ret = 0;
-        for (int i = 0; i < 8; i += 1) {
-            if (sq.moveDest(dir, i) != null) {
-                ret += 1;
+    int blocked(Square from, int direction) {
+        assert from._contains != EMP;
+        Piece _piece = from._contains;
+        Piece blocker = WP;
+        if (_piece == WP) {
+            blocker = BP;
+        }
+        //assert from._contains == WP;
+        int dirC, dirR, c, r, dist;
+        dirC = Square.DIR[direction][0];
+        dirR = Square.DIR[direction][1];
+        c = from.col(); r = from.row();
+        dist = 0;
+        while (((c < BOARD_SIZE - 1) && (r < BOARD_SIZE - 1)) && ((c > 0) && (r > 0))) {
+            c += dirC; r += dirR;
+            dist += 1;
+            if (sq(c,r)._contains == blocker) {
+                return dist;
             }
         }
-        return ret;
+        return 0;
     }
+
     int actions(Square from, int direction) {
         int dir = direction % 4;
-        int ret = 0;
+        int action = 0;
+        int dirC = Square.DIR[dir][0];
+        int dirR = Square.DIR[dir][1];
         int fromR = from.row();
         int fromC = from.col();
+        int forwardC, backC; int forwardR, backR;
+        forwardC = backC = fromC; forwardR = backR = fromR;
         if (sq(fromC, fromR)._contains != EMP) {
-            ret += 1;
+            action += 1;
         }
-        if (dir == 0) {
-            // going up
-            for (int rUp = fromR + 1; rUp < BOARD_SIZE; rUp += 1) {
-                if (sq(fromC, rUp)._contains != EMP) {
-                    ret += 1;
-                }
-            }
-            for (int rDn = fromR - 1; rDn >= 0; rDn -= 1) {
-                if (sq(fromC, rDn)._contains != EMP) {
-                    ret += 1;
-                }
-            }
-        } else if (dir == 2) {
-            for (int cRt = fromC + 1; cRt < BOARD_SIZE; cRt += 1) {
-                if (sq(cRt, fromR)._contains != EMP) {
-                    ret += 1;
-                }
-            }
-            for (int cLt = fromC - 1; cLt >= 0; cLt -= 1) {
-                if (sq(cLt, fromR)._contains != EMP) {
-                    ret += 1;
-                }
+        while ((forwardC < BOARD_SIZE - 1) && (forwardR < BOARD_SIZE - 1)) {
+            forwardC += dirC; forwardR += dirR;
+            if (sq(forwardC, forwardR)._contains != EMP) {
+                action += 1;
             }
         }
-
-        return ret;
+        while ((backC > 0) && (backR > 0)) {
+            backC -= dirC; backR -= dirR;
+            if (sq(backC, backR)._contains != EMP) {
+                action += 1;
+            }
+        }
+        return action;
     }
+
 
     /** Return true iff MOVE is legal for the player currently on move.
      *  The isCapture() property is ignored. */
@@ -289,8 +293,39 @@ class Board {
      *  containing P at and adjacent to SQ.  VISITED indicates squares that
      *  have already been processed or are in different clusters.  Update
      *  VISITED to reflect squares counted. */
-    private int numContig(Square sq, boolean[][] visited, Piece p) {
-        return 0;  // FIXME
+    int numContig(Square sq, boolean[][] visited, Piece p, int count) {
+        if (sq == null) {
+            return 0;
+        }
+        int c = sq.col();
+        int r = sq.row();
+        if (visited[c][r] == true) {
+            return 0;
+        }
+        if (p == EMP) {
+            visited[c][r] = true;
+            return 0;
+        }
+        visited[c][r] = true;
+        Square[] checkSq = new Square[8];
+        for (int i = 0; i < 8; i += 1) {
+            int cc = Square.DIR[i][0];
+            int cr = Square.DIR[i][1];
+            checkSq[i] = sq(c + cc, r + cr);
+        }
+        for (int j = 0; j < 8; j += 1) {
+            System.out.print(checkSq[j]);
+        }
+        System.out.println(" ");
+        for (int j = 0; j < 8; j += 1) {
+            count += numContig(checkSq[j], visited, p, count);
+            System.out.println(count);
+        }
+        return count;  // FIXME
+    }
+
+    private int match(Square from, Square to) {
+        return 0;
     }
 
     /** Set the values of _whiteRegionSizes and _blackRegionSizes. */
@@ -301,6 +336,24 @@ class Board {
         _whiteRegionSizes.clear();
         _blackRegionSizes.clear();
         // FIXME
+        boolean[][] visited = new boolean[BOARD_SIZE][BOARD_SIZE];
+        for (int c = 0; c < BOARD_SIZE; c += 1) {
+            for (int r = 0; c < BOARD_SIZE; r += 1) {
+                Piece curr = sq(c,r)._contains;
+                if (curr == EMP) {
+                    visited[c][r] = true;
+                } else if ((curr == WP || curr == BP) && !visited[c][r]) {
+                    int count = numContig(sq(c,r), visited, curr, 0);
+                    if (count > 0) {
+                        if (curr == WP) {
+                            _whiteRegionSizes.add(count);
+                        } else {
+                            _blackRegionSizes.add(count);
+                        }
+                    }
+                }
+            }
+        }
         Collections.sort(_whiteRegionSizes, Collections.reverseOrder());
         Collections.sort(_blackRegionSizes, Collections.reverseOrder());
         _subsetsInitialized = true;

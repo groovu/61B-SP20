@@ -3,12 +3,13 @@
 package loa;
 
 import org.junit.Test;
+
+import static loa.Square.BOARD_SIZE;
 import static org.junit.Assert.*;
 
 import static loa.Piece.*;
 import static loa.Square.sq;
 import static loa.Move.mv;
-import static loa.Board.*;
 
 /** Tests of the Board class API.
  *  @author
@@ -99,26 +100,41 @@ public class BoardTest {
     /** Test to see if counting actions works. */
     @Test
     public void testActions() {
-        int c = Square.DIR[0][0];
-        int r = Square.DIR[0][1];
         Board test = new Board(BOARD1, BP);
-        System.out.println(test);
-        System.out.println(test.actions(sq(1,7),0));
         assertEquals(5, test.actions(sq(0,0),0));
         assertEquals(3, test.actions(sq(7,7), 4));
         assertEquals(4, test.actions(sq(5,2), 0));
         assertEquals(2, test.actions(sq(0, 1), 2));
         assertEquals(4, test.actions(sq(0, 4), 2));
-
     }
 
-    //@Test
-    //public void distance
+    /** Test to see if piece is blocked */
+    @Test
+    public void testBlocked() {
+        Board test = new Board(BOARD1, BP);
+        System.out.println(test);
+        assertEquals(0, test.blocked(sq(0,1),0));
+        assertEquals(2, test.blocked(sq(0,3), 2));
+        assertEquals(1, test.blocked(sq(5,2),0));
+        assertEquals(4, test.blocked(sq(1, 0), 1));
+        assertEquals(1, test.blocked(sq(5,3),5));
+    }
+
+    @Test
+    public void testSq() {
+        System.out.println(sq(9,9));
+        Square test = sq(9,9);
+        System.out.println(test);
+    }
 
     /** Test legal moves. */
     @Test
     public void testLegality1() {
         Board b = new Board(BOARD1, BP);
+        System.out.println(b);
+//        System.out.println(sq('f',3)._contains);
+//        System.out.println(sq('h', 5)._contains);
+//        System.out.println(b.actions(sq('f',3), 1));
         assertTrue("f3-d5", b.isLegal(mv("f3-d5")));
         assertTrue("f3-h5", b.isLegal(mv("f3-h5")));
         assertTrue("f3-h1", b.isLegal(mv("f3-h1")));
@@ -128,6 +144,15 @@ public class BoardTest {
         assertFalse("f3-e4", b.isLegal(mv("f3-e4")));
         assertFalse("c4-c7", b.isLegal(mv("c4-c7")));
         assertFalse("b1-b4", b.isLegal(mv("b1-b4")));
+    }
+
+    //** Test numContig. */
+    @Test
+    public void testNumContig() {
+        Board test = new Board(BOARD1, BP);
+        boolean[][] v = new boolean[BOARD_SIZE][BOARD_SIZE];
+        int x = test.numContig(sq(7,7),v,WP, 0);
+        System.out.println(x);
     }
 
     /** Test contiguity. */
