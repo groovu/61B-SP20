@@ -93,8 +93,9 @@ class Board {
      *  to NEXT, if NEXT is not null. */
     void set(Square sq, Piece v, Piece next) {
         //Piece setter = get(sq);
-        Piece setter = v;
-        _board[sq.index()] = setter;
+        //Piece setter = v;
+        _board[sq.index()] = v;
+        sq._contains = v;
         if (next != null) {
             _turn = next;
         }
@@ -123,7 +124,7 @@ class Board {
         assert isLegal(move);
         Square from = move.getFrom();
         Square to = move.getTo();
-        if (get(from) != get(to)) {
+        if (get(from) != get(to) && get(to) != EMP) {
             Move.mv(from, to, true);
             _moves.add(Move.mv(from, to, true));
         } else {
@@ -164,6 +165,7 @@ class Board {
      *  move. */
     boolean isLegal(Square from, Square to) {
         if (!from.isValidMove(to)) {
+            //System.out.println("fails !isValidMove");
             return false;
         }
         if ((from == null) || (to == null)) {
@@ -173,6 +175,7 @@ class Board {
             return false;
         }
         if (from._contains == to._contains) {
+            System.out.println("samesies");
             return false;
         }
 //        int fromR, fromC, toR, toC;
@@ -182,12 +185,17 @@ class Board {
         int dir = from.direction(to);
         int actions = actions(from, dir);
         if (dist != actions) {
+            System.out.println(dist + " " + actions);
+            System.out.println("Fails dist!= actions");
             return false;
         }
         int blockDist = blocked(from, dir);
         if (blockDist < actions && blockDist != 0) {
             System.out.println("blockDist < actions");
             return false;
+        }
+        if (from._contains != to._contains) {
+            //System.out.println("should be capture");
         }
         return true;   // FIXME
     }
@@ -204,8 +212,11 @@ class Board {
         dirR = Square.DIR[direction][1];
         c = from.col(); r = from.row();
         dist = 0;
-        while (((c < BOARD_SIZE - 1) && (r < BOARD_SIZE - 1)) && ((c > 0) && (r > 0))) {
+        while (((c < BOARD_SIZE - 1) && (r < BOARD_SIZE - 1)) && ((c >= 0) && (r >= 0))) {
             c += dirC; r += dirR;
+            if (c < 0 || r < 0) {
+                break;
+            }
             dist += 1;
             if (sq(c,r)._contains == blocker) {
                 return dist;
@@ -215,6 +226,9 @@ class Board {
     }
 
     int actions(Square from, int direction) {
+        if (from == sq('f',1)) {
+            System.out.println("in action");
+        }
         int dir = direction % 4;
         int action = 0;
         int dirC = Square.DIR[dir][0];
@@ -224,16 +238,23 @@ class Board {
         int forwardC, backC; int forwardR, backR;
         forwardC = backC = fromC; forwardR = backR = fromR;
         if (sq(fromC, fromR)._contains != EMP) {
+            //System.out.println("action: self added.");
             action += 1;
         }
         while ((forwardC < BOARD_SIZE - 1) && (forwardR < BOARD_SIZE - 1)) {
             forwardC += dirC; forwardR += dirR;
+            //if (sq(forwardC,forwardR) == null)
             if (sq(forwardC, forwardR)._contains != EMP) {
+                //System.out.println("action: " + sq(forwardC,forwardR)._contains +" added");
                 action += 1;
             }
         }
-        while ((backC > 0) && (backR > 0)) {
+        while ((backC > 0) || (backR > 0)) {
+            //FIXME does this give nullpoint ever?
             backC -= dirC; backR -= dirR;
+            if (backC < 0 || backR < 0) {
+                break;
+            }
             if (sq(backC, backR)._contains != EMP) {
                 action += 1;
             }

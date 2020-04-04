@@ -130,6 +130,8 @@ class Game {
             case "?": case "help":
                 help();
                 break;
+            //case "actions":
+            //    System.out.println("yup");
             default:
                 if (!processMove(line)) {
                     error("unknown command: %s%n", line);

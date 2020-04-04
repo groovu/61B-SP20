@@ -93,26 +93,32 @@ public class BoardTest {
         Board test = new Board(BOARD1, BP);
         Board initial = new Board(Board.INITIAL_PIECES, WP);
         assertEquals(BOARD1_STRING, test.toString().replaceAll("\\r\\n", "\n"));
-        System.out.println(test.toString());
-        System.out.println(initial.toString());
+        //System.out.println(test.toString());
+        //System.out.println(initial.toString());
     }
 
     /** Test to see if counting actions works. */
     @Test
     public void testActions() {
         Board test = new Board(BOARD1, BP);
+        System.out.println(test);
         assertEquals(5, test.actions(sq(0,0),0));
         assertEquals(3, test.actions(sq(7,7), 4));
         assertEquals(4, test.actions(sq(5,2), 0));
         assertEquals(2, test.actions(sq(0, 1), 2));
         assertEquals(4, test.actions(sq(0, 4), 2));
+        assertEquals(5, test.actions(sq(7,7), 6));
+        assertEquals(3, test.actions(sq(5,0), 6));
+
+
+        //assertEquals()
     }
 
     /** Test to see if piece is blocked */
     @Test
     public void testBlocked() {
         Board test = new Board(BOARD1, BP);
-        System.out.println(test);
+        //System.out.println(test);
         assertEquals(0, test.blocked(sq(0,1),0));
         assertEquals(2, test.blocked(sq(0,3), 2));
         assertEquals(1, test.blocked(sq(5,2),0));
@@ -120,18 +126,18 @@ public class BoardTest {
         assertEquals(1, test.blocked(sq(5,3),5));
     }
 
-    @Test
-    public void testSq() {
-        System.out.println(sq(9,9));
-        Square test = sq(9,9);
-        System.out.println(test);
-    }
+//    @Test
+//    public void testSq() {
+//        System.out.println(sq(9,9));
+//        Square test = sq(0,9);
+//        System.out.println(test);
+//    }
 
     /** Test legal moves. */
     @Test
     public void testLegality1() {
         Board b = new Board(BOARD1, BP);
-        System.out.println(b);
+       // System.out.println(b);
 //        System.out.println(sq('f',3)._contains);
 //        System.out.println(sq('h', 5)._contains);
 //        System.out.println(b.actions(sq('f',3), 1));
@@ -146,7 +152,7 @@ public class BoardTest {
         assertFalse("b1-b4", b.isLegal(mv("b1-b4")));
     }
 
-    //** Test numContig. */
+    /** Test numContig. */
     @Test
     public void testNumContig() {
         Board test = new Board(Board.INITIAL_PIECES, BP);
@@ -159,6 +165,19 @@ public class BoardTest {
         boolean[][] z = new boolean[8][8];
         assertEquals(2, test2.numContig(sq(2, 4), z, WP, 0));
         assertEquals(3, test2.numContig(sq(2, 7), z, BP, 0));
+    }
+
+    /** Test makeMove. */
+    @Test
+    public void testMakeMove() {
+        Board test = new Board(Board.INITIAL_PIECES, BP);
+        Square from = sq('b',1);
+        Square to = sq('d', 3);
+        System.out.println(test);
+        Move moveTest = new Move(from, to, false);
+        test.makeMove(moveTest);
+        System.out.println(test);
+        assertEquals(BP, to._contains);
     }
 
     /** Test contiguity. */
@@ -200,5 +219,17 @@ public class BoardTest {
         assertEquals("Check move count for board 1 after move + retraction",
                      0, b1.movesMade());
     }
-
+    @Test
+    public void testMoveAndActions() {
+        Board test = new Board(Board.INITIAL_PIECES, BP);
+        test.makeMove(mv("b1-d3"));
+        test.makeMove(mv("a3-d3"));
+        System.out.println(test);
+        //test.makeMove(mv("f1-a1"));
+        Square boo = sq('f',1);
+        int x = test.actions(boo, 6);
+        System.out.println(x);
+        test.makeMove(mv("f1-a1"));
+        System.out.println(test);
+    }
 }

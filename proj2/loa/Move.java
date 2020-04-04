@@ -82,7 +82,8 @@ final class Move {
     }
 
     /** Construct a Move from FROM to TO, capturing iff CAPTURE. */
-    private Move(Square from, Square to, boolean capture) {
+    //FIXME Move should be private?
+    Move(Square from, Square to, boolean capture) {
         assert from.isValidMove(to);
         _from = from; _to = to;
         _capture = capture;
