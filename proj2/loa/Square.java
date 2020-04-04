@@ -217,6 +217,17 @@ final class Square {
     private final String _str;
 
     /** Currently contains this piece in square. */
-    public Piece _contains;
+    private Piece _contains;
+
+    /** Returns piece contained in square. */
+    Piece contains() {
+        return _contains;
+    }
+
+    /** Sets piece contained in square. */
+    void contains(Piece p) {
+        _contains = p;
+    }
+
 
 }

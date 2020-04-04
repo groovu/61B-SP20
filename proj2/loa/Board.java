@@ -55,7 +55,7 @@ class Board {
         for (int r = 0; r < BOARD_SIZE; r += 1) {
             for (int c = 0; c < BOARD_SIZE; c += 1) {
                 _board[(r << 3) + c] = contents[r][c];
-                sq(c,r)._contains = contents[r][c];
+                sq(c,r).contains(contents[r][c]);
                 set(sq(c, r), contents[r][c]);
             }
         }
@@ -95,7 +95,8 @@ class Board {
         //Piece setter = get(sq);
         //Piece setter = v;
         _board[sq.index()] = v;
-        sq._contains = v;
+        sq.contains(v);
+        //sq.contains();
         //System.out.println("sq " + sq + "to " + v);
         if (next != null) {
             _turn = next;
@@ -171,13 +172,13 @@ class Board {
             //System.out.println("fails !isValidMove");
             return false;
         }
-        if ((from == null) || (to == null) || from._contains == EMP)  {
+        if ((from == null) || (to == null) || from.contains() == EMP)  {
             return false;
         }
         if (from == to) {
             return false;
         }
-        if (from._contains == to._contains) {
+        if (from.contains() == to.contains()) {
             System.out.println("samesies");
             return false;
         }
@@ -197,19 +198,19 @@ class Board {
             System.out.println("blockDist < actions");
             return false;
         }
-        if (from._contains != to._contains) {
+        if (from.contains() != to.contains()) {
             //System.out.println("should be capture");
         }
         return true;   // FIXME
     }
     int blocked(Square from, int direction) {
-        assert from._contains != EMP;
-        Piece _piece = from._contains;
+        assert from.contains() != EMP;
+        Piece _piece = from.contains();
         Piece blocker = WP;
         if (_piece == WP) {
             blocker = BP;
         }
-        //assert from._contains == WP;
+        //assert from.contains() == WP;
         int dirC, dirR, c, r, dist;
         dirC = Square.DIR[direction][0];
         dirR = Square.DIR[direction][1];
@@ -221,7 +222,7 @@ class Board {
                 break;
             }
             dist += 1;
-            if (sq(c,r)._contains == blocker) {
+            if (sq(c,r).contains() == blocker) {
                 return dist;
             }
         }
@@ -240,7 +241,7 @@ class Board {
         int fromC = from.col();
         int forwardC, backC; int forwardR, backR;
         forwardC = backC = fromC; forwardR = backR = fromR;
-        if (sq(fromC, fromR)._contains != EMP) {
+        if (sq(fromC, fromR).contains() != EMP) {
             //System.out.println("action: self added.");
             action += 1;
         }
@@ -251,8 +252,8 @@ class Board {
                     || forwardR < 0 || forwardR == BOARD_SIZE) {
                 break;
             }
-            else if (sq(forwardC, forwardR)._contains != EMP) {
-                //System.out.println("action: " + sq(forwardC,forwardR)._contains +" added");
+            else if (sq(forwardC, forwardR).contains() != EMP) {
+                //System.out.println("action: " + sq(forwardC,forwardR).contains() +" added");
                 action += 1;
             }
         }
@@ -262,7 +263,7 @@ class Board {
             if (backC < 0 || backR < 0 || backC == BOARD_SIZE || backR == BOARD_SIZE) {
                 break;
             }
-             else if (sq(backC, backR)._contains != EMP) {
+             else if (sq(backC, backR).contains() != EMP) {
                 action += 1;
             }
         }
@@ -386,7 +387,7 @@ class Board {
             return 0;
         }
         visited[c][r] = true;
-        if (sq._contains == p) {
+        if (sq.contains() == p) {
             count += 1;
         }
         Square[] around = new Square[8];
@@ -395,7 +396,7 @@ class Board {
             int nextr = r + Square.DIR[i][1];
             if ((nextc > 7) || (nextr > 7) || (nextc < 0) || (nextr < 0)) {
                 continue;
-            } else if (sq(nextc, nextr)._contains == p) {
+            } else if (sq(nextc, nextr).contains() == p) {
                 around[i] = sq(nextc, nextr);
             }
         }
@@ -424,7 +425,7 @@ class Board {
         boolean[][] visited = new boolean[BOARD_SIZE][BOARD_SIZE];
         for (int c = 0; c < BOARD_SIZE; c += 1) {
             for (int r = 0; r < BOARD_SIZE; r += 1) {
-                Piece curr = sq(c,r)._contains;
+                Piece curr = sq(c,r).contains();
                 if (curr == EMP) {
                     visited[c][r] = true;
                 } else if ((curr == WP || curr == BP) && !visited[c][r]) {

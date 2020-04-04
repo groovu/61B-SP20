@@ -138,8 +138,8 @@ public class BoardTest {
     public void testLegality1() {
         Board b = new Board(BOARD1, BP);
        // System.out.println(b);
-//        System.out.println(sq('f',3)._contains);
-//        System.out.println(sq('h', 5)._contains);
+//        System.out.println(sq('f',3).contains());
+//        System.out.println(sq('h', 5).contains());
 //        System.out.println(b.actions(sq('f',3), 1));
         assertTrue("f3-d5", b.isLegal(mv("f3-d5")));
         assertTrue("f3-h5", b.isLegal(mv("f3-h5")));
@@ -177,7 +177,7 @@ public class BoardTest {
         Move moveTest = new Move(from, to, false);
         test.makeMove(moveTest);
         System.out.println(test);
-        assertEquals(BP, to._contains);
+        assertEquals(BP, to.contains());
     }
 
     /** Test contiguity. */
