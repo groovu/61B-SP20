@@ -96,6 +96,7 @@ class Board {
         //Piece setter = v;
         _board[sq.index()] = v;
         sq._contains = v;
+        //System.out.println("sq " + sq + "to " + v);
         if (next != null) {
             _turn = next;
         }
@@ -127,6 +128,7 @@ class Board {
         if (get(from) != get(to) && get(to) != EMP) {
             Move.mv(from, to, true);
             _moves.add(Move.mv(from, to, true));
+            System.out.println("Replaced " + sq(from.col(),from.row()) +" " + sq(to.col(), to.row()));
         } else {
             Move.mv(from, to, false);
             _moves.add(Move.mv(from, to, false));
@@ -168,7 +170,7 @@ class Board {
             //System.out.println("fails !isValidMove");
             return false;
         }
-        if ((from == null) || (to == null)) {
+        if ((from == null) || (to == null) || from._contains == EMP)  {
             return false;
         }
         if (from == to) {
@@ -241,7 +243,7 @@ class Board {
             //System.out.println("action: self added.");
             action += 1;
         }
-        while ((forwardC < BOARD_SIZE - 1) && (forwardR < BOARD_SIZE - 1)) {
+        while ((forwardC <= BOARD_SIZE - 1) && (forwardR <= BOARD_SIZE - 1)) {
             forwardC += dirC; forwardR += dirR;
             //if (sq(forwardC,forwardR) == null)
             if (forwardC < 0 || forwardC == BOARD_SIZE
