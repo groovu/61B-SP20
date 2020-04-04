@@ -135,6 +135,7 @@ class Board {
         }
         set(to, get(from));
         set(from, EMP);
+        _subsetsInitialized = false;
         _turn = turn().opposite();
 
         // FIXME
