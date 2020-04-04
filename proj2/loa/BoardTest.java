@@ -232,4 +232,81 @@ public class BoardTest {
         test.makeMove(mv("f1-a1"));
         System.out.println(test);
     }
+
+    @Test
+    public void bootlegFullGame1() {
+        Board test = new Board(Board.INITIAL_PIECES, BP);
+        test.makeMove(mv("d8-d6"));
+        test.makeMove(mv("a3-c3"));
+        test.makeMove(mv("d1-f3"));
+        test.makeMove(mv("a6-c8"));
+        test.makeMove(mv("f8-f5"));
+        test.makeMove(mv("a2-c2"));
+        test.makeMove(mv("f1-a1"));
+        test.makeMove(mv("a5-b6"));
+        test.makeMove(mv("c1-e3"));
+        test.makeMove(mv("h6-e6"));
+        System.out.println(test);
+        System.out.println("e1-c3 should be illegal");
+        test.makeMove(mv("e1-c3"));
+//        test.makeMove(mv("h5-f3"));
+//        test.makeMove(mv("b8-e5"));
+//        test.makeMove(mv("h4-f4"));
+//        test.makeMove(mv("e5-e1"));
+//        test.makeMove(mv("h2-f2"));
+//        test.makeMove(mv("b1-f1"));
+//        test.makeMove(mv("c2-a2"));
+//        test.makeMove(mv("f5-h7"));
+//        test.makeMove(mv("f4-d6"));
+//        test.makeMove(mv("e3-d2"));
+//        test.makeMove(mv("e6-h6"));
+//        test.makeMove(mv("f1-h3"));
+//        test.makeMove(mv("b6-b5"));
+//        test.makeMove(mv("h3-f5"));
+//        test.makeMove(mv("a2-c4"));
+//        test.makeMove(mv("d2-f4"));
+//        test.makeMove(mv("b5-d5"));
+//        test.makeMove(mv("f4-f8"));
+//        test.makeMove(mv("f3-g4"));
+//        test.makeMove(mv("g8-d5"));
+//        test.makeMove(mv("d6-c7"));
+//        test.makeMove(mv("f8-h6"));
+//        test.makeMove(mv("a4-c6"));
+//        test.makeMove(mv("e1-h1"));
+//        test.makeMove(mv("f2-c5"));
+//        test.makeMove(mv("h7-g8"));
+//        test.makeMove(mv("g4-e4"));
+//        test.makeMove(mv("e8-c6"));
+//        test.makeMove(mv("e4-e5"));
+//        test.makeMove(mv("c6-f3"));
+//        test.makeMove(mv("a7-d4"));
+//        test.makeMove(mv("c3-b4"));
+//        test.makeMove(mv("c8-b7"));
+//        test.makeMove(mv("a1-d4"));
+//        test.makeMove(mv("c7-b6"));
+//        test.makeMove(mv("g1-c5"));
+//        test.makeMove(mv("c4-d3"));
+//        test.makeMove(mv("f5-d3"));
+//        test.makeMove(mv("e5-d6"));
+//        test.makeMove(mv("h1-g1"));
+//        test.makeMove(mv("b6-c7"));
+    }
+    @Test
+    public void bootlegIllegal() {
+        Board test = new Board(Board.INITIAL_PIECES, BP);
+        test.makeMove(mv("c1-e3"));
+        test.makeMove(mv("a5-c5"));
+        test.makeMove(mv("f8-c5"));
+        test.makeMove(mv("h3-f1"));
+        test.makeMove(mv("c8-d7"));
+        System.out.println(test);
+//        test.makeMove(mv("b1-b2"));
+        System.out.println(test);
+//        test.makeMove(mv("a2-b2"));
+//        System.out.println(test);
+//        test.makeMove(mv("a2-a7"));
+//        System.out.println(test);
+//        test.makeMove(mv("f1-a1"));
+//        System.out.println(test);
+    }
 }

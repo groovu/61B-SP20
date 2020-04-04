@@ -244,7 +244,11 @@ class Board {
         while ((forwardC < BOARD_SIZE - 1) && (forwardR < BOARD_SIZE - 1)) {
             forwardC += dirC; forwardR += dirR;
             //if (sq(forwardC,forwardR) == null)
-            if (sq(forwardC, forwardR)._contains != EMP) {
+            if (forwardC < 0 || forwardC == BOARD_SIZE
+                    || forwardR < 0 || forwardR == BOARD_SIZE) {
+                break;
+            }
+            else if (sq(forwardC, forwardR)._contains != EMP) {
                 //System.out.println("action: " + sq(forwardC,forwardR)._contains +" added");
                 action += 1;
             }
@@ -252,10 +256,10 @@ class Board {
         while ((backC > 0) || (backR > 0)) {
             //FIXME does this give nullpoint ever?
             backC -= dirC; backR -= dirR;
-            if (backC < 0 || backR < 0) {
+            if (backC < 0 || backR < 0 || backC == BOARD_SIZE || backR == BOARD_SIZE) {
                 break;
             }
-            if (sq(backC, backR)._contains != EMP) {
+             else if (sq(backC, backR)._contains != EMP) {
                 action += 1;
             }
         }
