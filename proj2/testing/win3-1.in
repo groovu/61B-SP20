@@ -1,0 +1,35 @@
+# Test irregular configuration win by opponent moving.
+#* java -ea loa.Main
+manual white
+g1-g3
+h2-h8
+f1-f3
+h7-h1
+e1-e3
+h8-h2
+c1-f4
+h1-h7
+f8-f5
+h3-g2
+c8-e6
+a3-b4
+g8-d5
+a4-c6
+d1-c2
+g2-c2
+b8-b5
+b4-b1
+b5-d3
+c6-e8
+d8-b6
+b1-b3
+b6-d8
+a7-c7
+d8-b8
+a2-b1
+b8-d8
+dump
+a5-d8
+#*win+
+dump
+quit

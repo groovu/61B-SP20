@@ -140,8 +140,16 @@ class Board {
         _turn = turn().opposite();
 
         // FIXME
+        gameOverCheck();
     }
 
+    void gameOverCheck() {
+        if (movesMade() >= _moveLimit) {
+            _winner = EMP;
+            _winnerKnown = true;
+            gameOver();
+        }
+    }
     /** Retract (unmake) one move, returning to the state immediately before
      *  that move.  Requires that movesMade () > 0. */
     void retract() {
@@ -301,7 +309,12 @@ class Board {
             //_winnerKnown = true;
             if (piecesContiguous(WP) || piecesContiguous(BP)) {
                 _winnerKnown = true;
-                _winner = _turn.opposite();
+                if (piecesContiguous(WP)) {
+                    _winner = WP;
+                } else {
+                    _winner = BP;
+                }
+                //_winner = _turn.opposite();
             }
         }
         return _winner;
