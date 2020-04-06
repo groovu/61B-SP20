@@ -123,11 +123,11 @@ class Board {
         Square from = move.getFrom();
         Square to = move.getTo();
         if (get(from) != get(to) && get(to) != EMP) {
-            Move.mv(from, to, true);
-            _moves.add(Move.mv(from, to, true));
+            Move m = Move.mv(from, to, true);
+            _moves.add(m);
         } else {
-            Move.mv(from, to, false);
-            _moves.add(Move.mv(from, to, false));
+            Move m = Move.mv(from, to, false);
+            _moves.add(m);
         }
         set(to, get(from));
         set(from, EMP);

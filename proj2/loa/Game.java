@@ -117,6 +117,9 @@ class Game {
             case "quit":
                 quit();
                 break;
+            case "retract":
+                _board.retract();
+                break;
             case "seed":
                 seedCommand(command.group(2));
                 break;

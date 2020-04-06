@@ -39,8 +39,21 @@ class GUI extends TopLevel implements View, Reporter {
     GUI(String title) {
         super(title, true);
         addMenuButton("Game->New", this::newGame);
+        addMenuButton("Game->Undo", this::retract);
+        addMenuButton("Game->Set-Up Mode", this::nill);
         addMenuButton("Game->Quit", this::quit);
-        addMenuButton("Help->Help", this::help);
+        addMenuButton("Settings->Seed", this::nill);
+        addMenuButton("Settings->Manual Black", this::manualWhite);
+        addMenuButton("Settings->Auto Black", this::nill);
+        addMenuButton("Settings->Manual White", this::manualBlack);
+        addMenuButton("Settings->Auto White", this::nill);
+        addMenuButton("Help->Game", this::help);
+        addMenuButton("Help->About", this::about);
+        _pendingCommands.offer("manual White");
+        addLabel("Manual: White and Black", "Manual",
+                new LayoutSpec("x", 3, "y", 0,
+                        "height", 1,
+                        "width", 3));
 
         // FIXME: Other controls?
 
@@ -69,9 +82,26 @@ class GUI extends TopLevel implements View, Reporter {
     /** REsponse to "Help" button click. */
     private void help(String dummy) {
         displayText("Help", HELP_TEXT);
-        _pendingCommands.offer("help");
+    }
+    private void about(String dummy) {
+        displayText("Help", ABOUT_TEXT);
+    }
+    private void retract(String dummy) {
+        _pendingCommands.offer("retract");
     }
 
+    /** Response to "Manual White" button click. */
+    private void manualWhite(String dummy) {
+        _pendingCommands.offer("manual White");
+    }
+    /** Response to "Manual Black" button click. */
+    private void manualBlack(String dummy) {
+        _pendingCommands.offer("manual Black");
+    }
+    /** Null placeholder. */
+    private void nill(String dummy) {
+        System.out.println("Not implemented");
+    }
     /** Return the next command from our widget, waiting for it as necessary.
      *  The BoardWidget uses _pendingCommands to queue up moves that it
      *  receives.  Thie class uses _pendingCommands to queue up commands that

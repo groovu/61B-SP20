@@ -123,6 +123,10 @@ class BoardWidget extends Pad {
     private void mousePressed(Square s) {
         System.out.println(s);
         System.out.println(s.contains());
+        if (_board.get(s) == _board.turn()) {
+            mip = true;
+            _from = s;
+        }
         // FIXME
         repaint();
     }
@@ -131,6 +135,13 @@ class BoardWidget extends Pad {
     private void mouseReleased(Square s) {
         System.out.println("mouse released");
         // FIXME
+        if (mip && _from != null) {
+            if (_board.isLegal(_from, s)) {
+                _commands.add(Move.mv(_from, s).toString());
+            }
+        }
+        mip = false;
+        _from = null;
         repaint();
     }
 
@@ -203,5 +214,11 @@ class BoardWidget extends Pad {
 
     /** True iff accepting moves from user. */
     private boolean _acceptingMoves;
+
+    /** From square */
+    private Square _from;
+
+    /** Move in progress? */
+    private boolean mip;
 
 }

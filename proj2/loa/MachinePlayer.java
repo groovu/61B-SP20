@@ -2,6 +2,8 @@
  * University of California.  All rights reserved. */
 package loa;
 
+import java.util.List;
+
 import static loa.Piece.*;
 
 /** An automated Player.
@@ -71,18 +73,41 @@ class MachinePlayer extends Player {
      *  on BOARD, does not set _foundMove. */
     private int findMove(Board board, int depth, boolean saveMove,
                          int sense, int alpha, int beta) {
+        if (depth == 0) {
+            return 0; //whatever hueristic value you're looking for.
+        }
+        int bestscore = 0;
         /** FIXME */
         if (saveMove) {
             _foundMove = null; /** FIXME */
         }
-        return 0; /** FIXME */
+        if (sense == 1) {
+            bestscore = 0;
+            List<Move> legalMoves = board.legalMoves();
+            for (Move m : legalMoves) {
+                int newAlpha, newBeta;
+                Board newBoard = new Board();
+                newBoard.copyFrom(board);
+                if (true) {
+                    newAlpha = 0;
+                } else {
+                    newBeta = 0;
+                }
+                int score = findMove(newBoard, depth - 1, saveMove, -1*sense, newAlpha, newBeta);
+                if (score > bestscore) {
+                    bestscore = score;
+                }
+            }
+        }
+        return bestscore; /** FIXME */
     }
 
     /** Return a search depth for the current position. */
     private int chooseDepth() {
-        return 1;   /**FIXME */
+        return 3;   /**FIXME */
 
     }
+
 
     /** FIXME: Other methods, variables here. */
 
