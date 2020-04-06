@@ -70,9 +70,6 @@ public class BoardTest {
     @Test
     public void coordTest() {
         Board test = new Board(Board.INITIAL_PIECES2, BP);
-//        for (Piece b : test._board) {
-//            System.out.println(b);
-//        }
         int i = (2 << 3) + 1;
         int y = i >> 3;
         int x = i - y * 8;
@@ -80,21 +77,16 @@ public class BoardTest {
         assertEquals(2, y);
         assertEquals(1, x);
         assertEquals(17, out);
-        // 56...       63
-        // ...
-        // 16 ...      23
-        // 8 ...       15
-        // 0 1 2 3 ... 7
+
     }
 
-    /** Test display (which also checks to see if initializer is working properly.) */
+    /** Test display (which also checks to see if initializer is working
+     * properly). */
     @Test
     public void toStringTest() {
         Board test = new Board(BOARD1, BP);
         Board initial = new Board(Board.INITIAL_PIECES, WP);
         assertEquals(BOARD1_STRING, test.toString().replaceAll("\\r\\n", "\n"));
-        //System.out.println(test.toString());
-        //System.out.println(initial.toString());
     }
 
     /** Test to see if counting actions works. */
@@ -102,45 +94,33 @@ public class BoardTest {
     public void testActions() {
         Board test = new Board(BOARD1, BP);
         System.out.println(test);
-        assertEquals(5, test.actions(sq(0,0),0));
-        assertEquals(3, test.actions(sq(7,7), 4));
-        assertEquals(4, test.actions(sq(5,2), 0));
+        assertEquals(5, test.actions(sq(0, 0), 0));
+        assertEquals(3, test.actions(sq(7, 7), 4));
+        assertEquals(4, test.actions(sq(5, 2), 0));
         assertEquals(2, test.actions(sq(0, 1), 2));
         assertEquals(4, test.actions(sq(0, 4), 2));
-        assertEquals(5, test.actions(sq(7,7), 6));
-        assertEquals(3, test.actions(sq(5,0), 6));
+        assertEquals(5, test.actions(sq(7, 7), 6));
+        assertEquals(3, test.actions(sq(5, 0), 6));
 
 
-        //assertEquals()
     }
 
     /** Test to see if piece is blocked */
     @Test
     public void testBlocked() {
         Board test = new Board(BOARD1, BP);
-        //System.out.println(test);
-        assertEquals(0, test.blocked(sq(0,1),0));
-        assertEquals(2, test.blocked(sq(0,3), 2));
-        assertEquals(1, test.blocked(sq(5,2),0));
+        assertEquals(0, test.blocked(sq(0, 1), 0));
+        assertEquals(2, test.blocked(sq(0, 3), 2));
+        assertEquals(1, test.blocked(sq(5, 2), 0));
         assertEquals(4, test.blocked(sq(1, 0), 1));
-        assertEquals(1, test.blocked(sq(5,3),5));
+        assertEquals(1, test.blocked(sq(5, 3), 5));
     }
 
-//    @Test
-//    public void testSq() {
-//        System.out.println(sq(9,9));
-//        Square test = sq(0,9);
-//        System.out.println(test);
-//    }
 
     /** Test legal moves. */
     @Test
     public void testLegality1() {
         Board b = new Board(BOARD1, BP);
-       // System.out.println(b);
-//        System.out.println(sq('f',3).contains());
-//        System.out.println(sq('h', 5).contains());
-//        System.out.println(b.actions(sq('f',3), 1));
         assertTrue("f3-d5", b.isLegal(mv("f3-d5")));
         assertTrue("f3-h5", b.isLegal(mv("f3-h5")));
         assertTrue("f3-h1", b.isLegal(mv("f3-h1")));
@@ -157,8 +137,8 @@ public class BoardTest {
     public void testNumContig() {
         Board test = new Board(Board.INITIAL_PIECES, BP);
         boolean[][] v = new boolean[BOARD_SIZE][BOARD_SIZE];
-        Square boo = sq(7,7);
-        int x = test.numContig(boo,v,WP, 0);
+        Square boo = sq(7, 7);
+        int x = test.numContig(boo, v, WP, 0);
         assertEquals(6, x);
         Board test2 = new Board(BOARD1, BP);
         System.out.println(test2);
@@ -171,7 +151,7 @@ public class BoardTest {
     @Test
     public void testMakeMove() {
         Board test = new Board(Board.INITIAL_PIECES, BP);
-        Square from = sq('b',1);
+        Square from = sq('b', 1);
         Square to = sq('d', 3);
         System.out.println(test);
         Move moveTest = new Move(from, to, false);
@@ -225,72 +205,13 @@ public class BoardTest {
         test.makeMove(mv("b1-d3"));
         test.makeMove(mv("a3-d3"));
         System.out.println(test);
-        //test.makeMove(mv("f1-a1"));
-        Square boo = sq('f',1);
+        Square boo = sq('f', 1);
         int x = test.actions(boo, 6);
         System.out.println(x);
-        test.makeMove(mv("f1-a1"));
         System.out.println(test);
     }
 
-    @Test
-    public void bootlegFullGame1() {
-        Board test = new Board(Board.INITIAL_PIECES, BP);
-        try { test.makeMove(mv("d8-d6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("a3-c3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("d1-f3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("a6-c8")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f8-f5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("a2-c2")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f1-a1")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("a5-b6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("c1-e3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("h6-e6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("e1-c3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("h5-f3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("b8-e5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("h4-f4")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("e5-e1")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("h2-f2")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("b1-f1")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("c2-a2")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f5-h7")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f4-d6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("e3-d2")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("e6-h6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f1-h3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("b6-b5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("h3-f5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("a2-c4")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("d2-f4")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("b5-d5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f4-f8")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f3-g4")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("g8-d5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("d6-c7")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f8-h6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("a4-c6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("e1-h1")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f2-c5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("h7-g8")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("g4-e4")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("e8-c6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("e4-e5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("c6-f3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("a7-d4")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("c3-b4")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("c8-b7")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("a1-d4")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("c7-b6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("g1-c5")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("c4-d3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("f5-d3")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("e5-d6")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        try { test.makeMove(mv("h1-g1")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        System.out.println(test);
-        try { test.makeMove(mv("b6-c7")); } catch (AssertionError e) { System.out.println("invalid move"); }
-        System.out.println(test);
-    }
+
     @Test
     public void bootlegIllegal() {
         Board test = new Board(Board.INITIAL_PIECES, BP);
@@ -300,13 +221,7 @@ public class BoardTest {
         test.makeMove(mv("h3-f1"));
         test.makeMove(mv("c8-d7"));
         System.out.println(test);
-//        test.makeMove(mv("b1-b2"));
         System.out.println(test);
-//        test.makeMove(mv("a2-b2"));
-//        System.out.println(test);
-//        test.makeMove(mv("a2-a7"));
-//        System.out.println(test);
-//        test.makeMove(mv("f1-a1"));
-//        System.out.println(test);
+
     }
 }

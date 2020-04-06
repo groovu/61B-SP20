@@ -58,8 +58,8 @@ final class Square {
 
     /** Definitions of directions.  DIR[k] = (dcol, drow)
      *  means that to going one step from (col, row) in direction k,
-     *  brings us to (col + dcol, row + drow). */
-    //FIXME change back to private
+     *  brings us to (col + dcol, row + drow). Does this need to be changed back
+     *  to private? */
     public static final int[][] DIR = {
         { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 },
         { -1, -1 }, { -1, 0 }, { -1, 1 }
@@ -131,9 +131,12 @@ final class Square {
         return SQUARES[col][row];
     }
 
-    /** Return unique Square using alphabet position */
+    /** Return unique Square using alphabet position.
+     *@param a Char representing column on board.
+     *@param row Int representing row on board. */
     static Square sq(char a, int row) {
-        return sq(a - 97, row - 1);
+        int reduce2 = 1;
+        return sq(a - reduce, row - reduce2);
     }
 
     /** Return the (unique) Square denoting the position in POSN, in the
@@ -223,8 +226,11 @@ final class Square {
     Piece contains() {
         return _contains;
     }
+    /** Char to bit adjuster. */
+    private static int reduce = 10 * 9 + 7;
 
-    /** Sets piece contained in square. */
+    /** Sets piece contained in square.
+     * @param p Piece that is inside of square. */
     void contains(Piece p) {
         _contains = p;
     }

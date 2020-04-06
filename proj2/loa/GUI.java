@@ -40,6 +40,8 @@ class GUI extends TopLevel implements View, Reporter {
         super(title, true);
         addMenuButton("Game->New", this::newGame);
         addMenuButton("Game->Quit", this::quit);
+        addMenuButton("Help->Help", this::help);
+
         // FIXME: Other controls?
 
         _widget = new BoardWidget(_pendingCommands);
@@ -62,6 +64,12 @@ class GUI extends TopLevel implements View, Reporter {
     /** Response to "New Game" button click. */
     private void newGame(String dummy) {
         _pendingCommands.offer("new");
+    }
+
+    /** REsponse to "Help" button click. */
+    private void help(String dummy) {
+        displayText("Help", HELP_TEXT);
+        _pendingCommands.offer("help");
     }
 
     /** Return the next command from our widget, waiting for it as necessary.

@@ -81,8 +81,8 @@ final class Move {
         return String.format("%s-%s", getFrom(), getTo());
     }
 
-    /** Construct a Move from FROM to TO, capturing iff CAPTURE. */
-    //FIXME Move should be private?
+    /** Construct a Move from FROM to TO, capturing iff CAPTURE.
+     * Does move need to be private?  */
     Move(Square from, Square to, boolean capture) {
         assert from.isValidMove(to);
         _from = from; _to = to;

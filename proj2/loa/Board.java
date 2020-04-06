@@ -2,6 +2,7 @@
  * University of California.  All rights reserved. */
 package loa;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,7 +15,7 @@ import static loa.Piece.*;
 import static loa.Square.*;
 
 /** Represents the state of a game of Lines of Action.
- *  @author
+ *  @author Cherish Truong
  */
 class Board {
 
@@ -51,11 +52,11 @@ class Board {
 
     /** Set my state to CONTENTS with SIDE to move. */
     void initialize(Piece[][] contents, Piece side) {
-        // FIXME
+
         for (int r = 0; r < BOARD_SIZE; r += 1) {
             for (int c = 0; c < BOARD_SIZE; c += 1) {
                 _board[(r << 3) + c] = contents[r][c];
-                sq(c,r).contains(contents[r][c]);
+                sq(c, r).contains(contents[r][c]);
                 set(sq(c, r), contents[r][c]);
             }
         }
@@ -73,7 +74,6 @@ class Board {
         if (board == this) {
             return;
         }
-        // FIXME
         for (int r = 0; r < BOARD_SIZE; r += 1) {
             for (int c = 0; c < BOARD_SIZE; c += 1) {
                 _board[(r << 3) + c] = board.get(sq(c, r));
@@ -92,12 +92,8 @@ class Board {
     /** Set the square at SQ to V and set the side that is to move next
      *  to NEXT, if NEXT is not null. */
     void set(Square sq, Piece v, Piece next) {
-        //Piece setter = get(sq);
-        //Piece setter = v;
         _board[sq.index()] = v;
         sq.contains(v);
-        //sq.contains();
-        //System.out.println("sq " + sq + "to " + v);
         if (next != null) {
             _turn = next;
         }
@@ -129,7 +125,6 @@ class Board {
         if (get(from) != get(to) && get(to) != EMP) {
             Move.mv(from, to, true);
             _moves.add(Move.mv(from, to, true));
-            System.out.println("Replaced " + sq(from.col(),from.row()) +" " + sq(to.col(), to.row()));
         } else {
             Move.mv(from, to, false);
             _moves.add(Move.mv(from, to, false));
@@ -138,11 +133,9 @@ class Board {
         set(from, EMP);
         _subsetsInitialized = false;
         _turn = turn().opposite();
-
-        // FIXME
         gameOverCheck();
     }
-
+    /** Checks if game is over.  If it is, runs gameOver() */
     void gameOverCheck() {
         if (movesMade() >= _moveLimit) {
             _winner = EMP;
@@ -165,7 +158,6 @@ class Board {
         }
         _turn = turn().opposite();
         _subsetsInitialized = false;
-        // FIXME
     }
 
     /** Return the Piece representing who is next to move. */
@@ -177,7 +169,6 @@ class Board {
      *  move. */
     boolean isLegal(Square from, Square to) {
         if (!from.isValidMove(to)) {
-            //System.out.println("fails !isValidMove");
             return false;
         }
         if ((from == null) || (to == null) || from.contains() == EMP)  {
@@ -187,60 +178,60 @@ class Board {
             return false;
         }
         if (from.contains() == to.contains()) {
-            System.out.println("samesies");
             return false;
         }
-//        int fromR, fromC, toR, toC;
-//        fromC = from.col(); fromR = from.row();
-//        toC = from.row(); toR = to.row();
         int dist = from.distance(to);
         int dir = from.direction(to);
         int actions = actions(from, dir);
         if (dist != actions) {
-            System.out.println(dist + " " + actions);
-            System.out.println("Fails dist!= actions");
             return false;
         }
         int blockDist = blocked(from, dir);
         if (blockDist < actions && blockDist != 0) {
-            System.out.println("blockDist < actions");
             return false;
         }
-        if (from.contains() != to.contains()) {
-            //System.out.println("should be capture");
-        }
-        return true;   // FIXME
+
+        return true;
     }
+
+    /** Given a square and a direction, it returns the distance to blocking.
+     * @param from Starting square.
+     * @param direction int from 0 to 7 given direction.
+     * */
+
     int blocked(Square from, int direction) {
         assert from.contains() != EMP;
-        Piece _piece = from.contains();
+        Piece piece = from.contains();
         Piece blocker = WP;
-        if (_piece == WP) {
+        if (piece == WP) {
             blocker = BP;
         }
-        //assert from.contains() == WP;
         int dirC, dirR, c, r, dist;
         dirC = Square.DIR[direction][0];
         dirR = Square.DIR[direction][1];
         c = from.col(); r = from.row();
         dist = 0;
-        while (((c < BOARD_SIZE - 1) && (r < BOARD_SIZE - 1)) && ((c >= 0) && (r >= 0))) {
+        while (((c < BOARD_SIZE - 1) && (r < BOARD_SIZE - 1))
+                && ((c >= 0) && (r >= 0))) {
             c += dirC; r += dirR;
             if (c < 0 || r < 0) {
                 break;
             }
             dist += 1;
-            if (sq(c,r).contains() == blocker) {
+            if (sq(c, r).contains() == blocker) {
                 return dist;
             }
         }
         return 0;
     }
 
+    /** Returns number of actions from a square's position.
+     *
+     * @param from The square that is moving.
+     * @param direction direction from is trying to go.
+     * @return total distance it can move.
+     */
     int actions(Square from, int direction) {
-        if (from == sq('f',1)) {
-            System.out.println("in action");
-        }
         int dir = direction % 4;
         int action = 0;
         int dirC = Square.DIR[dir][0];
@@ -250,28 +241,23 @@ class Board {
         int forwardC, backC; int forwardR, backR;
         forwardC = backC = fromC; forwardR = backR = fromR;
         if (sq(fromC, fromR).contains() != EMP) {
-            //System.out.println("action: self added.");
             action += 1;
         }
         while ((forwardC <= BOARD_SIZE - 1) && (forwardR <= BOARD_SIZE - 1)) {
             forwardC += dirC; forwardR += dirR;
-            //if (sq(forwardC,forwardR) == null)
             if (forwardC < 0 || forwardC == BOARD_SIZE
                     || forwardR < 0 || forwardR == BOARD_SIZE) {
                 break;
-            }
-            else if (sq(forwardC, forwardR).contains() != EMP) {
-                //System.out.println("action: " + sq(forwardC,forwardR).contains() +" added");
+            } else if (sq(forwardC, forwardR).contains() != EMP) {
                 action += 1;
             }
         }
         while ((backC > 0) || (backR > 0)) {
-            //FIXME does this give nullpoint ever?
             backC -= dirC; backR -= dirR;
-            if (backC < 0 || backR < 0 || backC == BOARD_SIZE || backR == BOARD_SIZE) {
+            if (backC < 0 || backR < 0
+                    || backC == BOARD_SIZE || backR == BOARD_SIZE) {
                 break;
-            }
-             else if (sq(backC, backR).contains() != EMP) {
+            } else if (sq(backC, backR).contains() != EMP) {
                 action += 1;
             }
         }
@@ -287,7 +273,7 @@ class Board {
 
     /** Return a sequence of all legal moves from this position. */
     List<Move> legalMoves() {
-        return null;  // FIXME
+        return null;
     }
 
     /** Return true iff the game is over (either player has all his
@@ -305,8 +291,6 @@ class Board {
      *  null.  If the game has ended in a tie, returns EMP. */
     Piece winner() {
         if (!_winnerKnown) {
-            // FIXME
-            //_winnerKnown = true;
             if (piecesContiguous(WP) || piecesContiguous(BP)) {
                 _winnerKnown = true;
                 if (piecesContiguous(WP)) {
@@ -314,7 +298,6 @@ class Board {
                 } else {
                     _winner = BP;
                 }
-                //_winner = _turn.opposite();
             }
         }
         return _winner;
@@ -354,49 +337,26 @@ class Board {
     }
 
     /** Return true if a move from FROM to TO is blocked by an opposing
-     *  piece or by a friendly piece on the target square. */
+     *  piece or by a friendly piece on the target square.*/
     private boolean blocked(Square from, Square to) {
-        return false; // FIXME I made my own block method.
+        return false;
     }
 
     /** Return the size of the as-yet unvisited cluster of squares
      *  containing P at and adjacent to SQ.  VISITED indicates squares that
      *  have already been processed or are in different clusters.  Update
-     *  VISITED to reflect squares counted. */
+     *  VISITED to reflect squares counted.
+     * @param sq Square being checked if it is part of the contig piece.
+     * @param visited Array that tracks if a square has been visisted or not.
+     * @param p Piece that is being checked.
+     *  @param count Internal count tracker.*/
     int numContig(Square sq, boolean[][] visited, Piece p, int count) {
-//        if (sq == null) {
-//            return 0;
-//        }
-//        int c = sq.col();
-//        int r = sq.row();
-//        if (visited[c][r] == true) {
-//            return 0;
-//        }
-//        if (p == EMP) {
-//            visited[c][r] = true;
-//            return 0;
-//        }
-//        visited[c][r] = true;
-//        Square[] checkSq = new Square[8];
-//        for (int i = 0; i < 8; i += 1) {
-//            int cc = Square.DIR[i][0];
-//            int cr = Square.DIR[i][1];
-//            checkSq[i] = sq(c + cc, r + cr);
-//        }
-//        for (int j = 0; j < 8; j += 1) {
-//            System.out.print(checkSq[j]);
-//        }
-//        System.out.println(" ");
-//        for (int j = 0; j < 8; j += 1) {
-//            count += numContig(checkSq[j], visited, p, count);
-//            System.out.println(count);
-//        }
         if (sq == null) {
             return 0;
         }
         int c = sq.col();
         int r = sq.row();
-        if (visited[c][r] == true) {
+        if (visited[c][r]) {
             return 0;
         }
         visited[c][r] = true;
@@ -420,11 +380,7 @@ class Board {
             }
         }
 
-        return count + newcount;  // FIXME
-    }
-
-    private int match(Square from, Square to) {
-        return 0;
+        return count + newcount;
     }
 
     /** Set the values of _whiteRegionSizes and _blackRegionSizes. */
@@ -434,15 +390,14 @@ class Board {
         }
         _whiteRegionSizes.clear();
         _blackRegionSizes.clear();
-        // FIXME
         boolean[][] visited = new boolean[BOARD_SIZE][BOARD_SIZE];
         for (int c = 0; c < BOARD_SIZE; c += 1) {
             for (int r = 0; r < BOARD_SIZE; r += 1) {
-                Piece curr = sq(c,r).contains();
+                Piece curr = sq(c, r).contains();
                 if (curr == EMP) {
                     visited[c][r] = true;
                 } else if ((curr == WP || curr == BP) && !visited[c][r]) {
-                    int count = numContig(sq(c,r), visited, curr, 0);
+                    int count = numContig(sq(c, r), visited, curr, 0);
                     if (count > 0) {
                         if (curr == WP) {
                             _whiteRegionSizes.add(count);
@@ -469,8 +424,8 @@ class Board {
         }
     }
 
-    // FIXME: Other methods, variables?
-    /** Takes in index and returns coordinates */
+    /** Takes in index and returns coordinates.
+     * @param i into to RC val.*/
     public int[] indexToRC(int i) {
         int[] ret = new int[2];
         ret[1] = i >> 3;
@@ -478,7 +433,10 @@ class Board {
         return ret;
     };
 
-    /** Takes in RC coordinates and returns index. */
+    /** Takes in RC coordinates and returns index.
+     * @param r Int for row.
+     * @param c int for col.
+     */
     public int rctoIndex(int r, int c) {
         return (c << 3) + r;
     };
@@ -509,8 +467,7 @@ class Board {
             { EMP, BP,  BP,  BP,  BP,  BP,  BP,  EMP }
     };
     /** Current contents of the board.  Square S is at _board[S.index()]. */
-    // FIXME change back to private.
-    public final Piece[] _board = new Piece[BOARD_SIZE  * BOARD_SIZE];
+    private final Piece[] _board = new Piece[BOARD_SIZE  * BOARD_SIZE];
 
     /** List of all unretracted moves on this board, in order. */
     private final ArrayList<Move> _moves = new ArrayList<>();
@@ -532,6 +489,4 @@ class Board {
         _whiteRegionSizes = new ArrayList<>(),
         _blackRegionSizes = new ArrayList<>();
 
-    /** Pieces on board */
-    private Piece[][] _pob;
 }

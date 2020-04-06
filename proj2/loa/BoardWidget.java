@@ -121,12 +121,15 @@ class BoardWidget extends Pad {
 
     /** Handle a mouse-button push on S. */
     private void mousePressed(Square s) {
+        System.out.println(s);
+        System.out.println(s.contains());
         // FIXME
         repaint();
     }
 
     /** Handle a mouse-button release on S. */
     private void mouseReleased(Square s) {
+        System.out.println("mouse released");
         // FIXME
         repaint();
     }
@@ -141,6 +144,7 @@ class BoardWidget extends Pad {
             Square s = sq(x, y);
             switch (e.getID()) {
             case MouseEvent.MOUSE_PRESSED:
+                System.out.println("mouse pressed from mouseAction");
                 mousePressed(s);
                 break;
             case MouseEvent.MOUSE_RELEASED:
