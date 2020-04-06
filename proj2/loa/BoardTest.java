@@ -232,6 +232,7 @@ public class BoardTest {
         for (Move m : movelist) {
             System.out.println(m);
         }
+        System.out.println(movelist.get(0));
     }
 
     @Test

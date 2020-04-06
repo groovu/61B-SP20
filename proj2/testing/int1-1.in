@@ -1,0 +1,13 @@
+# Testing board movements
+#* java -ea loa.Main
+manual white
+b1-b3
+a2-a8
+c1-c3
+a3-c5
+d1-d3
+a4-c6
+e1-e3
+g1-g3
+a6-c8
+dump

@@ -2,7 +2,8 @@
  * University of California.  All rights reserved. */
 package loa;
 
-import java.util.List;
+import java.util.ArrayList;
+
 
 import static loa.Piece.*;
 
@@ -73,31 +74,15 @@ class MachinePlayer extends Player {
      *  on BOARD, does not set _foundMove. */
     private int findMove(Board board, int depth, boolean saveMove,
                          int sense, int alpha, int beta) {
-        if (depth == 0) {
-            Piece p = WP;
-            return board.score(p);
-        }
         int bestscore = 0;
-        if (saveMove) {
-            _foundMove = null;
-        }
-        if (sense == 1) {
-            bestscore = 0;
-            List<Move> legalMoves = board.legalMoves();
-            for (Move m : legalMoves) {
-                int newAlpha, newBeta = 0;
-                Board newBoard = new Board();
-                newBoard.copyFrom(board);
-                if (true) {
-                    newAlpha = 0;
-                } else {
-                    newBeta = 0;
-                }
-                int score = findMove(newBoard, depth - 1,
-                        saveMove, -1 * sense, newAlpha, newBeta);
-                if (score > bestscore) {
-                    bestscore = score;
-                }
+        ArrayList<Move> legalMoves = board.legalMoves();
+        for (Move m : legalMoves) {
+            Board copyBoard = new Board(board);
+            copyBoard.makeMove(m);
+            int score = copyBoard.score();
+            if (score > bestscore) {
+                bestscore = score;
+                _foundMove = m;
             }
         }
         return bestscore;

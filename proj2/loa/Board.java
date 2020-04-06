@@ -310,15 +310,15 @@ class Board {
     boolean inbounds(int c, int r) {
         return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
     }
-    /** Score of current board.
-     * @param p Side that score is being calculated for.
-     * @return Returns score of the board.*/
-    int score(Piece p) {
-        if (piecesContiguous(p)) {
+    /** Score of current board for _turn player.
+     * @return Returns score of the board for turn player..*/
+    int score() {
+        if (piecesContiguous(_turn)) {
             return Integer.MAX_VALUE;
-        } else {
-            return 0;
+        } else if (piecesContiguous(_turn.opposite())) {
+            return -Integer.MAX_VALUE;
         }
+        return 1;
     }
 
     /** Return true iff the game is over (either player has all his
