@@ -15,7 +15,7 @@ import static loa.Piece.*;
 import static loa.Square.sq;
 
 /** A widget that displays a Loa game.
- *  @author
+ *  @author Cherish Truong
  */
 class BoardWidget extends Pad {
 
@@ -93,7 +93,6 @@ class BoardWidget extends Pad {
         for (Square sq : Square.ALL_SQUARES) {
             drawPiece(g, sq);
         }
-        // More? FIXME
     }
 
     /** Draw the contents of S on G. */
@@ -127,14 +126,12 @@ class BoardWidget extends Pad {
             mip = true;
             _from = s;
         }
-        // FIXME
         repaint();
     }
 
     /** Handle a mouse-button release on S. */
     private void mouseReleased(Square s) {
         System.out.println("mouse released");
-        // FIXME
         if (mip && _from != null) {
             if (_board.isLegal(_from, s)) {
                 _commands.add(Move.mv(_from, s).toString());
@@ -170,7 +167,6 @@ class BoardWidget extends Pad {
     /** Revise the displayed board according to BOARD. */
     synchronized void update(Board board) {
         _board.copyFrom(board);
-        // FIXME?
         repaint();
     }
 
@@ -179,7 +175,6 @@ class BoardWidget extends Pad {
      *  the board. */
     void setMoveCollection(boolean collecting) {
         _acceptingMoves = collecting;
-        // FIXME?
         repaint();
     }
 
@@ -215,7 +210,7 @@ class BoardWidget extends Pad {
     /** True iff accepting moves from user. */
     private boolean _acceptingMoves;
 
-    /** From square */
+    /** From square. */
     private Square _from;
 
     /** Move in progress? */

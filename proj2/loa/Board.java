@@ -272,8 +272,53 @@ class Board {
     }
 
     /** Return a sequence of all legal moves from this position. */
-    List<Move> legalMoves() {
-        return null;
+    ArrayList<Move> legalMoves() {
+        Piece p = _turn;
+        for (int c = 0; c < BOARD_SIZE; c += 1) {
+            for (int r = 0; r < BOARD_SIZE; r += 1) {
+                Square current = sq(c, r);
+                if (get(current) == p) {
+                    for (int i = 0; i < 3; i += 1) {
+                        int actions = actions(current, i);
+                        int forwardC = actions * DIR[i][0] + current.col();
+                        int forwardR = actions * DIR[i][1] + current.row();
+                        int backwardC = actions * -DIR[i][0] + current.col();
+                        int backwardR = actions * -DIR[i][1] + current.row();
+                        if (inbounds(forwardC, forwardR)) {
+                            Square forward = sq(forwardC, forwardR);
+                            if (isLegal(current, forward)) {
+                                legalMoves.add(Move.mv(current, forward));
+                            }
+                        }
+                        if (inbounds(backwardC, backwardR)) {
+                            Square backward = sq(backwardC, backwardR);
+                            if (isLegal(current, backward)) {
+                                legalMoves.add(Move.mv(current, backward));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return legalMoves;
+    }
+    /** Returns if coordinates are valid. *
+     * @param c x coord
+     * @param r y coord
+     * @return Boolean.
+     */
+    boolean inbounds(int c, int r) {
+        return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
+    }
+    /** Score of current board.
+     * @param p Side that score is being calculated for.
+     * @return Returns score of the board.*/
+    int score(Piece p) {
+        if (piecesContiguous(p)) {
+            return Integer.MAX_VALUE;
+        } else {
+            return 0;
+        }
     }
 
     /** Return true iff the game is over (either player has all his
@@ -471,6 +516,8 @@ class Board {
 
     /** List of all unretracted moves on this board, in order. */
     private final ArrayList<Move> _moves = new ArrayList<>();
+    /** List of legal moves for current _turn. */
+    private final ArrayList<Move> legalMoves = new ArrayList<>();
     /** Current side on move. */
     private Piece _turn;
     /** Limit on number of moves before tie is declared.  */

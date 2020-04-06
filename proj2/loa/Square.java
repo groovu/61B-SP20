@@ -125,6 +125,7 @@ final class Square {
     /** Return the (unique) Square denoting COL ROW. */
     static Square sq(int col, int row) {
         if (!exists(row, col)) {
+            System.out.println(row + " " + col);
             error(1, "row or column out of bounds");
 
         }

@@ -4,6 +4,8 @@ package loa;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static loa.Square.BOARD_SIZE;
 import static org.junit.Assert.*;
 
@@ -211,7 +213,6 @@ public class BoardTest {
         System.out.println(test);
     }
 
-
     @Test
     public void bootlegIllegal() {
         Board test = new Board(Board.INITIAL_PIECES, BP);
@@ -222,6 +223,21 @@ public class BoardTest {
         test.makeMove(mv("c8-d7"));
         System.out.println(test);
         System.out.println(test);
+    }
 
+    @Test
+    public void legalMovesTest() {
+        Board test = new Board(Board.INITIAL_PIECES, BP);
+        ArrayList<Move> movelist = test.legalMoves();
+        for (Move m : movelist) {
+            System.out.println(m);
+        }
+    }
+
+    @Test
+    public void inBoundsTest() {
+        Board test = new Board(Board.INITIAL_PIECES, BP);
+        boolean x = test.inbounds(8, 0);
+        System.out.println(x);
     }
 }

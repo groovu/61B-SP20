@@ -19,7 +19,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import static loa.Piece.*;
 
 /** The GUI controller for a LOA board and buttons.
- *  @author
+ *  @author Cherish Truong
  */
 class GUI extends TopLevel implements View, Reporter {
 
@@ -55,7 +55,6 @@ class GUI extends TopLevel implements View, Reporter {
                         "height", 1,
                         "width", 3));
 
-        // FIXME: Other controls?
 
         _widget = new BoardWidget(_pendingCommands);
         add(_widget,
@@ -66,7 +65,6 @@ class GUI extends TopLevel implements View, Reporter {
                  new LayoutSpec("x", 0, "y", 0,
                                 "height", 1,
                                 "width", 3));
-        // FIXME: Other components?
     }
 
     /** Response to "Quit" button click. */
@@ -83,9 +81,11 @@ class GUI extends TopLevel implements View, Reporter {
     private void help(String dummy) {
         displayText("Help", HELP_TEXT);
     }
+    /** Reponse to "About" button click. */
     private void about(String dummy) {
-        displayText("Help", ABOUT_TEXT);
+        displayText("About", ABOUT_TEXT);
     }
+    /** Response to "Undo" button click. */
     private void retract(String dummy) {
         _pendingCommands.offer("retract");
     }
@@ -133,7 +133,6 @@ class GUI extends TopLevel implements View, Reporter {
 
         boolean manualWhite = controller.manualWhite(),
             manualBlack = controller.manualBlack();
-        // FIXME: More?
     }
 
     /** Display text in resource named TEXTRESOURCE in a new window titled

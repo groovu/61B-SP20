@@ -74,18 +74,18 @@ class MachinePlayer extends Player {
     private int findMove(Board board, int depth, boolean saveMove,
                          int sense, int alpha, int beta) {
         if (depth == 0) {
-            return 0; //whatever hueristic value you're looking for.
+            Piece p = WP;
+            return board.score(p);
         }
         int bestscore = 0;
-        /** FIXME */
         if (saveMove) {
-            _foundMove = null; /** FIXME */
+            _foundMove = null;
         }
         if (sense == 1) {
             bestscore = 0;
             List<Move> legalMoves = board.legalMoves();
             for (Move m : legalMoves) {
-                int newAlpha, newBeta;
+                int newAlpha, newBeta = 0;
                 Board newBoard = new Board();
                 newBoard.copyFrom(board);
                 if (true) {
@@ -93,25 +93,21 @@ class MachinePlayer extends Player {
                 } else {
                     newBeta = 0;
                 }
-                int score = findMove(newBoard, depth - 1, saveMove, -1*sense, newAlpha, newBeta);
+                int score = findMove(newBoard, depth - 1,
+                        saveMove, -1 * sense, newAlpha, newBeta);
                 if (score > bestscore) {
                     bestscore = score;
                 }
             }
         }
-        return bestscore; /** FIXME */
+        return bestscore;
     }
 
     /** Return a search depth for the current position. */
     private int chooseDepth() {
-        return 3;   /**FIXME */
-
+        return 3;
     }
-
-
-    /** FIXME: Other methods, variables here. */
 
     /** Used to convey moves discovered by findMove. */
     private Move _foundMove;
-
 }
