@@ -58,6 +58,11 @@ class Board {
                 _board[(r << 3) + c] = contents[r][c];
                 sq(c, r).contains(contents[r][c]);
                 set(sq(c, r), contents[r][c]);
+                if (contents[r][c] == WP) {
+                    _wp += 1;
+                } else if (contents[r][c] == BP) {
+                    _bp += 1;
+                }
             }
         }
         _turn = side;
@@ -66,6 +71,8 @@ class Board {
 
     /** Set me to the initial configuration. */
     void clear() {
+        _bp = 0;
+        _wp = 0;
         initialize(INITIAL_PIECES, BP);
     }
 
@@ -78,6 +85,10 @@ class Board {
             for (int c = 0; c < BOARD_SIZE; c += 1) {
                 _board[(r << 3) + c] = board.get(sq(c, r));
             }
+        }
+        this._moves.clear();
+        for (Move m: board._moves) {
+            this._moves.add(m);
         }
 
         _turn = board._turn;
@@ -119,12 +130,20 @@ class Board {
      *  later retraction, makeMove itself uses MOVE.captureMove() to produce
      *  the capturing move. */
     void makeMove(Move move) {
-        assert isLegal(move);
+        //assert isLegal(move);
+        if (!isLegal(move)) {
+            return;
+        }
         Square from = move.getFrom();
         Square to = move.getTo();
         if (get(from) != get(to) && get(to) != EMP) {
             Move m = Move.mv(from, to, true);
             _moves.add(m);
+            if (to.contains() == WP) {
+                _wp -= 1;
+            } else if (to.contains() == BP) {
+                _bp -= 1;
+            }
         } else {
             Move m = Move.mv(from, to, false);
             _moves.add(m);
@@ -169,28 +188,34 @@ class Board {
      *  move. */
     boolean isLegal(Square from, Square to) {
         if (!from.isValidMove(to)) {
+            System.out.println("Fails !isValidMove");
             return false;
         }
-        if ((from == null) || (to == null) || from.contains() == EMP)  {
+        if ((from == null) || (to == null))  {
+            System.out.println("this one");
             return false;
         }
         if (from == to) {
+            System.out.println("From == to");
             return false;
         }
         if (from.contains() == to.contains()) {
+            System.out.println("From contaos = to contains");
             return false;
         }
         int dist = from.distance(to);
         int dir = from.direction(to);
         int actions = actions(from, dir);
         if (dist != actions) {
+            System.out.println( dist + "!="  + actions);
+            System.out.println("Dist != Actions");
             return false;
         }
         int blockDist = blocked(from, dir);
         if (blockDist < actions && blockDist != 0) {
+            System.out.println("Blocked");
             return false;
         }
-
         return true;
     }
 
@@ -200,7 +225,7 @@ class Board {
      * */
 
     int blocked(Square from, int direction) {
-        assert from.contains() != EMP;
+        //assert from.contains() != EMP;
         Piece piece = from.contains();
         Piece blocker = WP;
         if (piece == WP) {
@@ -313,12 +338,28 @@ class Board {
     /** Score of current board for _turn player.
      * @return Returns score of the board for turn player..*/
     int score() {
-        if (piecesContiguous(_turn)) {
-            return Integer.MAX_VALUE;
-        } else if (piecesContiguous(_turn.opposite())) {
-            return -Integer.MAX_VALUE;
+//        if (piecesContiguous(_turn)) {
+//            return Integer.MAX_VALUE;
+//        } else if (piecesContiguous(_turn.opposite())) {
+//            return -Integer.MAX_VALUE;
+//        }
+        if (piecesContiguous(WP)) {
+            return MachinePlayer.winningValue();
+        } else if (piecesContiguous(BP)) {
+            return -MachinePlayer.winningValue();
         }
-        return 1;
+        int pieceDif = _wp - _bp;
+        int numRegionDif = _whiteRegionSizes.size() - _blackRegionSizes.size();
+        int whiteSize = 0;
+        int blackSize = 0;
+        for (int w: _whiteRegionSizes) {
+            whiteSize += w;
+        }
+        for (int b: _blackRegionSizes) {
+            blackSize += b;
+        }
+        int regionSizeDif = whiteSize - blackSize;
+        return (int) (pieceDif + numRegionDif * 1.1 + regionSizeDif * 2);
     }
 
     /** Return true iff the game is over (either player has all his
@@ -536,4 +577,9 @@ class Board {
         _whiteRegionSizes = new ArrayList<>(),
         _blackRegionSizes = new ArrayList<>();
 
+    /** Number of black pieces on board. */
+    private int _bp;
+
+    /** Number of white pieces on bard */
+    private int _wp;
 }

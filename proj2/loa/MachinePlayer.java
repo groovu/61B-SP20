@@ -2,6 +2,8 @@
  * University of California.  All rights reserved. */
 package loa;
 
+import com.google.common.collect.Streams;
+
 import java.util.ArrayList;
 
 
@@ -22,6 +24,11 @@ class MachinePlayer extends Player {
      *  a template). */
     MachinePlayer() {
         this(null, null);
+    }
+
+    /** Returns Winning Value */
+    public static int winningValue() {
+        return WINNING_VALUE;
     }
 
     /** A MachinePlayer that plays the SIDE pieces in GAME. */
@@ -62,6 +69,7 @@ class MachinePlayer extends Player {
         } else {
             value = findMove(work, chooseDepth(), true, -1, -INFTY, INFTY);
         }
+        System.out.println("value :" +value);
         return _foundMove;
     }
 
@@ -74,15 +82,38 @@ class MachinePlayer extends Player {
      *  on BOARD, does not set _foundMove. */
     private int findMove(Board board, int depth, boolean saveMove,
                          int sense, int alpha, int beta) {
-        int bestscore = 0;
+//        int bestscore = 0;
+//        ArrayList<Move> legalMoves = board.legalMoves();
+//        for (Move m : legalMoves) {
+//            Board copyBoard = new Board(board);
+//            copyBoard.makeMove(m);
+//            int score = copyBoard.score();
+//            if (score > bestscore) {
+//                bestscore = score;
+//                _foundMove = m;
+//            }
+//        }
+//        return bestscore;
         ArrayList<Move> legalMoves = board.legalMoves();
-        for (Move m : legalMoves) {
+        _foundMove = legalMoves.get(0);
+        int bestscore = 0;
+        for (Move m: legalMoves) {
             Board copyBoard = new Board(board);
             copyBoard.makeMove(m);
-            int score = copyBoard.score();
-            if (score > bestscore) {
-                bestscore = score;
-                _foundMove = m;
+            if (sense == 1) {
+                int score = findMin(copyBoard, depth, alpha, beta);
+                if (score > alpha) {
+                    alpha = score;
+                    _foundMove = m;
+                    bestscore = score;
+                }
+            } else if (sense == -1) {
+                int score = findMax(copyBoard, depth, alpha, beta);
+                if (score < beta) {
+                    beta = score;
+                    _foundMove = m;
+                    bestscore = score;
+                }
             }
         }
         return bestscore;
@@ -90,7 +121,46 @@ class MachinePlayer extends Player {
 
     /** Return a search depth for the current position. */
     private int chooseDepth() {
-        return 3;
+        return 0;
+    }
+
+    private int findMax(Board board, int depth, int alpha, int beta) {
+        if (depth == 0 || board.gameOver()) {
+            return board.score();
+        }
+        ArrayList<Move> legalMoves = board.legalMoves();
+        int bestsofar = -INFTY;
+        for (Move m : legalMoves) {
+            Board copyBoard = new Board(board);
+            copyBoard.makeMove(m);
+            int response = findMin(copyBoard, depth - 1, alpha, beta);
+            if (response >= bestsofar) {
+                alpha = Math.max(alpha, response);
+                if (beta <= alpha) break;
+            }
+        }
+        return bestsofar;
+    }
+
+    private int findMin(Board board, int depth, int alpha, int beta) {
+        if (depth == 0 || board.gameOver()) {
+            return board.score();
+        }
+        ArrayList<Move> legalMoves = board.legalMoves();
+        int bestsofar = INFTY;
+        for (Move m : legalMoves) {
+            Board copyBoard = new Board(board);
+            System.out.println(m);
+            System.out.println(copyBoard);
+            copyBoard.makeMove(m);
+            int response = findMin(copyBoard, depth - 1, alpha, beta);
+            if (response <= bestsofar) {
+                bestsofar = response;
+                beta = Math.min(beta, response);
+                if (beta <= alpha) break;
+            }
+        }
+        return bestsofar;
     }
 
     /** Used to convey moves discovered by findMove. */

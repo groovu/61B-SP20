@@ -241,4 +241,19 @@ public class BoardTest {
         boolean x = test.inbounds(8, 0);
         System.out.println(x);
     }
+    @Test
+    public void movingf3() {
+        Board test = new Board(Board.INITIAL_PIECES, BP);
+        test.makeMove(mv(sq('b',1), sq('b',3)));
+        test.makeMove(mv(sq('a',6), sq('c',8)));
+        test.makeMove(mv(sq('c',1), sq('c',3)));
+        test.makeMove(mv(sq('c',8), sq('c',6)));
+        System.out.println(sq('d',1).contains());
+        System.out.println(sq('d',3).contains());
+        test.makeMove(mv(sq('d',1), sq('d',3)));
+        test.makeMove(mv(sq('h',3), sq('f',1)));
+        test.makeMove(mv(sq('e',1), sq('e',3)));
+        test.makeMove(mv(sq('f',1), sq('f',3)));
+        System.out.println(test);
+    }
 }
