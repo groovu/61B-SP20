@@ -110,6 +110,7 @@ public class Main {
             readIn = readIn.concat(args[1]);
         }
         Utils.writeContents(STORY, readIn);
+        System.out.println(readIn);
     }
 
     /**
@@ -121,6 +122,7 @@ public class Main {
     public static void makeDog(String[] args) {
         validateNumArgs("dog", args, 4);
         Dog newDog = new Dog(args[1], args[2], Integer.parseInt(args[3]));
+        System.out.println(newDog.toString());
         newDog.saveDog();
         // FIXME
     }
