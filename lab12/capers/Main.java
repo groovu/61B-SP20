@@ -1,57 +1,73 @@
 package capers;
 
 import java.io.File;
+import java.io.IOException;
 
 /** Canine Capers: A Gitlet Prelude.
  * @author Sean Dooher
 */
 public class Main {
-    /** Current Working Directory. */
+    /**
+     * Current Working Directory.
+     */
     static final File CWD = new File(".");
 
-    /** Main metadata folder. */
-    static final File CAPERS_FOLDER = null; // FIXME
+    /**
+     * Main metadata folder.
+     */
+    static final File CAPERS_FOLDER = new File(".capers");
+
+    static final File STORY = new File(".capers/story");
+
 
     /**
      * Runs one of three commands:
      * story [text] -- Appends "text" + a newline to a story file in the
-     *                 .capers directory. Additionally, prints out the
-     *                 current story.
-     *
+     * .capers directory. Additionally, prints out the
+     * current story.
+     * <p>
      * dog [name] [breed] [age] -- Persistently creates a dog with
-     *                             the specified parameters; should also print
-     *                             the dog's toString(). Assume dog names are
-     *                             unique.
-     *
+     * the specified parameters; should also print
+     * the dog's toString(). Assume dog names are
+     * unique.
+     * <p>
      * birthday [name] -- Advances a dog's age persistently
-     *                    and prints out a celebratory message.
-     *
+     * and prints out a celebratory message.
+     * <p>
      * All persistent data should be stored in a ".capers"
      * directory in the current working directory.
-     *
+     * <p>
      * Recommended structure (you do not have to follow):
-     *
+     * <p>
      * *YOU SHOULD NOT CREATE THESE MANUALLY,
-     *  YOUR PROGRAM SHOULD CREATE THESE FOLDERS/FILES*
-     *
+     * YOUR PROGRAM SHOULD CREATE THESE FOLDERS/FILES*
+     * <p>
      * .capers/ -- top level folder for all persistent data in your lab12 folder
-     *    - dogs/ -- folder containing all of the persistent data for dogs
-     *    - story -- file containing the current story
+     * - dogs/ -- folder containing all of the persistent data for dogs
+     * - story -- file containing the current story
      *
      * @param args arguments from the command line
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             exitWithError("Must have at least one argument");
         }
         setupPersistence();
         switch (args[0]) {
-        case "story":
-            writeStory(args);
-            break;
-        // FIXME
-        default:
-            exitWithError(String.format("Unknown command: %s", args[0]));
+            case "story":
+                writeStory(args);
+                break;
+            // FIXME
+            case "dog":
+                // dog name breed age
+                // create dog with specified parameters
+                makeDog(args);
+                break;
+            case "birthday":
+                celebrateBirthday(args);
+                break;
+            default:
+                exitWithError(String.format("Unknown command: %s", args[0]));
         }
         return;
     }
@@ -60,24 +76,36 @@ public class Main {
      * Does required filesystem operations to allow for persistence.
      * (creates any necessary folders or files)
      * Remember: recommended structure (you do not have to follow):
-     *
+     * <p>
      * .capers/ -- top level folder for all persistent data in your lab12 folder
-     *    - dogs/ -- folder containing all of the persistent data for dogs
-     *    - story -- file containing the current story
-     *
+     * - dogs/ -- folder containing all of the persistent data for dogs
+     * - story -- file containing the current story
      */
-    public static void setupPersistence() {
-        // FIXME
+    public static void setupPersistence() throws IOException {
+        if (!CAPERS_FOLDER.exists()) {
+            CAPERS_FOLDER.mkdir();
+        }
+        if (!Dog.DOG_FOLDER.exists()) {
+            Dog.DOG_FOLDER.mkdir();
+        }
+        if (!STORY.exists()) {
+            STORY.createNewFile();
+        }
     }
+        // FIXME
+
 
     /**
      * Appends the first non-command argument in args
      * to a file called `story` in the .capers directory.
      * @param args Array in format: {'story', text}
      */
-    public static void writeStory(String[] args) {
+    public static void writeStory(String[] args) throws IOException {
         validateNumArgs("story", args, 2);
-        // FIXME
+        String readIn = Utils.readContentsAsString(STORY);
+        readIn = readIn.concat(args[1]);
+        readIn = readIn.concat("\n");
+        Utils.writeContents(STORY, readIn);
     }
 
     /**
@@ -88,6 +116,8 @@ public class Main {
      */
     public static void makeDog(String[] args) {
         validateNumArgs("dog", args, 4);
+        Dog newDog = new Dog(args[1], args[2], Integer.parseInt(args[3]));
+        newDog.saveDog();
         // FIXME
     }
 
@@ -99,6 +129,9 @@ public class Main {
      */
     public static void celebrateBirthday(String[] args) {
         validateNumArgs("birthday", args, 2);
+        Dog bdog = Dog.fromFile(args[1]);
+        bdog.haveBirthday();
+        bdog.saveDog();
         // FIXME
     }
 
@@ -131,4 +164,13 @@ public class Main {
                 String.format("Invalid number of arguments for: %s.", cmd));
         }
     }
+//
+//    /** Capers Directory Check */
+//    private boolean isCapersCreated = false;
+//
+//    /** Dogs Directory Check */
+//    private boolean isDogsCreated = false;
+//
+//    /** Story file check */
+//    private boolean isFileCreated = false;
 }
