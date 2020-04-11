@@ -131,7 +131,8 @@ public class Main {
         validateNumArgs("birthday", args, 2);
         Dog bdog = Dog.fromFile(args[1]);
         bdog.haveBirthday();
-        bdog.saveDog();
+        File save = Utils.join(Dog.DOG_FOLDER, args[1]);
+        Utils.writeObject(save, bdog);
         // FIXME
     }
 
