@@ -15,9 +15,9 @@ public class Main {
     /**
      * Main metadata folder.
      */
-    static final File CAPERS_FOLDER = new File(".capers");
+    static final File CAPERS_FOLDER = Utils.join(".",".capers");
 
-    static final File STORY = new File(".capers/story");
+    static final File STORY = Utils.join(".capers", "story");
 
 
     /**
