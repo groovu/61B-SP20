@@ -103,8 +103,8 @@ public class Main {
     public static void writeStory(String[] args) throws IOException {
         validateNumArgs("story", args, 2);
         String readIn = Utils.readContentsAsString(STORY);
-        readIn = readIn.concat(args[1]);
         readIn = readIn.concat("\n");
+        readIn = readIn.concat(args[1]);
         Utils.writeContents(STORY, readIn);
     }
 
