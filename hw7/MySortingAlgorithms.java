@@ -42,7 +42,19 @@ public class MySortingAlgorithms {
     public static class InsertionSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            int temp, next;
+            for (int i = 0; i < k; i += 1) {
+                next = i;
+                while (next > 0 && array[next-1] > array[next]) {
+                    temp = array[next-1];
+                    array[next-1] = array[next];
+                    array[next] = temp;
+                    next -= 1;
+                    if (next < 0) {
+                        break;
+                    }
+                }
+            }
         }
 
         @Override
@@ -60,7 +72,20 @@ public class MySortingAlgorithms {
     public static class SelectionSort implements SortingAlgorithm {
         @Override
         public void sort(int[] array, int k) {
-            // FIXME
+            int min;
+            for (int i = 0; i < k; i += 1) {
+                min = i;
+                for (int j = i; j < k; j += 1) {
+                    if (array[j] < array[min]) {
+                        min = j;
+                    }
+                }
+                if (min != i) {
+                    int temp = array[i];
+                    array[i] = array[min];
+                    array[min] = temp;
+                }
+            }
         }
 
         @Override
@@ -78,8 +103,50 @@ public class MySortingAlgorithms {
         @Override
         public void sort(int[] array, int k) {
             // FIXME
-        }
+            sort2(array, 0, k-1);
 
+        }
+        public void sort2(int[] array, int l, int r) {
+            if (l < r) {
+                int m = (l + r) / 2;
+                sort2(array, l, m);
+                sort2(array, m + 1, r);
+                merge(array, l, m, r);
+            }
+        }
+        public void merge(int[] array, int l, int m, int r) {
+            int[] left = new int[m-l+1];
+            for (int i = 0; i < m-l+1; i += 1) {
+                left[i] = array[l+i];
+            }
+            int[] right = new int[r-m];
+            for (int i = 0; i < r - m; i += 1) {
+                right[i] = array[m + 1 + i];
+            }
+            int i = 0;
+            int j = 0;
+            int k = l;
+            while (i < m - l + 1 && j < r - m) {
+                if (left[i] <= right[j]) {
+                    array[k] = left[i];
+                    i += 1;
+                } else {
+                    array[k] = right[j];
+                    j += 1;
+                }
+                k += 1;
+            }
+            while (i < m - l + 1) {
+                array[k] = left[i];
+                i += 1;
+                k += 1;
+            }
+            while (j < r - m) {
+                array[k] = right[j];
+                j += 1;
+                k += 1;
+            }
+        }
         // may want to add additional methods
 
         @Override
