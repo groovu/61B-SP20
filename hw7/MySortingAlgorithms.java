@@ -1,4 +1,6 @@
-import java.util.Arrays;
+import net.sf.saxon.style.XSLOutput;
+
+import java.util.*;
 
 /**
  * Note that every sorting algorithm takes in an argument k. The sorting 
@@ -218,18 +220,44 @@ public class MySortingAlgorithms {
         @Override
         public void sort(int[] a, int k) {
             // FIXME
-            int n = a.length;
-            int R = 256;
-            for (int i = k - 1; i < n; i += 1) {
-
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "LSD Sort";
+            System.out.println(Arrays.toString(a));
+            int[] b = Arrays.copyOfRange(a, 0, k);
+            System.out.println(Arrays.toString(b));
+            System.out.println(k);
+            //radixSort(b);
+            System.out.println(Arrays.toString(b));
+            System.out.println(" break");
         }
     }
+
+//        public void radix(int[] a){
+//            int max = maxVal(a);
+//            int numDig = numDigits(max);
+//            int placeVal = 1;
+//            while (numDig > 0) {
+//            }
+//
+//        }
+//        public int numDigits(int d) {
+//            if (d / 10 == 0 ) {
+//            return 1;
+//        }
+//            return 1 + numDigits(d/10);
+//        }
+//        public int maxVal(int[] a) {
+//            int max = 0;
+//            for (int i : a) {
+//                if (i > max) {
+//                    max = i;
+//                }
+//            }
+//            return max;
+//        }
+//        @Override
+//        public String toString() {
+//            return "LSD Sort";
+//        }
+//    }
 
     /**
      * MSD Sort implementation.
