@@ -137,6 +137,7 @@ public class RedBlackTree<T extends Comparable<T>> {
 
         // Insert (return) new red leaf node.
         if (node == null) {
+            return new RBTreeNode(false, item);
             // YOUR CODE HERE
 
         }
@@ -146,29 +147,35 @@ public class RedBlackTree<T extends Comparable<T>> {
         if (comp == 0) {
             return node; // do nothing.
         } else if (comp < 0) {
-
+            node.left = insert(node.left, item);
             // YOUR CODE HERE
 
         } else {
             // YOUR CODE HERE
-
+            node.right = insert(node.right,item);
         }
 
         // handle case C and "Right-leaning" situation.
+        // node is right child of red, rotate left on node.
         if (isRed(node.right) && !isRed(node.left)) {
             // YOUR CODE HERE
-
+            node = rotateLeft(node);
         }
 
         // handle case B
+        // node is left child of red,  rotate right on node.
         if (isRed(node.left) && isRed(node.left.left)) {
             // YOUR CODE HERE
+            node = rotateRight(node);
 
         }
 
         // handle case A
+        // node is rightchild of black, flip colors, change root to black.
         if (isRed(node.left) && isRed(node.right)) {
             // YOUR CODE HERE
+            flipColors(node);
+            root.isBlack = true;
 
         }
         return node;
