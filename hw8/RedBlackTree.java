@@ -32,8 +32,25 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return root of the Red-Black tree for given 2-3-4 tree.
      */
     RBTreeNode<T> buildRedBlackTree(BTree.Node<T> r) {
-        // YOUR CODE HERE
-        return null;
+        if (r == null) {
+            return null;
+        }
+        RBTreeNode<T> left = null; RBTreeNode<T> right = null; T mid = null;
+        int items = r.getItemCount();
+        if (items == 1) {
+            mid = r.getItemAt(0);
+            left = buildRedBlackTree(r.getChildAt(0));
+            right = buildRedBlackTree(r.getChildAt(1));
+        } else if (items >= 2) {
+            mid = r.getItemAt(1);
+            left = new RBTreeNode(false, r.getItemAt(0), buildRedBlackTree(r.getChildAt(0)), buildRedBlackTree(r.getChildAt(1)));
+            if (items == 3) {
+                right = new RBTreeNode(false, r.getItemAt(2), buildRedBlackTree(r.getChildAt(2)), buildRedBlackTree(r.getChildAt(3)));
+            } else {
+                right = buildRedBlackTree(r.getChildAt(2));
+            }
+        }
+        return new RBTreeNode<T>(true, mid, left, right);
     }
 
     /**
@@ -116,6 +133,7 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return (new) root of the subtree rooted at given node.
      */
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
+        System.out.println("insert not implemented, checking to see if RBT is created.");
 
         // Insert (return) new red leaf node.
         if (node == null) {
@@ -128,6 +146,7 @@ public class RedBlackTree<T extends Comparable<T>> {
         if (comp == 0) {
             return node; // do nothing.
         } else if (comp < 0) {
+
             // YOUR CODE HERE
 
         } else {
