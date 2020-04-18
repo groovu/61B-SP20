@@ -153,4 +153,9 @@ Session.vim
 .netrwhist
 *~
 
+## .gitlet test folder ##
+.gitlet
+test.txt
+
+
 

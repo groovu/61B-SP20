@@ -1,5 +1,5 @@
 # Gitlet Design Document
-Authors: Cherish Truong, Jason Bustani
+Authors: Cherish Truong
 
 # Classes and Data Structures
 ## HashingBase

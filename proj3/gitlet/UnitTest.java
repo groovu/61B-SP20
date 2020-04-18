@@ -2,6 +2,9 @@ package gitlet;
 
 import ucb.junit.textui;
 import org.junit.Test;
+
+import java.io.File;
+
 import static org.junit.Assert.*;
 
 /** The suite of all JUnit tests for the gitlet package.
@@ -15,9 +18,16 @@ public class UnitTest {
         System.exit(textui.runClasses(UnitTest.class));
     }
 
-    /** A dummy test to avoid complaint. */
+    /** Testing opening files */
     @Test
-    public void placeholderTest() {
+    public void readFile() {
+        File f = Utils.join(Main.getCWD(), "test.txt");
+        System.out.println(Utils.sha1(Utils.readContents(f)));
+        String test = Utils.readContentsAsString(f);
+        System.out.println(test);
+        test += "boo ";
+        Utils.writeContents(f, test);
+        System.out.println(Utils.sha1(Utils.readContents(f)));
     }
 
 }

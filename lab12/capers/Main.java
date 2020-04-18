@@ -171,13 +171,4 @@ public class Main {
                 String.format("Invalid number of arguments for: %s.", cmd));
         }
     }
-//
-//    /** Capers Directory Check */
-//    private boolean isCapersCreated = false;
-//
-//    /** Dogs Directory Check */
-//    private boolean isDogsCreated = false;
-//
-//    /** Story file check */
-//    private boolean isFileCreated = false;
 }
