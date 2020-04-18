@@ -4,6 +4,7 @@ import ucb.junit.textui;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -28,6 +29,28 @@ public class UnitTest {
         test += "boo ";
         Utils.writeContents(f, test);
         System.out.println(Utils.sha1(Utils.readContents(f)));
+    }
+
+    @Test
+    public void hashTest() {
+        File empty1 = Utils.join("./testing/empty1.txt");
+        File empty2 = Utils.join("./testing/empty2.txt");
+        File test = Utils.join("./testing/bob.txt");
+        byte[] testc = Utils.readContents(test);
+        byte[] empty1c= Utils.readContents(empty1);
+        byte[] empty2c = Utils.readContents(empty2);
+        assertEquals(Utils.sha1(empty1c), Utils.sha1(empty2c));
+        System.out.println(Utils.sha1(testc));
+    }
+
+    @Test
+    public void writeToDisk() throws IOException {
+        String boo = "Boo!";
+        String sha = Utils.sha1(boo);
+        //File test = new File("./testing/", sha);
+        File test = Utils.join("./testing/", sha);
+        test.createNewFile();
+
     }
 
 }

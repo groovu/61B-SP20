@@ -11,9 +11,20 @@ public class Blob implements Serializable {
      * @param
      */
     Blob(File input) {
-        _bytes = Utils.readContents(input);
+        _contents = Utils.readContents(input);
+        _sha = Utils.sha1(_contents);
     }
 
-    static byte[] _bytes;
-    static String _string;
+    public String sha() {
+        return _sha;
+    }
+
+    /** Contents of file, stored in Blob. */
+    static byte[] _contents;
+
+    /** Name of file, stored in Blob. */
+    static String _name;
+
+    /** SHA1 of file */
+    static String _sha;
 }

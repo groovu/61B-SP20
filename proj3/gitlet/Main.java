@@ -44,9 +44,14 @@ public class Main {
             exitWithError("fatal: not a gitlet repository (or any of the parent directors): .gitlet");
         }
         switch (args[0]) {
-        }
-
+            case "add":
+                add(args);
+                break;
+            default:
+                exitWithError(String.format("gitlet: '%s' is not a gitlet command.", args[0]));
+            }
     }
+
     private static void init(String[] args) throws FileNotFoundException {
         if (!Utils.join(GD).exists()) {
             GD.mkdir();
@@ -54,13 +59,48 @@ public class Main {
             REFS.mkdir();
             System.out.println("Initialized empty Gitlet repository in " + System.getProperty("user.dir") + "\\.gitlet\\");
             String test = "test.  holding spot for HEAD";
-            PrintWriter head = new PrintWriter(".gitlet/HEAD");
+            PrintWriter head = new PrintWriter(Utils.join(GD, "HEAD"));
             head.println("ref: refs/heads/master");
             head.close();
-            //String test = "test.  holding spot for HEAD";
-            //Utils.writeObject(Utils.join(GD,"HEAD"), test);
+            Index index = new Index();
+            Utils.writeObject(Utils.join(GD, "index"), index);
             System.exit(0);
         }
+    }
+
+    private static void add(String... args) throws IOException {
+        try {
+            String addCheck = args[1];
+        }
+        catch(Exception e) {
+            System.out.println("Nothing specified, nothing added.");
+            System.out.println("Maybe you wanted to say 'git add .'?");
+            System.exit(1);
+        }
+        //File add = Utils.join(CWD.toString(), args[1].toString());
+        File add = Utils.join(CWD, args[1]);
+        if (!add.exists()) {
+            System.out.println("fatal: path spec '" + args[1] + "' did not match any files");
+            System.exit(1);
+        } else if (add.exists()) {
+            Blob blobAdd = new Blob(add);
+            String blobSha = blobAdd.sha();
+            File blobObj = Utils.join(OBJECTS, blobSha);
+            Utils.writeObject(blobObj, blobAdd);
+            blobObj.createNewFile();
+        }
+//        try {
+//            System.out.println("Trying to add file");
+//            File add = Utils.join(CWD.toString(), args[1].toString());
+//            if (!add.exists()) {
+//                System.out.println("File does not exist.");
+//            }
+//            System.out.println(add.hashCode());
+//        } catch (Exception e) {
+//            System.out.println("File does not exist.");
+//            e.printStackTrace();
+//        }
+
     }
     private static boolean repoInitCheck() {
         if (!GD.exists()) {
