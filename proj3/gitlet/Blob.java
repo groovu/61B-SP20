@@ -5,26 +5,27 @@ import java.io.Serializable;
 import static gitlet.Main.*;
 import static gitlet.Utils.*;
 
-
+/** Class the represents the contents of a file.
+ * @author Cherish Truong*/
 public class Blob implements Serializable {
     /** Blob constructor.  Give it a file, get a blob back ./
-     * @param
+     * @param input File to be turned into contents.
      */
     Blob(File input) {
         _contents = Utils.readContents(input);
         _sha = Utils.sha1(_contents);
     }
-
-    public String sha() {
+    /** Returns the sha of the Blob. */
+    String sha() {
         return _sha;
     }
 
     /** Contents of file, stored in Blob. */
-    static byte[] _contents;
+    private static byte[] _contents;
 
     /** Name of file, stored in Blob. */
-    static String _name;
+    private static String _name;
 
-    /** SHA1 of file */
-    static String _sha;
+    /** SHA1 of file. */
+    private static String _sha;
 }

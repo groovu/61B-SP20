@@ -37,7 +37,7 @@ public class UnitTest {
         File empty2 = Utils.join("./testing/empty2.txt");
         File test = Utils.join("./testing/bob.txt");
         byte[] testc = Utils.readContents(test);
-        byte[] empty1c= Utils.readContents(empty1);
+        byte[] empty1c = Utils.readContents(empty1);
         byte[] empty2c = Utils.readContents(empty2);
         assertEquals(Utils.sha1(empty1c), Utils.sha1(empty2c));
         System.out.println(Utils.sha1(testc));
