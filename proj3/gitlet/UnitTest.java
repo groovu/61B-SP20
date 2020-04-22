@@ -44,12 +44,9 @@ public class UnitTest {
     }
 
     @Test
-    public void writeToDisk() throws IOException {
-        String boo = "Boo!";
-        String sha = Utils.sha1(boo);
-        //File test = new File("./testing/", sha);
-        File test = Utils.join("./testing/", sha);
-        test.createNewFile();
+    public void writeText() {
+        File test = Utils.join("./testing/global.txt");
+        Utils.writeContents(test, "Hello");
 
     }
 

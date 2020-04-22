@@ -23,14 +23,30 @@ public class Main {
     /** Hidden .gitlet Directory. */
     private static final File GD = Utils.join(CWD, ".gitlet");
 
+    /** Get gitlet dir. */
+    static File getGD() { return GD; }
+
     /** Objectrs directory, inside .gitlet. */
-    private static final File OBJECTS = Utils.join(GD, "objects");
+    private static final File OD = Utils.join(GD, "objects");
+
+    /** Get Objects directory. */
+    static File getOD() { return OD; }
 
     /** Refs directory, inside .gitlet. */
     private static final File REFS = Utils.join(GD, "refs");
 
+    /** Index file that tracks the working directory. */
+    private static final File INDEX = Utils.join(GD, "index");
+
+    /** Head file thats keeps track of current head. */
+    private static final File HEAD = Utils.join(GD, "HEAD");
+
+    /** Global log file. */
+    private static final File GLOG = Utils.join(GD, "global-log");
+
     /** Debug check. */
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
+
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
@@ -47,7 +63,7 @@ public class Main {
             init(args);
         }
         if (!repoInitCheck()) {
-            System.out.println("?Not in an initialized Gitlet directory.");
+            System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
         switch (args[0]) {
@@ -94,25 +110,41 @@ public class Main {
     }
     /** Init.
      * @param args Args passed into command. */
-    private static void init(String... args) throws FileNotFoundException {
+    private static void init(String... args) throws IOException {
         if (Utils.join(GD).exists()) {
             System.out.println("Gitlet version-control system already exists"
-                    + " in the current directory.\"");
+                    + " in the current directory.");
             System.exit(0);
         }
         if (!Utils.join(GD).exists()) {
             GD.mkdir();
-            OBJECTS.mkdir();
+            OD.mkdir();
             REFS.mkdir();
-            System.out.println("Initialized empty Gitlet repository in "
-                    + System.getProperty("user.dir") + "\\.gitlet\\");
-            PrintWriter head = new PrintWriter(Utils.join(GD, "HEAD"));
-            head.println("ref: refs/heads/master");
-            head.close();
-            Index index = new Index();
-            Utils.writeObject(Utils.join(GD, "index"), index);
+            INDEX.createNewFile();
+            HEAD.createNewFile();
+            GLOG.createNewFile();
+            indexInit();
+            initCommit();
             System.exit(0);
         }
+    }
+    /** Initialize Index for persistence. */
+    private static void indexInit() {
+        _index = new Index();
+    }
+    /** Method that updates the global log; updated after every commit.
+     * @param cmt Metadata from commit to be added to global log.*/
+    private static void globalLogAdd(Commit cmt) throws FileNotFoundException {
+        String readIn = Utils.readContentsAsString(GLOG);
+        String write = "===\n" + "commit " + cmt.sha()
+                + " \nDate: " + cmt.time() + "\n" + cmt.msg();
+        if (readIn.isEmpty()) {
+            readIn = readIn.concat(write);
+        } else {
+            readIn = readIn.concat("\n");
+            readIn = readIn.concat(write);
+        }
+        Utils.writeContents(GLOG, readIn);
     }
     /** Add.
      * @param args Args passed into command. */
@@ -125,18 +157,25 @@ public class Main {
             // make sure file is no longer staged for removal.
             Blob blobAdd = new Blob(add);
             String blobSha = blobAdd.sha();
-            File blobObj = Utils.join(OBJECTS, blobSha);
-            Utils.writeObject(blobObj, blobAdd);
-            blobObj.createNewFile();
-            // returns true, so somehow use index to change staging to be added?
+            File blobObj = Utils.join(OD, blobSha);
+            if (!blobObj.exists()) {
+                Utils.writeObject(blobObj, blobAdd);
+                blobObj.createNewFile();
+            }
+            _index.put(blobAdd, args[1]);
+            // update index.
         }
     }
     /** Commit.
      * @param args Args passed into command. */
     private static void commit(String... args) {
-        System.out.println("Commit not implemented.");
         // If no files staged in index,
         // print "No changes added to the commit. And exit."
+        // from index, grab all tracked blobs.
+    }
+    private static void initCommit() throws FileNotFoundException {
+        Commit initial = new Commit(_index, 0);
+        globalLogAdd(initial);
     }
     /** Remove.
      * @param args Args passed into command. */
@@ -166,7 +205,8 @@ public class Main {
         // If multiple keys have the same value,
         // return all of them on separate lines.
     }
-    /** Returns status of repo.
+    /** Returns status of repo.  This should just read from index,
+     * As all changes are made to index after each command.
     * @param args Args passed into command. */
     private static void status(String... args) {
         System.out.println("status not implemeneted.");
@@ -237,4 +277,11 @@ public class Main {
             incOp();
         }
     }
+    /** Global log. */
+    private static File _globalLog;
+    /** PrintWriter Head. */
+    private static File _head;
+    /** Index that contains current working dir. */
+    private static Index _index;
 }
+
