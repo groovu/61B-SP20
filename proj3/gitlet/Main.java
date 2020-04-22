@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.List;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *  @author Cherish Truong
@@ -27,25 +28,27 @@ public class Main {
     static File getGD() { return GD; }
 
     /** Objectrs directory, inside .gitlet. */
-    private static final File OD = Utils.join(GD, "objects");
+    private static File OD = Utils.join(GD, "objects");
 
     /** Get Objects directory. */
     static File getOD() { return OD; }
 
     /** Refs directory, inside .gitlet. */
-    private static final File REFS = Utils.join(GD, "refs");
+    private static File REFS = Utils.join(GD, "refs");
 
     /** Index file that tracks the working directory. */
-    private static final File INDEX = Utils.join(GD, "index");
+    private static File INDEX = Utils.join(GD, "index");
 
     /** Head file thats keeps track of current head. */
-    private static final File HEAD = Utils.join(GD, "HEAD");
+    private static File HEAD = Utils.join(GD, "HEAD");
 
     /** Global log file. */
-    private static final File GLOG = Utils.join(GD, "global-log");
+    private static File GLOG = Utils.join(GD, "global-log");
 
     /** Debug check. */
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
+    /** Debug flag access for other classes. */
+    static boolean debug() { return DEBUG; }
 
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
@@ -123,15 +126,26 @@ public class Main {
             INDEX.createNewFile();
             HEAD.createNewFile();
             GLOG.createNewFile();
-            indexInit();
-            initCommit();
+            initPers();
+            //indexInit();
+            //initCommitHead();
             System.exit(0);
         }
     }
-    /** Initialize Index for persistence. */
-    private static void indexInit() {
-        _index = new Index();
+    /** Persistence Initializer. Initailizes INDEX, HEAD, and GLOG. */
+    private static void initPers() throws FileNotFoundException {
+        Index initInd = new Index();
+        Utils.writeObject(INDEX, initInd);
+        Index i = Utils.readObject(INDEX, Index.class);
+        Commit initial = new Commit(i, 0);
+        Utils.writeContents(HEAD, initial.sha());
+        globalLogAdd(initial);
     }
+//    /** Initialize Index for persistence. */
+//    private static void indexInit() {
+//        Index initial = new Index();
+//        Utils.writeObject(INDEX, initial);
+//    }
     /** Method that updates the global log; updated after every commit.
      * @param cmt Metadata from commit to be added to global log.*/
     private static void globalLogAdd(Commit cmt) throws FileNotFoundException {
@@ -156,14 +170,21 @@ public class Main {
         } else if (add.exists()) {
             // make sure file is no longer staged for removal.
             Blob blobAdd = new Blob(add);
-            String blobSha = blobAdd.sha();
-            File blobObj = Utils.join(OD, blobSha);
+            File blobObj = Utils.join(OD, blobAdd.sha());
+            Index ind = Utils.readObject(INDEX, gitlet.Index.class);
             if (!blobObj.exists()) {
                 Utils.writeObject(blobObj, blobAdd);
                 blobObj.createNewFile();
+            } else if (blobObj.exists() && ind.blobs().containsKey(args[1])) {
+                if (blobAdd.sha().equals(ind.blobs().get(args[1]))) {
+                    if (DEBUG) {
+                        System.out.println("File is unchanged in blobs.");
+                    }
+                    System.exit(0);
+                }
             }
-            _index.put(blobAdd, args[1]);
-            // update index.
+            ind.put(blobAdd, args);
+            Utils.writeObject(INDEX, ind);
         }
     }
     /** Commit.
@@ -173,10 +194,8 @@ public class Main {
         // print "No changes added to the commit. And exit."
         // from index, grab all tracked blobs.
     }
-    private static void initCommit() throws FileNotFoundException {
-        Commit initial = new Commit(_index, 0);
-        globalLogAdd(initial);
-    }
+
+
     /** Remove.
      * @param args Args passed into command. */
     private static void rm(String... args) {
@@ -209,10 +228,34 @@ public class Main {
      * As all changes are made to index after each command.
     * @param args Args passed into command. */
     private static void status(String... args) {
-        System.out.println("status not implemeneted.");
         // Displays branches, with current branch marked with *.
         // Template
         // check 61b site.
+        List<String> dirFiles = Utils.plainFilenamesIn(CWD);
+        Index i = Utils.readObject(INDEX, gitlet.Index.class);
+        List<String> staged = i.staged();
+
+
+
+        System.out.println("=== Branches ===");
+
+        System.out.println("\n=== Staged Files ===");
+        for (String s : staged) {
+            System.out.println(s);
+        }
+
+        System.out.println("\n=== Removed Files ===");
+
+        System.out.println("\n=== Modifications Not Staged For Commit ===");
+
+        System.out.println("\n=== Untracked Files ===");
+        for (String s : dirFiles) {
+            System.out.println(s);
+        }
+
+
+
+
     }
     /** Checkouts ID.
      * @param args Args passed into command. */
@@ -277,10 +320,6 @@ public class Main {
             incOp();
         }
     }
-    /** Global log. */
-    private static File _globalLog;
-    /** PrintWriter Head. */
-    private static File _head;
     /** Index that contains current working dir. */
     private static Index _index;
 }

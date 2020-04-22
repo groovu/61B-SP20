@@ -10,6 +10,8 @@ import java.util.HashMap;
  * @author Cherish Truong
  */
 public class Commit implements Serializable {
+    /** Bootleg var that makes readObject work. */
+    private static final long serialVersionUID = 222222222;
     /** Commit constructor.
      * @param parent 1
      * @param msg 1

@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -47,6 +49,23 @@ public class UnitTest {
     public void writeText() {
         File test = Utils.join("./testing/global.txt");
         Utils.writeContents(test, "Hello");
+    }
+    @Test
+    public void filesInDir() {
+        List<String> test = Utils.plainFilenamesIn(Main.getCWD());
+        System.out.println(test.toString());
+        File dir = new File(".");
+        System.out.println(Arrays.toString(dir.list()));
+    }
+    @Test
+    public void readObjTest() throws IOException {
+        File test = Utils.join("./testing/scratch/test");
+        test.createNewFile();
+        Index i = new Index();
+        Utils.writeObject(test, i);
+        Index b = Utils.readObject(test, Index.class);
+        System.out.println(b.blobs());
+        System.out.println(test.getClass());
 
     }
 

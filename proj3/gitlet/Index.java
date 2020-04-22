@@ -2,7 +2,10 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 
 /** Index file that acts as the working directory of current
  * gitlet instance.  When you commit, you are committing the
@@ -10,27 +13,53 @@ import java.util.HashMap;
  * file on disk.
  * @author Cherish Truong*/
 public class Index implements Serializable {
+    private static final long serialVerisonUID = 999999999;
     private static final File INDEX = Utils.join(Main.getGD(), "index");
 
     /** Construct index from commit. */
     Index(Commit cmt) {
         _blobs = cmt.blobs();
         _parent = cmt.parent();
-        //System.out.println("index file created.");
+        clearStage();
     }
     /** Initial Index constructor. */
     Index() {
-        _blobs = new HashMap<String, String>();
+        _blobs = new HashMap<>();
         _parent = null;
+        clearStage();
     }
+
+    /** Method that adds blobs to _blobs and _staged.
+     * @param b Blobs to be added.
+     * @param args File name of blobs.
+     */
     void put(Blob b, String... args) {
-        _blobs.put(b.sha(), args[1]);
+        _blobs.put(args[1], b.sha());
+        _staged.add(args[1]);
+        if (Main.debug()) {
+            System.out.println("debug: Added " + args[1]);
+            System.out.println("debug: " + _blobs);
+        }
     }
+    private void clearStage() {
+        _staged = new ArrayList<>();
+        _removal = new ArrayList<>();
+    }
+    /** Method that returns parent of index. */
     String parent() {
         return _parent;
     }
+    /** Method that returns list of staged files. */
+    List<String> staged() {
+        return _staged;
+    }
+    /** Method that returns blobs in index. */
     HashMap<String, String> blobs() {
         return _blobs;
+    }
+    /** Method that adds file names to staged list. */
+    private void stage(String filename){
+        _staged.add(filename);
     }
 
     /** SHA1 of current index.  When a commit is pulled,
@@ -38,7 +67,11 @@ public class Index implements Serializable {
     String _commit;
 
     /** HashMap that maps blob shas to file names. */
-    private static HashMap<String, String> _blobs;
+    private HashMap<String, String> _blobs;
     /** Parent commit of index. */
     private static String _parent;
+    /** List of Strings that contain staged files for addition. */
+    private List<String> _staged;
+    /** List of files names that are staged for removal. */
+    private List<String> _removal;
 }

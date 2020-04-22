@@ -8,6 +8,8 @@ import static gitlet.Utils.*;
 /** Class the represents the contents of a file.
  * @author Cherish Truong*/
 public class Blob implements Serializable {
+    /** Bootleg var that makes readObject work. */
+    private static final long serialVersionUID = 111111111;
     /** Blob constructor.  Give it a file, get a blob back ./
      * @param input File to be turned into contents.
      */
