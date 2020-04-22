@@ -49,6 +49,18 @@ public class Index implements Serializable {
     String parent() {
         return _parent;
     }
+    /** Method for setting parent of index. */
+    void setParent(String sha) {
+        _parent = sha;
+    }
+    /** Returns current logs. */
+    List<String > log() {
+        return _logs;
+    }
+    /** Set logs from init commit.  Should never happen again. */
+    void setLog(List<String> log) {
+        _logs = log;
+    }
     /** Method that returns list of staged files. */
     List<String> staged() {
         return _staged;
@@ -56,10 +68,6 @@ public class Index implements Serializable {
     /** Method that returns blobs in index. */
     HashMap<String, String> blobs() {
         return _blobs;
-    }
-    /** Method that adds file names to staged list. */
-    private void stage(String filename){
-        _staged.add(filename);
     }
 
     /** SHA1 of current index.  When a commit is pulled,
@@ -74,4 +82,6 @@ public class Index implements Serializable {
     private List<String> _staged;
     /** List of files names that are staged for removal. */
     private List<String> _removal;
+    /** Logs stored in a list. */
+    private List<String> _logs;
 }

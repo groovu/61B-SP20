@@ -127,25 +127,20 @@ public class Main {
             HEAD.createNewFile();
             GLOG.createNewFile();
             initPers();
-            //indexInit();
-            //initCommitHead();
             System.exit(0);
         }
     }
     /** Persistence Initializer. Initailizes INDEX, HEAD, and GLOG. */
     private static void initPers() throws FileNotFoundException {
         Index initInd = new Index();
+        //Utils.writeObject(INDEX, initInd);
+        //Index i = Utils.readObject(INDEX, Index.class);
+        Commit initCommit = new Commit(initInd, 0);
+        initInd.setLog(initCommit.logs());
         Utils.writeObject(INDEX, initInd);
-        Index i = Utils.readObject(INDEX, Index.class);
-        Commit initial = new Commit(i, 0);
-        Utils.writeContents(HEAD, initial.sha());
-        globalLogAdd(initial);
+        Utils.writeContents(HEAD, initCommit.sha());
+        globalLogAdd(initCommit);
     }
-//    /** Initialize Index for persistence. */
-//    private static void indexInit() {
-//        Index initial = new Index();
-//        Utils.writeObject(INDEX, initial);
-//    }
     /** Method that updates the global log; updated after every commit.
      * @param cmt Metadata from commit to be added to global log.*/
     private static void globalLogAdd(Commit cmt) throws FileNotFoundException {
@@ -160,6 +155,8 @@ public class Main {
         }
         Utils.writeContents(GLOG, readIn);
     }
+    /** Method to update index log.  Logs are stored in commits.  */
+    private static void logAdd() { }
     /** Add.
      * @param args Args passed into command. */
     private static void add(String... args) throws IOException {
@@ -189,10 +186,17 @@ public class Main {
     }
     /** Commit.
      * @param args Args passed into command. */
-    private static void commit(String... args) {
+    private static void commit(String... args) throws FileNotFoundException {
         // If no files staged in index,
         // print "No changes added to the commit. And exit."
         // from index, grab all tracked blobs.
+        Index i = Utils.readObject(INDEX, gitlet.Index.class);
+        Commit cmt = new Commit(i, args);
+        File cmtFile = Utils.join(OD, cmt.sha());
+        Utils.writeObject(cmtFile, cmt);
+        i.setParent(cmt.sha());
+        Utils.writeObject(INDEX, i);
+        globalLogAdd(cmt);
     }
 
 
@@ -207,8 +211,10 @@ public class Main {
     /** Log.
      * @param args Args passed into command. */
     private static void log(String... args) {
-        System.out.println("log not implemented.");
-        // Returns the log from current head commit to initial commit.
+        Index i = Utils.readObject(INDEX, gitlet.Index.class);
+        for (String s : i.log()) {
+            System.out.println(s);
+        }
     }
     /** Global Log.
      * @param args Args passed into command. */
@@ -228,16 +234,12 @@ public class Main {
      * As all changes are made to index after each command.
     * @param args Args passed into command. */
     private static void status(String... args) {
-        // Displays branches, with current branch marked with *.
-        // Template
-        // check 61b site.
         List<String> dirFiles = Utils.plainFilenamesIn(CWD);
         Index i = Utils.readObject(INDEX, gitlet.Index.class);
         List<String> staged = i.staged();
 
-
-
         System.out.println("=== Branches ===");
+        // Display first branch with *.
 
         System.out.println("\n=== Staged Files ===");
         for (String s : staged) {

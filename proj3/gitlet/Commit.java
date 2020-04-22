@@ -3,8 +3,10 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /** Class the represents a Commit.
  * @author Cherish Truong
@@ -37,8 +39,27 @@ public class Commit implements Serializable {
         _msg = "initial commit";
         _blobs = ind.blobs();
         _sha1 = Utils.sha1(_time + _parent + _msg + _blobs);
-        File commit = Utils.join(Main.getOD(), _sha1);
-        Utils.writeObject(commit, this);
+        //File commit = Utils.join(Main.getOD(), _sha1);
+        //Utils.writeObject(commit, this);
+        _logs = new ArrayList<>();
+        _logs.add("===\n" + "commit " + _sha1
+                + " \nDate: " + _time + "\n" + _msg +"\n");
+    }
+    /** Commit constructor using Index. */
+    Commit(Index ind, String[] args) {
+        SimpleDateFormat time = new SimpleDateFormat("EE LLL d HH:mm:ss yyyy "
+                + "Z");
+        _time = time.format(new Date());
+        _blobs = ind.blobs();
+        _parent = ind.parent();
+        _msg = args[1];
+        _sha1 = Utils.sha1(_time + _parent + _msg + _blobs.toString());
+        _logs = ind.log();
+        _logs.add("===\n" + "commit " + _sha1
+                + " \nDate: " + _time + "\n" + _msg +"\n");
+    }
+    List<String> logs() {
+        return _logs;
     }
     /** Returns hashmap that maps Blob SHAs to File names. */
     HashMap<String, String> blobs() {
@@ -70,5 +91,7 @@ public class Commit implements Serializable {
     private static String _sha1;
     /** Commit time. */
     private static String _time;
+    /** Logs stored in a list. */
+    private List<String> _logs;
 
 }
