@@ -1,6 +1,5 @@
 package gitlet;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +12,11 @@ import java.util.List;
  * file on disk.
  * @author Cherish Truong*/
 public class Index implements Serializable {
-    private static final long serialVerisonUID = 999999999;
-    private static final File INDEX = Utils.join(Main.getGD(), "index");
+    /** Bootleg var that makes readObject work. */
+    private static final long serialVersionUID = 999999999;
 
-    /** Construct index from commit. */
+    /** Construct index from commit.
+     * @param cmt Commit file to be loaded into index. */
     Index(Commit cmt) {
         _blobs = cmt.blobs();
         _parent = cmt.parent();
@@ -31,8 +31,7 @@ public class Index implements Serializable {
 
     /** Method that adds blobs to _blobs and _staged.
      * @param b Blobs to be added.
-     * @param args File name of blobs.
-     */
+     * @param args File name of blobs. */
     void put(Blob b, String... args) {
         _blobs.put(args[1], b.sha());
         _staged.add(args[1]);
@@ -41,6 +40,7 @@ public class Index implements Serializable {
             System.out.println("debug: " + _blobs);
         }
     }
+    /** Clears the staging area of index after being loaded. */
     private void clearStage() {
         _staged = new ArrayList<>();
         _removal = new ArrayList<>();
@@ -49,35 +49,47 @@ public class Index implements Serializable {
     String parent() {
         return _parent;
     }
-    /** Method for setting parent of index. */
+
+    /** Method for setting parent of index.
+     * @param sha SHA of parent. */
     void setParent(String sha) {
         _parent = sha;
     }
     /** Returns current logs. */
-    List<String > log() {
+    List<String> log() {
         return _logs;
     }
-    /** Set logs from init commit.  Should never happen again. */
+
+    /** Set logs from init commit.  Should never happen again.
+     * @param log log copied from init commit to be stored in index. */
     void setLog(List<String> log) {
         _logs = log;
     }
-    /** Method that returns list of staged files. */
+
+    /** Method that returns list of staged files.
+     *
+     * @return Returns list of staged files.
+     */
     List<String> staged() {
         return _staged;
     }
-    /** Method that returns blobs in index. */
+
+    /** Method that returns blobs in index.
+     *
+     * @return Returns Map of file names to blobs.
+     */
     HashMap<String, String> blobs() {
         return _blobs;
     }
 
     /** SHA1 of current index.  When a commit is pulled,
      * this SHA1 should match the commits, until a change is made. */
-    String _commit;
+    private String _commit;
 
     /** HashMap that maps blob shas to file names. */
     private HashMap<String, String> _blobs;
     /** Parent commit of index. */
-    private static String _parent;
+    private String _parent;
     /** List of Strings that contain staged files for addition. */
     private List<String> _staged;
     /** List of files names that are staged for removal. */

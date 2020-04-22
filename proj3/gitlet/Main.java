@@ -3,8 +3,8 @@ package gitlet;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
@@ -24,31 +24,43 @@ public class Main {
     /** Hidden .gitlet Directory. */
     private static final File GD = Utils.join(CWD, ".gitlet");
 
-    /** Get gitlet dir. */
-    static File getGD() { return GD; }
+    /** Get gitlet dir.
+     *
+     * @return Gitlet directory.
+     */
+    static File getGD() {
+        return GD;
+    }
 
-    /** Objectrs directory, inside .gitlet. */
-    private static File OD = Utils.join(GD, "objects");
+    /** Objects directory, inside .gitlet. */
+    private static File od = Utils.join(GD, "objects");
 
-    /** Get Objects directory. */
-    static File getOD() { return OD; }
+    /** Get Objects directory.
+     * @return Returns objects directory.*/
+    static File getOd() {
+        return od;
+    }
 
     /** Refs directory, inside .gitlet. */
-    private static File REFS = Utils.join(GD, "refs");
+    private static File _refs = Utils.join(GD, "refs");
 
     /** Index file that tracks the working directory. */
-    private static File INDEX = Utils.join(GD, "index");
+    private static File _index = Utils.join(GD, "index");
 
     /** Head file thats keeps track of current head. */
-    private static File HEAD = Utils.join(GD, "HEAD");
+    private static File _head = Utils.join(GD, "HEAD");
 
     /** Global log file. */
-    private static File GLOG = Utils.join(GD, "global-log");
+    private static File _glog = Utils.join(GD, "global-log");
 
     /** Debug check. */
     private static final boolean DEBUG = false;
-    /** Debug flag access for other classes. */
-    static boolean debug() { return DEBUG; }
+
+    /** Debug flag access for other classes.
+     * @return Debug flag on or off. */
+    static boolean debug() {
+        return DEBUG;
+    }
 
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
@@ -121,11 +133,11 @@ public class Main {
         }
         if (!Utils.join(GD).exists()) {
             GD.mkdir();
-            OD.mkdir();
-            REFS.mkdir();
-            INDEX.createNewFile();
-            HEAD.createNewFile();
-            GLOG.createNewFile();
+            od.mkdir();
+            _refs.mkdir();
+            _index.createNewFile();
+            _head.createNewFile();
+            _glog.createNewFile();
             initPers();
             System.exit(0);
         }
@@ -133,18 +145,18 @@ public class Main {
     /** Persistence Initializer. Initailizes INDEX, HEAD, and GLOG. */
     private static void initPers() throws FileNotFoundException {
         Index initInd = new Index();
-        //Utils.writeObject(INDEX, initInd);
-        //Index i = Utils.readObject(INDEX, Index.class);
         Commit initCommit = new Commit(initInd, 0);
         initInd.setLog(initCommit.logs());
-        Utils.writeObject(INDEX, initInd);
-        Utils.writeContents(HEAD, initCommit.sha());
+        Utils.writeObject(_index, initInd);
+        Utils.writeContents(_head, initCommit.sha());
+        File icommit = Utils.join(od, initCommit.sha());
+        Utils.writeObject(icommit, initCommit);
         globalLogAdd(initCommit);
     }
     /** Method that updates the global log; updated after every commit.
      * @param cmt Metadata from commit to be added to global log.*/
     private static void globalLogAdd(Commit cmt) throws FileNotFoundException {
-        String readIn = Utils.readContentsAsString(GLOG);
+        String readIn = Utils.readContentsAsString(_glog);
         String write = "===\n" + "commit " + cmt.sha()
                 + " \nDate: " + cmt.time() + "\n" + cmt.msg();
         if (readIn.isEmpty()) {
@@ -153,7 +165,7 @@ public class Main {
             readIn = readIn.concat("\n");
             readIn = readIn.concat(write);
         }
-        Utils.writeContents(GLOG, readIn);
+        Utils.writeContents(_glog, readIn);
     }
     /** Method to update index log.  Logs are stored in commits.  */
     private static void logAdd() { }
@@ -167,8 +179,8 @@ public class Main {
         } else if (add.exists()) {
             // make sure file is no longer staged for removal.
             Blob blobAdd = new Blob(add);
-            File blobObj = Utils.join(OD, blobAdd.sha());
-            Index ind = Utils.readObject(INDEX, gitlet.Index.class);
+            File blobObj = Utils.join(od, blobAdd.sha());
+            Index ind = Utils.readObject(_index, gitlet.Index.class);
             if (!blobObj.exists()) {
                 Utils.writeObject(blobObj, blobAdd);
                 blobObj.createNewFile();
@@ -181,7 +193,7 @@ public class Main {
                 }
             }
             ind.put(blobAdd, args);
-            Utils.writeObject(INDEX, ind);
+            Utils.writeObject(_index, ind);
         }
     }
     /** Commit.
@@ -190,14 +202,28 @@ public class Main {
         // If no files staged in index,
         // print "No changes added to the commit. And exit."
         // from index, grab all tracked blobs.
-        Index i = Utils.readObject(INDEX, gitlet.Index.class);
+        Index i = Utils.readObject(_index, gitlet.Index.class);
         Commit cmt = new Commit(i, args);
-        File cmtFile = Utils.join(OD, cmt.sha());
+        if (DEBUG) {
+            System.out.println("Commit: index has this blob.");
+            System.out.println(i.blobs().toString());
+            System.out.println("Commit: new commit has this blob.  Should be "
+                    + "same.");
+            System.out.println(cmt.blobs().toString());
+        }
+        File cmtFile = Utils.join(od, cmt.sha());
         Utils.writeObject(cmtFile, cmt);
         i.setParent(cmt.sha());
-        Utils.writeObject(INDEX, i);
+        Utils.writeObject(_index, i);
         globalLogAdd(cmt);
+        Utils.writeContents(_head, cmt.sha());
     }
+//    private static void commit2(String sha) {
+//        File cmt2 = Utils.join(od, sha);
+//        Commit cmtTest = Utils.readObject(cmt2, Commit.class);
+//        System.out.println(sha);
+//        System.out.println(cmtTest.blobs());
+//    }
 
 
     /** Remove.
@@ -211,7 +237,7 @@ public class Main {
     /** Log.
      * @param args Args passed into command. */
     private static void log(String... args) {
-        Index ind = Utils.readObject(INDEX, gitlet.Index.class);
+        Index ind = Utils.readObject(_index, gitlet.Index.class);
         int size = ind.log().size();
         for (int i = size - 1; i >= 0; i -= 1) {
             System.out.println(ind.log().get(i));
@@ -236,7 +262,7 @@ public class Main {
     * @param args Args passed into command. */
     private static void status(String... args) {
         List<String> dirFiles = Utils.plainFilenamesIn(CWD);
-        Index i = Utils.readObject(INDEX, gitlet.Index.class);
+        Index i = Utils.readObject(_index, gitlet.Index.class);
         List<String> staged = i.staged();
 
         System.out.println("=== Branches ===");
@@ -263,6 +289,50 @@ public class Main {
     /** Checkouts ID.
      * @param args Args passed into command. */
     private static void checkout(String... args) {
+        if (args.length == 3 && args[1].equals("--")) {
+            String head = Utils.readContentsAsString(_head);
+            File headFile = Utils.join(od, head);
+            Commit headCommit = Utils.readObject(headFile, gitlet.Commit.class);
+            HashMap<String, String> blobs = headCommit.blobs();
+            if (!blobs.containsKey(args[2])) {
+                System.out.println("File does not exist in that commit.");
+                System.exit(0);
+            }
+            String checkoutSha = blobs.get(args[2]);
+            // for another version.
+//            File cwdCheck = Utils.join(CWD, args[2]);
+//            if (cwdCheck.exists()) {
+//                Blob check = new Blob(cwdCheck);
+//                if (check.sha().equals(checkoutSha)) {
+//                    System.out.println();
+//                }
+//            }
+            File checkoutFile = Utils.join(od, checkoutSha);
+            Blob checkOutBlob = Utils.readObject(checkoutFile, Blob.class);
+            File checkOutFinal = Utils.join(CWD, args[2]);
+            Utils.writeContents(checkOutFinal, (Object) checkOutBlob.contents());
+            //Utils.writeObject(checkOutFinal, checkOutBlob);
+        }
+        else if (args.length == 4 && args[2].equals("--")) {
+            String commitID = args[1];
+            File commitFile = Utils.join(od, commitID);
+            if (!commitFile.exists()) {
+                System.out.println("No commit with that id exists.");
+                System.exit(0);
+            }
+            Commit loadcommit = Utils.readObject(commitFile,
+                    gitlet.Commit.class);
+            HashMap<String, String> blobs = loadcommit.blobs();
+            if (!blobs.containsKey(args[3])) {
+                System.out.println("File does not exists in that commit.");
+                System.exit(0);
+            }
+            String checkoutSha = blobs.get(args[3]);
+            File checkoutFile = Utils.join(od, checkoutSha);
+            Blob checkOutBlob = Utils.readObject(checkoutFile, Blob.class);
+            File checkOutFinal = Utils.join(CWD, args[3]);
+            Utils.writeContents(checkOutFinal, (Object) checkOutBlob.contents());
+        }
     }
     /** Branches current repo.
      * @param args Args passed into command. */
@@ -323,7 +393,5 @@ public class Main {
             incOp();
         }
     }
-    /** Index that contains current working dir. */
-    private static Index _index;
 }
 

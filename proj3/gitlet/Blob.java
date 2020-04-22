@@ -22,12 +22,17 @@ public class Blob implements Serializable {
         return _sha;
     }
 
+    /** Returns contents of Blob. */
+    byte[] contents() {
+        return _contents;
+    }
+
     /** Contents of file, stored in Blob. */
-    private static byte[] _contents;
+    private byte[] _contents;
 
     /** Name of file, stored in Blob. */
-    private static String _name;
+    private String _name;
 
     /** SHA1 of file. */
-    private static String _sha;
+    private String _sha;
 }

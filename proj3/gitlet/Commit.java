@@ -15,9 +15,9 @@ public class Commit implements Serializable {
     /** Bootleg var that makes readObject work. */
     private static final long serialVersionUID = 222222222;
     /** Commit constructor.
+     * @param blobs HashMap that maps blobs to file names.
      * @param parent 1
-     * @param msg 1
-     * @blobs HashMap that maps blobs to file names.*/
+     * @param msg 1 */
     Commit(HashMap<String, String> blobs, String parent, String msg) {
         SimpleDateFormat time = new SimpleDateFormat("EE LLL d HH:mm:ss yyyy "
                 + "Z");
@@ -26,26 +26,32 @@ public class Commit implements Serializable {
         _parent = parent;
         _msg = msg;
         _sha1 = Utils.sha1(_time + _parent + _msg + _blobs.toString());
-        File commit = Utils.join(Main.getOD(), _sha1);
+        File commit = Utils.join(Main.getOd(), _sha1);
         Utils.writeObject(commit, this);
     }
-    /** Initial Commit when git is run. */
+
+    /** Initial Commit when git is run.
+     * @param ind Index passed in.
+     * @param z Dummy variable to force initial commit.
+     */
     Commit(Index ind, int z) {
         SimpleDateFormat time = new SimpleDateFormat("EE LLL d HH:mm:ss yyyy "
                 + "Z");
         _time = time.format(new Date(0));
-        //_time = "Thu Jan 1 00:00:00 1970 -0000";
+        String time2 = "Thu Jan 1 00:00:00 1970 -0000";
         _parent = ind.parent();
         _msg = "initial commit";
         _blobs = ind.blobs();
         _sha1 = Utils.sha1(_time + _parent + _msg + _blobs);
-        //File commit = Utils.join(Main.getOD(), _sha1);
-        //Utils.writeObject(commit, this);
         _logs = new ArrayList<>();
         _logs.add("===\n" + "commit " + _sha1
-                + " \nDate: " + _time + "\n" + _msg +"\n");
+                + " \nDate: " + _time + "\n" + _msg + "\n");
     }
-    /** Commit constructor using Index. */
+
+    /** Commit constructor using Index.
+     * @param ind Index passed in.
+     * @param args File name passed in from user.
+     */
     Commit(Index ind, String[] args) {
         SimpleDateFormat time = new SimpleDateFormat("EE LLL d HH:mm:ss yyyy "
                 + "Z");
@@ -56,8 +62,9 @@ public class Commit implements Serializable {
         _sha1 = Utils.sha1(_time + _parent + _msg + _blobs.toString());
         _logs = ind.log();
         _logs.add("===\n" + "commit " + _sha1
-                + " \nDate: " + _time + "\n" + _msg +"\n");
+                + " \nDate: " + _time + "\n" + _msg + "\n");
     }
+    /** Returns logs of commit. */
     List<String> logs() {
         return _logs;
     }
@@ -82,15 +89,15 @@ public class Commit implements Serializable {
         return _time;
     }
     /** HashMap that maps blob shas to file names. */
-    private static HashMap<String, String> _blobs;
+    private HashMap<String, String> _blobs;
     /** Parent of commit.*/
-    private static String _parent;
+    private String _parent;
     /** Msg of commit. */
-    private static String _msg;
+    private String _msg;
     /** SHA1 of commit. */
-    private static String _sha1;
+    private String _sha1;
     /** Commit time. */
-    private static String _time;
+    private String _time;
     /** Logs stored in a list. */
     private List<String> _logs;
 
