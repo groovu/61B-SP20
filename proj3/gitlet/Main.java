@@ -46,7 +46,7 @@ public class Main {
     private static File GLOG = Utils.join(GD, "global-log");
 
     /** Debug check. */
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     /** Debug flag access for other classes. */
     static boolean debug() { return DEBUG; }
 
@@ -211,9 +211,10 @@ public class Main {
     /** Log.
      * @param args Args passed into command. */
     private static void log(String... args) {
-        Index i = Utils.readObject(INDEX, gitlet.Index.class);
-        for (String s : i.log()) {
-            System.out.println(s);
+        Index ind = Utils.readObject(INDEX, gitlet.Index.class);
+        int size = ind.log().size();
+        for (int i = size - 1; i >= 0; i -= 1) {
+            System.out.println(ind.log().get(i));
         }
     }
     /** Global Log.
