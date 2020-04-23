@@ -19,20 +19,23 @@ public class MST {
     public static int[][] mst(int V, int[][] E) {
         E = Arrays.copyOf(E, E.length);
         int numEdgesInResult = V - 1;
-        // FIXME: how many edges should there
-        // be in our MST?
         UnionFind MST = new UnionFind(V);
         int[][] result = new int[numEdgesInResult][];
         Arrays.sort(result, EDGE_WEIGHT_COMPARATOR);
-        // FIXME: what other data structures do I need?
-        for (int i = 1; i < result.length; i += 1) {
+        int x = 0;
+        for (int i = 0; i < result.length; i += 1) {
+            result[x] = E[i];
             int[] vertices = result[i];
             int u = vertices[0];
             System.out.println(u);
             int v = vertices[1];
             System.out.println(v);
-            if (MST.samePartition(u, v) != true) {
+            if (!MST.samePartition(u, v)) {
                 MST.union(u,v);
+                x += 1;
+            }
+            if (x == numEdgesInResult) {
+                break;
             }
 
         }
