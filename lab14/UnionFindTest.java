@@ -97,5 +97,13 @@ public class UnionFindTest {
     }
 
     private UnionFind _uf;
-
+    private UnionFind _test;
+    @Test
+    public void unionFindTest() {
+        _test = new UnionFind(6);
+        int[] test = {0, 1, 1, 3, 1, 1, 5, 4};
+        _test.uf = test;
+        int x = _test.find(1);
+        System.out.println(x);
+    }
 }
