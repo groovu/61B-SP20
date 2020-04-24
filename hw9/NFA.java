@@ -102,7 +102,17 @@ public class NFA {
          * return an empty Set. */
         public Set<State> successors(char c) {
             // TODO: Implement this method
-            return new HashSet<State>();
+            Set<State> valid = new HashSet<>();
+            if (!_edges.containsKey(c)) {
+                return new HashSet<>();
+            }
+            valid.addAll(_edges.get(c));
+            if (c == EPSILON) {
+                for (State next : _edges.get(EPSILON)) {
+                    valid.addAll(next.successors(EPSILON));
+                }
+            }
+            return valid;
         }
 
         /**
@@ -360,7 +370,23 @@ public class NFA {
      * @return whether or not the string S is accepted by this NFA. */
     public boolean matches(String s) {
         // TODO: write the matching algorithm
-        return true;
+        Set<State> start = new HashSet<>();
+        start.add(_startState);
+        start.addAll(_startState.successors(EPSILON));
+        Set<State> end = new HashSet<>();
+        for (int i = 0; i < s.length(); i += 1) {
+            end.clear();
+            for (State state : start) {
+                end.addAll(state.successors(s.charAt(i)));
+            }
+            start.clear();
+            for (State state : end) {
+                start.add(state);
+                start.addAll(state.successors(EPSILON));
+            }
+        }
+        boolean matched = start.contains(_acceptState);
+        return matched;
     }
 
     /** Returns the pattern used to make this NFA. */
