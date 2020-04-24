@@ -199,10 +199,16 @@ public class Main {
     /** Commit.
      * @param args Args passed into command. */
     private static void commit(String... args) throws FileNotFoundException {
-        // If no files staged in index,
-        // print "No changes added to the commit. And exit."
-        // from index, grab all tracked blobs.
+        if (args[1].equals("")) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
         Index i = Utils.readObject(_index, gitlet.Index.class);
+        System.out.println(i.staged().toString());
+        if (i.staged().isEmpty() && i.removal().isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
         Commit cmt = new Commit(i, args);
         if (DEBUG) {
             System.out.println("Commit: index has this blob.");
@@ -213,18 +219,12 @@ public class Main {
         }
         File cmtFile = Utils.join(od, cmt.sha());
         Utils.writeObject(cmtFile, cmt);
+        i.clearStage();
         i.setParent(cmt.sha());
         Utils.writeObject(_index, i);
         globalLogAdd(cmt);
         Utils.writeContents(_head, cmt.sha());
     }
-//    private static void commit2(String sha) {
-//        File cmt2 = Utils.join(od, sha);
-//        Commit cmtTest = Utils.readObject(cmt2, Commit.class);
-//        System.out.println(sha);
-//        System.out.println(cmtTest.blobs());
-//    }
-
 
     /** Remove.
      * @param args Args passed into command. */

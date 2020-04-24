@@ -41,7 +41,7 @@ public class Index implements Serializable {
         }
     }
     /** Clears the staging area of index after being loaded. */
-    private void clearStage() {
+    void clearStage() {
         _staged = new ArrayList<>();
         _removal = new ArrayList<>();
     }
@@ -72,6 +72,13 @@ public class Index implements Serializable {
      */
     List<String> staged() {
         return _staged;
+    }
+
+    /** Method that returns list of files prepped for removal.
+     * @return List of files prepped for removal.
+     */
+    List<String> removal() {
+        return _removal;
     }
 
     /** Method that returns blobs in index.
