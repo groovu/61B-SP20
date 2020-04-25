@@ -51,6 +51,9 @@ public class Main {
     /** Global log file. */
     private static File _glog = Utils.join(GD, "global-log");
 
+    /** Branches file. */
+    private static File _branchList = Utils.join(GD, "branches");
+
     /** Debug check. */
     private static final boolean DEBUG = false;
 
@@ -154,6 +157,7 @@ public class Main {
             _index.createNewFile();
             _head.createNewFile();
             _glog.createNewFile();
+            _branchList.createNewFile();
             initPers();
             System.exit(0);
         }
@@ -162,9 +166,11 @@ public class Main {
     private static void initPers() throws FileNotFoundException {
         Index initInd = new Index();
         Commit initCommit = new Commit(initInd, 0);
+        Branch initBranch = new Branch(initCommit.sha());
         initInd.setLog(initCommit.logs());
         Utils.writeObject(_index, initInd);
         Utils.writeContents(_head, initCommit.sha());
+        Utils.writeObject(_branchList, initBranch);
         File icommit = Utils.join(od, initCommit.sha());
         Utils.writeObject(icommit, initCommit);
         globalLogAdd(initCommit);
@@ -300,11 +306,27 @@ public class Main {
     }
     /** Find commit.
      * @param args Args passed into command. */
-    private static void find(String... args) {
-        System.out.println("find not implemented.");
+    private static void find(String... args) throws FileNotFoundException {
+        Scanner read = new Scanner(_glog);
         // Finds commit message in global log and returns the commit ID.
         // If multiple keys have the same value,
         // return all of them on separate lines.
+        String l1 = null;
+        String l2 = null;
+        String l3 = null;
+        boolean found = false;
+        while (read.hasNext()) {
+            l1 = l2;
+            l2 = l3;
+            l3 = read.nextLine();
+            if (l3.equals(args[1])) {
+                System.out.println(l1.replaceAll("commit ", ""));
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("Found no commit with that message.");
+        }
     }
     /** Returns status of repo.  This should just read from index,
      * As all changes are made to index after each command.
@@ -313,12 +335,25 @@ public class Main {
         List<String> dirFiles = Utils.plainFilenamesIn(CWD);
         Index i = Utils.readObject(_index, gitlet.Index.class);
         List<String> staged = new ArrayList<String>(i.staged().keySet());
+        Branch branches = Utils.readObject(_branchList, gitlet.Branch.class);
+        String head = Utils.readContentsAsString(_head);
         //HashMap<String, String> staged = i.staged();
 
         System.out.println("=== Branches ===");
+//        HashMap<String, String> branchMap = branches.branches();
         // Display first branch with *.
+//        String star = branches.branches().;
+        ArrayList<String> branchList = branches.sortedBranchKeys();
         System.out.print("*");
-        System.out.println("master");
+        System.out.println(branches.currentBranch());
+        for (String s : branchList) {
+            if (s.equals(branches.currentBranch())) {
+                continue;
+            } else {
+                System.out.println(s);
+            }
+        }
+
 
         System.out.println("\n=== Staged Files ===");
         for (String s : staged) {
@@ -332,6 +367,8 @@ public class Main {
 
         System.out.println("\n=== Modifications Not Staged For Commit ===");
         for (Map.Entry<String, String> file: i.blobs().entrySet()) {
+        //for (Map.Entry<String, String> file: i.staged().entrySet()) {
+
             File load1 = Utils.join(od, file.getValue());
             Blob load = Utils.readObject(load1, gitlet.Blob.class);
             File dir1 = Utils.join(CWD,file.getValue());
@@ -346,7 +383,6 @@ public class Main {
             } else if (!load.sha().equals(dir.sha())) {
                 System.out.println(file.getKey());
             }
-
         }
 
         System.out.println("\n=== Untracked Files ===");
@@ -373,21 +409,11 @@ public class Main {
                 System.exit(0);
             }
             String checkoutSha = blobs.get(args[2]);
-            // for another version.
-//            File cwdCheck = Utils.join(CWD, args[2]);
-//            if (cwdCheck.exists()) {
-//                Blob check = new Blob(cwdCheck);
-//                if (check.sha().equals(checkoutSha)) {
-//                    System.out.println();
-//                }
-//            }
             File checkoutFile = Utils.join(od, checkoutSha);
             Blob checkOutBlob = Utils.readObject(checkoutFile, Blob.class);
             File checkOutFinal = Utils.join(CWD, args[2]);
-            Utils.writeContents(checkOutFinal, (Object) checkOutBlob.contents());
-            //Utils.writeObject(checkOutFinal, checkOutBlob);
-        }
-        else if (args.length == 4 && args[2].equals("--")) {
+            Utils.writeContents(checkOutFinal, checkOutBlob.contents());
+        } else if (args.length == 4 && args[2].equals("--")) {
             String commitID = args[1];
             File commitFile = Utils.join(od, commitID);
             if (!commitFile.exists()) {
@@ -406,15 +432,49 @@ public class Main {
             Blob checkOutBlob = Utils.readObject(checkoutFile, Blob.class);
             File checkOutFinal = Utils.join(CWD, args[3]);
             Utils.writeContents(checkOutFinal, (Object) checkOutBlob.contents());
+        } else if (args.length == 2) {
+            Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
+            if (!branchList.branches().containsKey(args[1])) {
+                System.out.println("No such branch exists.");
+            } else if (branchList.currentBranch().equals(args[1])) {
+                System.out.println("No need to checkout the current branch.");
+            } else {
+                Index i = Utils.readObject(_index, gitlet.Index.class);
+                for (Map.Entry<String, String> file: i.blobs().entrySet()) {
+                    File load1 = Utils.join(od, file.getValue());
+                    Blob load = Utils.readObject(load1, gitlet.Blob.class);
+                    File dir1 = Utils.join(CWD,file.getValue());
+                    Blob dir;
+                    if (!dir1.exists()) {
+                        continue;
+                    } else {
+                        dir = new Blob(Utils.join(CWD, file.getKey()));
+                    }
+                    if (!load1.exists()) {
+                        continue;
+                    } else if (!load.sha().equals(dir.sha())) {
+                        System.out.println("There is an untracked file in the way;"
+                                + " delete it, or add and commit it first. ");
+                        //System.out.println(file.getKey());
+                    }
+                }
+                //check out branch.
+                System.out.println("end of checkout");
+            }
+        } else {
+            incOp();
         }
     }
     /** Branches current repo.
      * @param args Args passed into command. */
-    private static void branch(String... args) {
-    }
-    private static void branchInit() {
+    private static void branch(String... args) throws IOException {
 
+        String head = Utils.readContentsAsString(_head);
+        Branch branchlist = Utils.readObject(_branchList, gitlet.Branch.class);
+        branchlist.addBranch(args[1], head);
+        Utils.writeObject(_branchList, branchlist);
     }
+
 
     /** Removes branch.
      * @param args Args passed into command.*/

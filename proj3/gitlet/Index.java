@@ -117,9 +117,12 @@ public class Index implements Serializable {
         return _blobs;
     }
 
+
     /** SHA1 of current index.  When a commit is pulled,
      * this SHA1 should match the commits, until a change is made. */
     private String _commit;
+    /** Branch of current index. */
+    private String[] _branch;
 
     /** HashMap that maps blob shas to file names. */
     private HashMap<String, String> _blobs;
