@@ -29,7 +29,7 @@ public class Index implements Serializable {
         _parent = null;
         clearStage();
     }
-
+    /**
     /** Method that adds blobs to _blobs and _staged.
      * @param b Blobs to be added.
      * @param args File name of blobs. */

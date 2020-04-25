@@ -332,17 +332,11 @@ public class Main {
      * As all changes are made to index after each command.
     * @param args Args passed into command. */
     private static void status(String... args) {
-        List<String> dirFiles = Utils.plainFilenamesIn(CWD);
         Index i = Utils.readObject(_index, gitlet.Index.class);
-        List<String> staged = new ArrayList<String>(i.staged().keySet());
-        Branch branches = Utils.readObject(_branchList, gitlet.Branch.class);
-        String head = Utils.readContentsAsString(_head);
-        //HashMap<String, String> staged = i.staged();
 
         System.out.println("=== Branches ===");
-//        HashMap<String, String> branchMap = branches.branches();
-        // Display first branch with *.
-//        String star = branches.branches().;
+        Branch branches = Utils.readObject(_branchList, gitlet.Branch.class);
+
         ArrayList<String> branchList = branches.sortedBranchKeys();
         System.out.print("*");
         System.out.println(branches.currentBranch());
@@ -354,35 +348,87 @@ public class Main {
             }
         }
 
-
         System.out.println("\n=== Staged Files ===");
+        ArrayList<String> staged = new ArrayList<String>(i.staged().keySet());
+        Collections.sort(staged);
         for (String s : staged) {
             System.out.println(s);
         }
 
         System.out.println("\n=== Removed Files ===");
-        for (String s : i.removal()) {
+        ArrayList<String> sortedRemoval = i.removal();
+        Collections.sort(sortedRemoval);
+        for (String s : sortedRemoval) {
             System.out.println(s);
         }
 
         System.out.println("\n=== Modifications Not Staged For Commit ===");
-        for (Map.Entry<String, String> file: i.blobs().entrySet()) {
-        //for (Map.Entry<String, String> file: i.staged().entrySet()) {
-
-            File load1 = Utils.join(od, file.getValue());
-            Blob load = Utils.readObject(load1, gitlet.Blob.class);
-            File dir1 = Utils.join(CWD,file.getValue());
-            Blob dir;
-            if (!dir1.exists()) {
-                continue;
+//        for (Map.Entry<String, String> file: i.blobs().entrySet()) {
+//        //for (Map.Entry<String, String> file: i.staged().entrySet()) {
+//
+//            File load1 = Utils.join(od, file.getValue());
+//            Blob load = Utils.readObject(load1, gitlet.Blob.class);
+//            File dir1 = Utils.join(CWD,file.getValue());
+//            Blob dir;
+//            if (!dir1.exists()) {
+//                continue;
+//            } else {
+//                dir = new Blob(Utils.join(CWD, file.getKey()));
+//            }
+//            if (!load1.exists()) {
+//                continue;
+//            } else if (!load.sha().equals(dir.sha())) {
+//                System.out.println(file.getKey());
+//            }
+//        }
+        ArrayList<String> dirFiles = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
+        Collections.sort(dirFiles);
+        ArrayList<String> mods = new ArrayList<>();
+        for (String s : dirFiles) {
+            if (i.blobs().containsKey(s) && !i.staged().containsKey(s)) {
+                Blob shaCheck = new Blob(Utils.join(CWD, s));
+                if (!i.blobs().get(s).equals(shaCheck.sha())) {
+                    mods.add(s + " (modified)");
+                }
+            }
+        }
+        for (String s : staged) {
+            File shaFile = Utils.join(CWD, s);
+            File objFile = Utils.join(od, i.staged().get(s));
+            if (!shaFile.exists()) {
+                mods.add(s + " (deleted)");
             } else {
-                dir = new Blob(Utils.join(CWD, file.getKey()));
+                Blob shaCheck = new Blob(shaFile);
+                Blob objSha = Utils.readObject(objFile, gitlet.Blob.class);
+//                System.out.println(s);
+//                System.out.println(i.blobs().toString());
+//                System.out.println(i.blobs().get(s));
+//                if (!i.blobs().get(s).equals(shaCheck.sha())) {
+//                    mods.add(s + " (modified)");
+//                }
+                if (!objSha.sha().equals(shaCheck.sha())) {
+                    mods.add(s + " (modified)");
+                }
             }
-            if (!load1.exists()) {
-                continue;
-            } else if (!load.sha().equals(dir.sha())) {
-                System.out.println(file.getKey());
+        }
+        for (String s : i.blobs().keySet()) {
+            if (!i.removal().contains(s)) {
+                File delChk = Utils.join(CWD, s);
+                if (!delChk.exists()) {
+                        mods.add(s + " (deleted)");
+                }
             }
+        }
+
+        // tracked in blob, changed in dir, and not staged (modified)
+        // staged for add, but dir is different from staged.
+        // staged for addition, but deleted in workdir.
+        // not staged for removal, but tracked in blob, and deleted from dir
+
+
+        Collections.sort(mods);
+        for (String s : mods) {
+            System.out.println(s);
         }
 
         System.out.println("\n=== Untracked Files ===");
@@ -433,33 +479,17 @@ public class Main {
             File checkOutFinal = Utils.join(CWD, args[3]);
             Utils.writeContents(checkOutFinal, (Object) checkOutBlob.contents());
         } else if (args.length == 2) {
+            Index ind = Utils.readObject(_index, gitlet.Index.class);
             Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
             if (!branchList.branches().containsKey(args[1])) {
                 System.out.println("No such branch exists.");
             } else if (branchList.currentBranch().equals(args[1])) {
                 System.out.println("No need to checkout the current branch.");
             } else {
-                Index i = Utils.readObject(_index, gitlet.Index.class);
-                for (Map.Entry<String, String> file: i.blobs().entrySet()) {
-                    File load1 = Utils.join(od, file.getValue());
-                    Blob load = Utils.readObject(load1, gitlet.Blob.class);
-                    File dir1 = Utils.join(CWD,file.getValue());
-                    Blob dir;
-                    if (!dir1.exists()) {
-                        continue;
-                    } else {
-                        dir = new Blob(Utils.join(CWD, file.getKey()));
-                    }
-                    if (!load1.exists()) {
-                        continue;
-                    } else if (!load.sha().equals(dir.sha())) {
-                        System.out.println("There is an untracked file in the way;"
-                                + " delete it, or add and commit it first. ");
-                        //System.out.println(file.getKey());
-                    }
-                }
-                //check out branch.
-                System.out.println("end of checkout");
+                String checkoutSha = branchList.branches().get(args[1]);
+                Commit ckoCommit = Utils.readObject(Utils.join(od, checkoutSha),
+                        gitlet.Commit.class);
+
             }
         } else {
             incOp();

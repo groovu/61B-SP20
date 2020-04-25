@@ -90,7 +90,7 @@ public class Branch implements Serializable {
     private String _name;
     /** Name of commit. */
     private String _commit;
-    /** Master list of branches. */
+    /** Master list of branches; name to sha. */
     private HashMap<String, String> _branches;
     /** Current branch name. */
     private String _currentBranch;
