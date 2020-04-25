@@ -253,7 +253,9 @@ public class Main {
         Utils.writeObject(_index, i);
 
         globalLogAdd(cmt);
-
+        Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
+        branchList.updateBranch(cmt.sha());
+        Utils.writeObject(_branchList, branchList);
         Utils.writeContents(_head, cmt.sha());
     }
 
@@ -308,9 +310,6 @@ public class Main {
      * @param args Args passed into command. */
     private static void find(String... args) throws FileNotFoundException {
         Scanner read = new Scanner(_glog);
-        // Finds commit message in global log and returns the commit ID.
-        // If multiple keys have the same value,
-        // return all of them on separate lines.
         String l1 = null;
         String l2 = null;
         String l3 = null;
@@ -363,25 +362,8 @@ public class Main {
         }
 
         System.out.println("\n=== Modifications Not Staged For Commit ===");
-//        for (Map.Entry<String, String> file: i.blobs().entrySet()) {
-//        //for (Map.Entry<String, String> file: i.staged().entrySet()) {
-//
-//            File load1 = Utils.join(od, file.getValue());
-//            Blob load = Utils.readObject(load1, gitlet.Blob.class);
-//            File dir1 = Utils.join(CWD,file.getValue());
-//            Blob dir;
-//            if (!dir1.exists()) {
-//                continue;
-//            } else {
-//                dir = new Blob(Utils.join(CWD, file.getKey()));
-//            }
-//            if (!load1.exists()) {
-//                continue;
-//            } else if (!load.sha().equals(dir.sha())) {
-//                System.out.println(file.getKey());
-//            }
-//        }
-        ArrayList<String> dirFiles = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
+        ArrayList<String> dirFiles
+                = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
         Collections.sort(dirFiles);
         ArrayList<String> mods = new ArrayList<>();
         for (String s : dirFiles) {
@@ -400,12 +382,6 @@ public class Main {
             } else {
                 Blob shaCheck = new Blob(shaFile);
                 Blob objSha = Utils.readObject(objFile, gitlet.Blob.class);
-//                System.out.println(s);
-//                System.out.println(i.blobs().toString());
-//                System.out.println(i.blobs().get(s));
-//                if (!i.blobs().get(s).equals(shaCheck.sha())) {
-//                    mods.add(s + " (modified)");
-//                }
                 if (!objSha.sha().equals(shaCheck.sha())) {
                     mods.add(s + " (modified)");
                 }
@@ -419,18 +395,10 @@ public class Main {
                 }
             }
         }
-
-        // tracked in blob, changed in dir, and not staged (modified)
-        // staged for add, but dir is different from staged.
-        // staged for addition, but deleted in workdir.
-        // not staged for removal, but tracked in blob, and deleted from dir
-
-
         Collections.sort(mods);
         for (String s : mods) {
             System.out.println(s);
         }
-
         System.out.println("\n=== Untracked Files ===");
         for (String s : dirFiles) {
             if (i.blobs().containsKey(s) || i.staged().containsKey(s)) {
@@ -440,7 +408,6 @@ public class Main {
             }
         }
         System.out.println("");
-
     }
     /** Checkouts ID.
      * @param args Args passed into command. */
@@ -461,6 +428,16 @@ public class Main {
             Utils.writeContents(checkOutFinal, checkOutBlob.contents());
         } else if (args.length == 4 && args[2].equals("--")) {
             String commitID = args[1];
+            if (commitID.length() < 40) {
+                ArrayList<String> possID
+                        = new ArrayList<String>(Utils.plainFilenamesIn(od));
+                for (String s : possID) {
+                    if(s.indexOf(commitID) == 0) {
+                        commitID = s;
+                        break;
+                    }
+                }
+            }
             File commitFile = Utils.join(od, commitID);
             if (!commitFile.exists()) {
                 System.out.println("No commit with that id exists.");
@@ -483,14 +460,37 @@ public class Main {
             Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
             if (!branchList.branches().containsKey(args[1])) {
                 System.out.println("No such branch exists.");
+                System.exit(0);
             } else if (branchList.currentBranch().equals(args[1])) {
                 System.out.println("No need to checkout the current branch.");
-            } else {
-                String checkoutSha = branchList.branches().get(args[1]);
-                Commit ckoCommit = Utils.readObject(Utils.join(od, checkoutSha),
-                        gitlet.Commit.class);
-
+                System.exit(0);
             }
+            String checkoutSha = branchList.branches().get(args[1]);
+            Commit ckoCommit = Utils.readObject(Utils.join(od, checkoutSha),
+                    gitlet.Commit.class);
+            ArrayList<String> dirFiles
+                    = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
+            for (String s : dirFiles) {
+                if (!ind.blobs().containsKey(s)
+                        && ckoCommit.blobs().containsKey(s)) {
+                    System.out.println("There is an untracked file in the way; "
+                            + "delete it, or add and commit it first.");
+                    System.exit(0);
+                } else if (!ckoCommit.blobs().containsKey(s) && ind.blobs().containsKey(s)) {
+                    File f = Utils.join(CWD, s);
+                    f.delete();
+                }
+            }
+            for (String s : ckoCommit.blobs().keySet()) {
+                String[] pargs = {"checkout", checkoutSha, "--", s};
+                checkout(pargs);
+            }
+            ind.clearStage();
+            ind.setBlobs(ckoCommit.blobs());
+            branchList.setBranch(args[1]);
+            Utils.writeObject(_branchList, branchList);
+            Utils.writeContents(_head, checkoutSha);
+            Utils.writeObject(_index, ind);
         } else {
             incOp();
         }

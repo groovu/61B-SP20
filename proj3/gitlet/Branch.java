@@ -53,6 +53,10 @@ public class Branch implements Serializable {
             _branches.put(name, sha);
         }
     }
+    /** Method to update branch pointer after commit. */
+    void updateBranch(String sha) {
+        _branches.put(_currentBranch, sha);
+    }
 
     /** Returns current branch.  Error if head sha does not match.
      * I should just put head in here.

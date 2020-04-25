@@ -116,6 +116,10 @@ public class Index implements Serializable {
     HashMap<String, String> blobs() {
         return _blobs;
     }
+    /** Method to set index blobs after checkout. */
+    void setBlobs(HashMap<String, String> b) {
+        _blobs = b;
+    }
 
 
     /** SHA1 of current index.  When a commit is pulled,
