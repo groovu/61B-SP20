@@ -3,9 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *  @author Cherish Truong
@@ -118,9 +116,27 @@ public class Main {
         case "merge":
             merge(args);
             break;
+        case "db":
+            db(args);
+            break;
         default:
             System.out.println("Command not implemented.");
             System.exit(0);
+        }
+    }
+    private static void db(String... args) {
+        Index ind = Utils.readObject(_index, gitlet.Index.class);
+
+        if (args[1].equals("blobs")) {
+            System.out.println(ind.blobs().toString());
+        }
+         else if (args[1].equals("remove")) {
+            System.out.println(ind.removal().toString());
+        }
+        else if (args[1].equals("stage")) {
+            System.out.println(ind.staged().toString());
+        } else {
+            System.out.println("blobs, remove, stage");
         }
     }
     /** Init.
@@ -165,6 +181,7 @@ public class Main {
             readIn = readIn.concat("\n");
             readIn = readIn.concat(write);
         }
+        readIn = readIn.concat("\n");
         Utils.writeContents(_glog, readIn);
     }
     /** Method to update index log.  Logs are stored in commits.  */
@@ -181,19 +198,24 @@ public class Main {
             Blob blobAdd = new Blob(add);
             File blobObj = Utils.join(od, blobAdd.sha());
             Index ind = Utils.readObject(_index, gitlet.Index.class);
+            //ind.removeRemove(args[1]);
             if (!blobObj.exists()) {
                 Utils.writeObject(blobObj, blobAdd);
                 blobObj.createNewFile();
             } else if (blobObj.exists() && ind.blobs().containsKey(args[1])) {
-                if (blobAdd.sha().equals(ind.blobs().get(args[1]))) {
+                if (blobAdd.sha().equals(ind.blobs().get(args[1]))
+                        && !ind.removal().contains(args[1])) {
                     if (DEBUG) {
                         System.out.println("File is unchanged in blobs.");
                     }
                     System.exit(0);
                 }
             }
-            ind.put(blobAdd, args);
+            ind.removeRemove(args[1]);
+            ind.put(blobAdd, args[1]);
             Utils.writeObject(_index, ind);
+
+
         }
     }
     /** Commit.
@@ -204,7 +226,6 @@ public class Main {
             System.exit(0);
         }
         Index i = Utils.readObject(_index, gitlet.Index.class);
-        System.out.println(i.staged().toString());
         if (i.staged().isEmpty() && i.removal().isEmpty()) {
             System.out.println("No changes added to the commit.");
             System.exit(0);
@@ -219,17 +240,44 @@ public class Main {
         }
         File cmtFile = Utils.join(od, cmt.sha());
         Utils.writeObject(cmtFile, cmt);
+
         i.clearStage();
         i.setParent(cmt.sha());
+
         Utils.writeObject(_index, i);
+
         globalLogAdd(cmt);
+
         Utils.writeContents(_head, cmt.sha());
     }
 
     /** Remove.
      * @param args Args passed into command. */
     private static void rm(String... args) {
-        System.out.println("rm not implemented.");
+        Index ind = Utils.readObject(_index, gitlet.Index.class);
+        if (!ind.staged().containsKey(args[1]) && !ind.blobs().containsKey(args[1])) {
+            System.out.println("No reason to remove the file.");
+            System.exit(0);
+        } else {
+            if (ind.removal().contains(args[1])) {
+                System.exit(0);
+            }
+            if (ind.staged().containsKey(args[1])
+                    && !ind.blobs().containsKey(args[1])) {
+                ind.removeStage(args);
+            } else if (!ind.staged().containsKey(args[1])
+                    && ind.blobs().containsKey(args[1])) {
+                ind.removeDelete(args);
+                Utils.join(CWD, args[1]).delete();
+            } else if (ind.staged().containsKey(args[1])
+            && ind.blobs().containsKey(args[1])) {
+                System.out.println("?File is staged and in commit.");
+            }
+            //Utils.writeObject(_index, ind);
+        }
+        Utils.writeObject(_index, ind);
+        // if staged but not in blob; remove from stage, do not delete.
+        // if staged and in blob, remove from stage, prep for remove, delete
         // if file is not staged or tracked,
         // print "No reason to remove the file." and exit?
         // If file is staged in index, remove it from staging.
@@ -246,7 +294,8 @@ public class Main {
     /** Global Log.
      * @param args Args passed into command. */
     private static void globalLog(String... args) {
-        System.out.println("globa-log not implemented.");
+        String readIn = Utils.readContentsAsString(_glog);
+        System.out.println(readIn);
         // returns all commits ever made, order does not matter.
     }
     /** Find commit.
@@ -263,10 +312,13 @@ public class Main {
     private static void status(String... args) {
         List<String> dirFiles = Utils.plainFilenamesIn(CWD);
         Index i = Utils.readObject(_index, gitlet.Index.class);
-        List<String> staged = i.staged();
+        List<String> staged = new ArrayList<String>(i.staged().keySet());
+        //HashMap<String, String> staged = i.staged();
 
         System.out.println("=== Branches ===");
         // Display first branch with *.
+        System.out.print("*");
+        System.out.println("master");
 
         System.out.println("\n=== Staged Files ===");
         for (String s : staged) {
@@ -274,16 +326,38 @@ public class Main {
         }
 
         System.out.println("\n=== Removed Files ===");
-
-        System.out.println("\n=== Modifications Not Staged For Commit ===");
-
-        System.out.println("\n=== Untracked Files ===");
-        for (String s : dirFiles) {
+        for (String s : i.removal()) {
             System.out.println(s);
         }
 
+        System.out.println("\n=== Modifications Not Staged For Commit ===");
+        for (Map.Entry<String, String> file: i.blobs().entrySet()) {
+            File load1 = Utils.join(od, file.getValue());
+            Blob load = Utils.readObject(load1, gitlet.Blob.class);
+            File dir1 = Utils.join(CWD,file.getValue());
+            Blob dir;
+            if (!dir1.exists()) {
+                continue;
+            } else {
+                dir = new Blob(Utils.join(CWD, file.getKey()));
+            }
+            if (!load1.exists()) {
+                continue;
+            } else if (!load.sha().equals(dir.sha())) {
+                System.out.println(file.getKey());
+            }
 
+        }
 
+        System.out.println("\n=== Untracked Files ===");
+        for (String s : dirFiles) {
+            if (i.blobs().containsKey(s) || i.staged().containsKey(s)) {
+                continue;
+            } else {
+                System.out.println(s);
+            }
+        }
+        System.out.println("");
 
     }
     /** Checkouts ID.
@@ -338,6 +412,9 @@ public class Main {
      * @param args Args passed into command. */
     private static void branch(String... args) {
     }
+    private static void branchInit() {
+
+    }
 
     /** Removes branch.
      * @param args Args passed into command.*/
@@ -385,6 +462,8 @@ public class Main {
             } else {
                 incOp();
             }
+        }else if (args[0].equals("db")) {
+            return;
         } else {
             System.out.println("No command with that name exists.");
             System.exit(0);

@@ -3,10 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /** Class the represents a Commit.
  * @author Cherish Truong
@@ -48,6 +45,17 @@ public class Commit implements Serializable {
                 + " \nDate: " + _time + "\n" + _msg + "\n");
     }
 
+    void removeBlobs(Index i) {
+        for (String remove : i.removal()) {
+            i.blobs().remove(remove);
+        }
+    }
+    void addBlobs(Index i) {
+        //for (String add : i.staged()) {
+        i.staged().forEach((k, v)
+                -> i.blobs().put(k, v));
+    }
+
     /** Commit constructor using Index.
      * @param ind Index passed in.
      * @param args File name passed in from user.
@@ -56,6 +64,8 @@ public class Commit implements Serializable {
         SimpleDateFormat time = new SimpleDateFormat("EE LLL d HH:mm:ss yyyy "
                 + "Z");
         _time = time.format(new Date());
+        removeBlobs(ind);
+        addBlobs(ind);
         _blobs = ind.blobs();
         _parent = ind.parent();
         _msg = args[1];

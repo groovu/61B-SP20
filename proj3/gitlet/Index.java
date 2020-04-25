@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.Serializable;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,18 +33,44 @@ public class Index implements Serializable {
     /** Method that adds blobs to _blobs and _staged.
      * @param b Blobs to be added.
      * @param args File name of blobs. */
-    void put(Blob b, String... args) {
-        _blobs.put(args[1], b.sha());
-        _staged.add(args[1]);
+    void put(Blob b, String args) {
+        //_blobs.put(args[1], b.sha());
+        if (_blobs.containsKey(args)) {
+            if (_blobs.get(args).equals(b.sha())) {
+                return;
+            }
+        }
+        _staged.put(args, b.sha());
+        //System.out.println(_removal.toString());
+        //_removal.remove(args);
+        //System.out.println(_removal.toString());
         if (Main.debug()) {
-            System.out.println("debug: Added " + args[1]);
+            System.out.println("debug: Added " + args);
             System.out.println("debug: " + _blobs);
         }
     }
+    /** Method that removes file from staging area. */
+    void removeStage(String... args) {
+        _staged.remove(args[1]);
+    }
+    /** Method for adding file for removal at commit. */
+    void removeDelete(String... args) {
+        _removal.add(args[1]);
+    }
+    /** Method for removing Strings from removal list. */
+    void removeRemove(String args) {
+        //System.out.println("running remove");
+        _removal.remove(args);
+    }
+    void blobRemove(String... args) {
+        _blobs.remove(args[1]);
+    }
     /** Clears the staging area of index after being loaded. */
     void clearStage() {
-        _staged = new ArrayList<>();
+        //_staged = new ArrayList<>();
+        _staged = new HashMap<>();
         _removal = new ArrayList<>();
+        //_removal.clear();
     }
     /** Method that returns parent of index. */
     String parent() {
@@ -70,14 +97,15 @@ public class Index implements Serializable {
      *
      * @return Returns list of staged files.
      */
-    List<String> staged() {
+    //List<String> staged() {
+    HashMap<String, String> staged() {
         return _staged;
     }
 
     /** Method that returns list of files prepped for removal.
      * @return List of files prepped for removal.
      */
-    List<String> removal() {
+    ArrayList<String> removal() {
         return _removal;
     }
 
@@ -98,9 +126,10 @@ public class Index implements Serializable {
     /** Parent commit of index. */
     private String _parent;
     /** List of Strings that contain staged files for addition. */
-    private List<String> _staged;
+    private HashMap<String, String> _staged;
+    //private List<String> _staged;
     /** List of files names that are staged for removal. */
-    private List<String> _removal;
+    private ArrayList<String> _removal;
     /** Logs stored in a list. */
     private List<String> _logs;
 }
