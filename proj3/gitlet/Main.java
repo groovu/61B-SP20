@@ -476,7 +476,8 @@ public class Main {
                     System.out.println("There is an untracked file in the way; "
                             + "delete it, or add and commit it first.");
                     System.exit(0);
-                } else if (!ckoCommit.blobs().containsKey(s) && ind.blobs().containsKey(s)) {
+                } else if (!ckoCommit.blobs().containsKey(s)
+                        && ind.blobs().containsKey(s)) {
                     File f = Utils.join(CWD, s);
                     f.delete();
                 }
@@ -498,7 +499,6 @@ public class Main {
     /** Branches current repo.
      * @param args Args passed into command. */
     private static void branch(String... args) throws IOException {
-
         String head = Utils.readContentsAsString(_head);
         Branch branchlist = Utils.readObject(_branchList, gitlet.Branch.class);
         branchlist.addBranch(args[1], head);
@@ -509,6 +509,17 @@ public class Main {
     /** Removes branch.
      * @param args Args passed into command.*/
     private static void rmbranch(String... args) {
+        Branch branchlist = Utils.readObject(_branchList, gitlet.Branch.class);
+        if (!branchlist.branches().containsKey(args[1])) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        } else if (branchlist.currentBranch().equals(args[1])) {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        } else {
+            branchlist.removeBranch(args[1]);
+        }
+        Utils.writeObject(_branchList, branchlist);
     }
     /** Resets ID.
      * @param args Args passed into command. */

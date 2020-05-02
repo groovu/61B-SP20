@@ -57,6 +57,10 @@ public class Branch implements Serializable {
     void updateBranch(String sha) {
         _branches.put(_currentBranch, sha);
     }
+    /** Method to remove branch. */
+    void removeBranch(String name) {
+        _branches.remove(name);
+    }
 
     /** Returns current branch.  Error if head sha does not match.
      * I should just put head in here.
