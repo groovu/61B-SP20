@@ -48,7 +48,7 @@ public class Branch implements Serializable {
     void addBranch(String name, String sha) {
         if (_branches.containsKey(name)) {
             System.out.println("A branch with that name already exists.");
-            return;
+            System.exit(0);
         } else {
             _branches.put(name, sha);
         }

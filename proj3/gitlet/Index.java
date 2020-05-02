@@ -82,9 +82,21 @@ public class Index implements Serializable {
     void setParent(String sha) {
         _parent = sha;
     }
-    /** Returns current logs. */
+
+    /** Returns current logs.
+     *
+     * @return Returns list of logs.
+     */
     List<String> log() {
         return _logs;
+    }
+
+    /** Write to log after checkout.
+     *
+     * @param log Logs from checkout commit.
+     */
+    void writeLog(List<String> log) {
+        _logs = log;
     }
 
     /** Set logs from init commit.  Should never happen again.

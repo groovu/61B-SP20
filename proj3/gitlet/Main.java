@@ -429,14 +429,7 @@ public class Main {
         } else if (args.length == 4 && args[2].equals("--")) {
             String commitID = args[1];
             if (commitID.length() < 40) {
-                ArrayList<String> possID
-                        = new ArrayList<String>(Utils.plainFilenamesIn(od));
-                for (String s : possID) {
-                    if(s.indexOf(commitID) == 0) {
-                        commitID = s;
-                        break;
-                    }
-                }
+                commitID = fullID(commitID);
             }
             File commitFile = Utils.join(od, commitID);
             if (!commitFile.exists()) {
@@ -446,26 +439,37 @@ public class Main {
             Commit loadcommit = Utils.readObject(commitFile,
                     gitlet.Commit.class);
             HashMap<String, String> blobs = loadcommit.blobs();
-            if (!blobs.containsKey(args[3])) {
+            if (args[3].equals("ALL")) {
+                for (Map.Entry<String, String> s : blobs.entrySet()) {
+                    File f = Utils.join(od, s.getValue());
+                    Blob b = Utils.readObject(f, gitlet.Blob.class);
+                    File w = Utils.join(CWD, s.getKey());
+                    Utils.writeContents(w, b.contents());
+                }
+            } else if (!blobs.containsKey(args[3])) {
                 System.out.println("File does not exists in that commit.");
                 System.exit(0);
+            } else {
+                String checkoutSha = blobs.get(args[3]);
+                File checkoutFile = Utils.join(od, checkoutSha);
+                Blob checkOutBlob = Utils.readObject(checkoutFile, Blob.class);
+                File checkOutFinal = Utils.join(CWD, args[3]);
+                Utils.writeContents(checkOutFinal, (Object) checkOutBlob.contents());
             }
-            String checkoutSha = blobs.get(args[3]);
-            File checkoutFile = Utils.join(od, checkoutSha);
-            Blob checkOutBlob = Utils.readObject(checkoutFile, Blob.class);
-            File checkOutFinal = Utils.join(CWD, args[3]);
-            Utils.writeContents(checkOutFinal, (Object) checkOutBlob.contents());
         } else if (args.length == 2) {
             Index ind = Utils.readObject(_index, gitlet.Index.class);
             Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
-            if (!branchList.branches().containsKey(args[1])) {
-                System.out.println("No such branch exists.");
-                System.exit(0);
-            } else if (branchList.currentBranch().equals(args[1])) {
-                System.out.println("No need to checkout the current branch.");
-                System.exit(0);
+            String checkoutSha = args[1];
+            if (checkoutSha.length() != 40) {
+                if (!branchList.branches().containsKey(args[1])) {
+                    System.out.println("No such branch exists.");
+                    System.exit(0);
+                } else if (branchList.currentBranch().equals(args[1])) {
+                    System.out.println("No need to checkout the current branch.");
+                    System.exit(0);
+                }
+                checkoutSha = branchList.branches().get(args[1]);
             }
-            String checkoutSha = branchList.branches().get(args[1]);
             Commit ckoCommit = Utils.readObject(Utils.join(od, checkoutSha),
                     gitlet.Commit.class);
             ArrayList<String> dirFiles
@@ -486,15 +490,34 @@ public class Main {
                 String[] pargs = {"checkout", checkoutSha, "--", s};
                 checkout(pargs);
             }
+            //List<String> ckoLog = ckoCommit.logs();
+            ind.writeLog(ckoCommit.logs());
             ind.clearStage();
             ind.setBlobs(ckoCommit.blobs());
-            branchList.setBranch(args[1]);
+            if (args[1].length() != 40) {
+                branchList.setBranch(args[1]);
+            } else if (args[1].length() == 40) {
+                branchList.updateBranch(args[1]);
+            }
             Utils.writeObject(_branchList, branchList);
             Utils.writeContents(_head, checkoutSha);
             Utils.writeObject(_index, ind);
         } else {
             incOp();
         }
+    }
+    /** Find full commit ID from short commit ID. */
+    private static String fullID(String shID) {
+        String commitID = shID;
+        ArrayList<String> pID =
+                new ArrayList<String>(Utils.plainFilenamesIn(od));
+        for (String s : pID) {
+            if (s.indexOf(shID) == 0) {
+                commitID = s;
+                break;
+            }
+        }
+        return commitID;
     }
     /** Branches current repo.
      * @param args Args passed into command. */
@@ -524,6 +547,34 @@ public class Main {
     /** Resets ID.
      * @param args Args passed into command. */
     private static void reset(String... args) {
+        String commitID = args[1];
+        if (commitID.length() < 40) {
+            commitID = fullID(commitID);
+        }
+        File commitFile = Utils.join(od, commitID);
+        if (!commitFile.exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+//        Index ind = Utils.readObject(_index, gitlet.Index.class);
+//        Commit ckoCommit = Utils.readObject(Utils.join(od, commitID),
+//                gitlet.Commit.class);
+//        ArrayList<String> dirFiles
+//                = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
+//        for (String s : dirFiles) {
+//            if (!ind.blobs().containsKey(s)
+//                    && ckoCommit.blobs().containsKey(s)) {
+//                System.out.println("There is an untracked file in the way; "
+//                        + "delete it, or add and commit it first.");
+//                System.exit(0);
+//            }
+//        }
+        //Branch branchList = Utils.readObject(_branchList, gitlet.Branch
+        // .class);
+        //String curr = branchList.currentBranch();
+        String[] a = {"checkout", commitID};
+        //branchList.updateBranch(commitID);
+        checkout(a);
     }
     /** Merges two branches.
      * @param args Args passed into command. */
