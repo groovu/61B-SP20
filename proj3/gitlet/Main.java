@@ -3,12 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *  @author Cherish Truong
@@ -144,6 +139,13 @@ public class Main {
             System.out.println(ind.removal().toString());
         } else if (args[1].equals("stage")) {
             System.out.println(ind.staged().toString());
+        } else if (args[1].equals("plog")) {
+            if (args.length == 2) {
+                System.out.println(ind.parentLog().toString());
+            } else if (args.length == 3) {
+                String[] a = {"1", args[2]};
+                findLCA(a);
+            }
         } else {
             System.out.println("blobs, remove, stage");
         }
@@ -174,6 +176,9 @@ public class Main {
         Commit initCommit = new Commit(initInd, 0);
         Branch initBranch = new Branch(initCommit.sha());
         initInd.setLog(initCommit.logs());
+
+        initInd.setParentLog(initCommit.parentLog());
+
         Utils.writeObject(_index, initInd);
         Utils.writeContents(_head, initCommit.sha());
         Utils.writeObject(_branchList, initBranch);
@@ -252,6 +257,8 @@ public class Main {
         i.clearStage();
         i.setParent(cmt.sha());
 
+        i.setParentLog(cmt.parentLog());
+
         Utils.writeObject(_index, i);
 
         globalLogAdd(cmt);
@@ -296,6 +303,7 @@ public class Main {
             System.out.println(ind.log().get(i));
         }
     }
+
     /** Global Log.
      * @param args Args passed into command. */
     private static void globalLog(String... args) {
@@ -510,6 +518,7 @@ public class Main {
             checkout(pargs);
         }
         ind.writeLog(ckoCommit.logs());
+        ind.setParentLog(ckoCommit.parentLog());
         ind.clearStage();
         ind.setBlobs(ckoCommit.blobs());
         if (args[1].length() != 4 * 10) {
@@ -582,14 +591,111 @@ public class Main {
     /** Merges two branches.
      * @param args Args passed into command. */
     private static void merge(String... args) {
+        mergeErr(args);
+        // find LCA.
+
+        // if LCA = curr, checkout curr then print "Current branch
+        // fast-forwarded".
+        // if LCA = given, merge complete, print
+        // "Given branch is an ancestor of the current branch."
+
+
+
+        // files modified in given branch but not curr branch since LCA
+        // should be checked out from given branch.
+        // modified means lca.fil != givenbranch.file
+
+        //files modified in currbranch, but not in given branch stays. (cause
+        // its the same in LCA?)
+
+        // files modified in curr and given the same way (same modified
+        // contents) stay the same after merge.
+
+        // if file is removed from curr and given, but file exists in CWD,
+        // stays in CWD.
+
+        // files not in LCA, but only in curr stay.
+
+        // files not in LCA, but only in given, are checkedout and staged.
+
+        // files in LCA, unmodified in curr, but deleted in given, should be
+        // removed and untracked.
+
+        // files in LCA, missing in curr, but unmodified in given, should
+        // stay missing.
+
+        // files modified in curr and given are in conflict.
+        // ex. both modified, one modified and other deleted,
+        // ex. not in LCA, but in curr and given with dif contents.
+        // conflict files are combined, in a specific format.
+
+        //once files are staged, commit with log message Merged given into curr.
+        //if conflict exists, print "Encountered merge conflict." to terminal.
+        // merge commits record parents differently. head of curr and given.
+
+        // sometimes you can have two LCAs.
+        // choose the LCA that is the closest to the current branch.
+        // if the distnace is the same, then choose either of them.
+
+    }
+
+    /** Find LCA between current branch and given branch.
+     *
+     * @param args Given branch.
+     * @return String if LCA.
+     */
+    private static String findLCA(String... args) {
+        String LCA = "";
+        Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
+        String givenBranch = branchList.branches().get(args[1]);
+        File givenFile = Utils.join(od, givenBranch);
+        Commit givenCommit = Utils.readObject(givenFile, gitlet.Commit.class);
+        List<String> givenPLog = givenCommit.parentLog();
+
+        Index ind = Utils.readObject(_index, gitlet.Index.class);
+        List<String> currPLog = ind.parentLog();
+        System.out.println(givenPLog.toString());
+        System.out.println(currPLog.toString());
+        return LCA;
+    }
+    /** Error check for merge.
+     *
+     * @param args Arguments passed from merge.
+     */
+    private static void mergeErr(String... args) {
+        Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
+        String current = branchList.currentBranch();
+        if (current.equals(args[1])) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        } else if (!branchList.branches().containsKey(args[1])) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+    }
+
+    /** Untracked check.
+     *
+     * @param ind Index.
+     * @param cmt Commit.
+     * @return True if there exists untracked file.
+     */
+    private static boolean untracked(Index ind, Commit cmt) {
+        boolean untracked = false;
+        ArrayList<String> dirFiles
+                = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
+        for (String s : dirFiles) {
+            if (!ind.blobs().containsKey(s)
+                    && cmt.blobs().containsKey(s)) {
+                untracked = true;
+            }
+        }
+        return untracked;
     }
     /** Checks to see if repo is initialized.
      * @return True if repo is init, False otherwise. */
     private static boolean repoInitCheck() {
-        if (!GD.exists()) {
-            return false;
-        }
-        return true;
+        return GD.exists();
     }
 
     /** Run if operands are not correct. */

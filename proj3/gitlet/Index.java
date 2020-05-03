@@ -106,7 +106,15 @@ public class Index implements Serializable {
     void setLog(List<String> log) {
         _logs = log;
     }
+    /** Sets parent log from init commit.*/
+    void setParentLog(List<String> pLog) {
+        _parentLog = pLog;
+    }
 
+    /** Gets parent log of index. */
+    List<String> parentLog() {
+        return _parentLog;
+    }
     /** Method that returns list of staged files.
      *
      * @return Returns list of staged files.
@@ -155,4 +163,6 @@ public class Index implements Serializable {
     private ArrayList<String> _removal;
     /** Logs stored in a list. */
     private List<String> _logs;
+    /** Parent log stored in a list. */
+    private List<String> _parentLog;
 }

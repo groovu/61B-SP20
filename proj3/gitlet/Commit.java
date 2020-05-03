@@ -46,6 +46,9 @@ public class Commit implements Serializable {
         _logs = new ArrayList<>();
         _logs.add("===\n" + "commit " + _sha1
                 + " \nDate: " + _time + "\n" + _msg + "\n");
+
+        _parentLog = new ArrayList<>();
+        _parentLog.add(_sha1);
     }
 
     /** Method that removeBlobs from index.
@@ -82,6 +85,8 @@ public class Commit implements Serializable {
         _logs = ind.log();
         _logs.add("===\n" + "commit " + _sha1
                 + " \nDate: " + _time + "\n" + _msg + "\n");
+        _parentLog = ind.parentLog();
+        _parentLog.add(_sha1);
     }
 
     /** Returns logs of commit.
@@ -90,6 +95,14 @@ public class Commit implements Serializable {
      */
     List<String> logs() {
         return _logs;
+    }
+
+    /** Returns parent log.
+     *
+     * @return List of parents.
+     */
+    List<String> parentLog() {
+        return _parentLog;
     }
 
     /** Returns hashmap that maps Blob SHAs to File names.
@@ -143,5 +156,7 @@ public class Commit implements Serializable {
     private String _time;
     /** Logs stored in a list. */
     private List<String> _logs;
+    /** Parent log stored in a list. */
+    private List<String> _parentLog;
 
 }
