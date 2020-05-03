@@ -3,12 +3,6 @@ package gitlet;
 import ucb.junit.textui;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 /** The suite of all JUnit tests for the gitlet package.
  *  @author

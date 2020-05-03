@@ -3,7 +3,12 @@ package gitlet;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *  @author Cherish Truong
@@ -67,9 +72,7 @@ public class Main {
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
     public static void main(String... args) throws IOException {
-        if (DEBUG) {
-            System.out.println("Debug flag is TRUE.");
-        }
+
         if (args.length == 0) {
             System.out.println("Please enter a command.");
             System.exit(0);
@@ -127,16 +130,19 @@ public class Main {
             System.exit(0);
         }
     }
+
+    /** Method used to debug.
+     *
+     * @param args Debug commands.
+     */
     private static void db(String... args) {
         Index ind = Utils.readObject(_index, gitlet.Index.class);
 
         if (args[1].equals("blobs")) {
             System.out.println(ind.blobs().toString());
-        }
-         else if (args[1].equals("remove")) {
+        } else if (args[1].equals("remove")) {
             System.out.println(ind.removal().toString());
-        }
-        else if (args[1].equals("stage")) {
+        } else if (args[1].equals("stage")) {
             System.out.println(ind.staged().toString());
         } else {
             System.out.println("blobs, remove, stage");
@@ -200,11 +206,9 @@ public class Main {
             System.out.println("File does not exist.");
             System.exit(0);
         } else if (add.exists()) {
-            // make sure file is no longer staged for removal.
             Blob blobAdd = new Blob(add);
             File blobObj = Utils.join(od, blobAdd.sha());
             Index ind = Utils.readObject(_index, gitlet.Index.class);
-            //ind.removeRemove(args[1]);
             if (!blobObj.exists()) {
                 Utils.writeObject(blobObj, blobAdd);
                 blobObj.createNewFile();
@@ -220,8 +224,6 @@ public class Main {
             ind.removeRemove(args[1]);
             ind.put(blobAdd, args[1]);
             Utils.writeObject(_index, ind);
-
-
         }
     }
     /** Commit.
@@ -263,7 +265,8 @@ public class Main {
      * @param args Args passed into command. */
     private static void rm(String... args) {
         Index ind = Utils.readObject(_index, gitlet.Index.class);
-        if (!ind.staged().containsKey(args[1]) && !ind.blobs().containsKey(args[1])) {
+        if (!ind.staged().containsKey(args[1])
+                && !ind.blobs().containsKey(args[1])) {
             System.out.println("No reason to remove the file.");
             System.exit(0);
         } else {
@@ -278,17 +281,11 @@ public class Main {
                 ind.removeDelete(args);
                 Utils.join(CWD, args[1]).delete();
             } else if (ind.staged().containsKey(args[1])
-            && ind.blobs().containsKey(args[1])) {
+                && ind.blobs().containsKey(args[1])) {
                 System.out.println("?File is staged and in commit.");
             }
-            //Utils.writeObject(_index, ind);
         }
         Utils.writeObject(_index, ind);
-        // if staged but not in blob; remove from stage, do not delete.
-        // if staged and in blob, remove from stage, prep for remove, delete
-        // if file is not staged or tracked,
-        // print "No reason to remove the file." and exit?
-        // If file is staged in index, remove it from staging.
     }
     /** Log.
      * @param args Args passed into command. */
@@ -304,7 +301,6 @@ public class Main {
     private static void globalLog(String... args) {
         String readIn = Utils.readContentsAsString(_glog);
         System.out.println(readIn);
-        // returns all commits ever made, order does not matter.
     }
     /** Find commit.
      * @param args Args passed into command. */
@@ -346,7 +342,6 @@ public class Main {
                 System.out.println(s);
             }
         }
-
         System.out.println("\n=== Staged Files ===");
         ArrayList<String> staged = new ArrayList<String>(i.staged().keySet());
         Collections.sort(staged);
@@ -360,10 +355,34 @@ public class Main {
         for (String s : sortedRemoval) {
             System.out.println(s);
         }
-
-        System.out.println("\n=== Modifications Not Staged For Commit ===");
         ArrayList<String> dirFiles
                 = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
+        ArrayList<String> mods = statusMods(i, staged, dirFiles);
+        Collections.sort(mods);
+        for (String s : mods) {
+            System.out.println(s);
+        }
+        System.out.println("\n=== Untracked Files ===");
+        for (String s : dirFiles) {
+            if (i.blobs().containsKey(s) || i.staged().containsKey(s)) {
+                continue;
+            } else {
+                System.out.println(s);
+            }
+        }
+        System.out.println("");
+    }
+    /** Status continued.
+     *
+     * @param i Passed in params.
+     * @param staged Passed in params.
+     * @param dirFiles Passed in params.
+     * @return List to be printed by status.
+     */
+    private static ArrayList<String> statusMods(Index i,
+                                                ArrayList<String> staged,
+                                                ArrayList<String> dirFiles) {
+        System.out.println("\n=== Modifications Not Staged For Commit ===");
         Collections.sort(dirFiles);
         ArrayList<String> mods = new ArrayList<>();
         for (String s : dirFiles) {
@@ -391,23 +410,11 @@ public class Main {
             if (!i.removal().contains(s)) {
                 File delChk = Utils.join(CWD, s);
                 if (!delChk.exists()) {
-                        mods.add(s + " (deleted)");
+                    mods.add(s + " (deleted)");
                 }
             }
         }
-        Collections.sort(mods);
-        for (String s : mods) {
-            System.out.println(s);
-        }
-        System.out.println("\n=== Untracked Files ===");
-        for (String s : dirFiles) {
-            if (i.blobs().containsKey(s) || i.staged().containsKey(s)) {
-                continue;
-            } else {
-                System.out.println(s);
-            }
-        }
-        System.out.println("");
+        return mods;
     }
     /** Checkouts ID.
      * @param args Args passed into command. */
@@ -428,7 +435,7 @@ public class Main {
             Utils.writeContents(checkOutFinal, checkOutBlob.contents());
         } else if (args.length == 4 && args[2].equals("--")) {
             String commitID = args[1];
-            if (commitID.length() < 40) {
+            if (commitID.length() < 4 * 10) {
                 commitID = fullID(commitID);
             }
             File commitFile = Utils.join(od, commitID);
@@ -454,59 +461,72 @@ public class Main {
                 File checkoutFile = Utils.join(od, checkoutSha);
                 Blob checkOutBlob = Utils.readObject(checkoutFile, Blob.class);
                 File checkOutFinal = Utils.join(CWD, args[3]);
-                Utils.writeContents(checkOutFinal, (Object) checkOutBlob.contents());
+                Utils.writeContents(checkOutFinal,
+                        (Object) checkOutBlob.contents());
             }
         } else if (args.length == 2) {
-            Index ind = Utils.readObject(_index, gitlet.Index.class);
-            Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
-            String checkoutSha = args[1];
-            if (checkoutSha.length() != 40) {
-                if (!branchList.branches().containsKey(args[1])) {
-                    System.out.println("No such branch exists.");
-                    System.exit(0);
-                } else if (branchList.currentBranch().equals(args[1])) {
-                    System.out.println("No need to checkout the current branch.");
-                    System.exit(0);
-                }
-                checkoutSha = branchList.branches().get(args[1]);
-            }
-            Commit ckoCommit = Utils.readObject(Utils.join(od, checkoutSha),
-                    gitlet.Commit.class);
-            ArrayList<String> dirFiles
-                    = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
-            for (String s : dirFiles) {
-                if (!ind.blobs().containsKey(s)
-                        && ckoCommit.blobs().containsKey(s)) {
-                    System.out.println("There is an untracked file in the way; "
-                            + "delete it, or add and commit it first.");
-                    System.exit(0);
-                } else if (!ckoCommit.blobs().containsKey(s)
-                        && ind.blobs().containsKey(s)) {
-                    File f = Utils.join(CWD, s);
-                    f.delete();
-                }
-            }
-            for (String s : ckoCommit.blobs().keySet()) {
-                String[] pargs = {"checkout", checkoutSha, "--", s};
-                checkout(pargs);
-            }
-            //List<String> ckoLog = ckoCommit.logs();
-            ind.writeLog(ckoCommit.logs());
-            ind.clearStage();
-            ind.setBlobs(ckoCommit.blobs());
-            if (args[1].length() != 40) {
-                branchList.setBranch(args[1]);
-            } else if (args[1].length() == 40) {
-                branchList.updateBranch(args[1]);
-            }
-            Utils.writeObject(_branchList, branchList);
-            Utils.writeContents(_head, checkoutSha);
-            Utils.writeObject(_index, ind);
+            checkout2(args);
         } else {
             incOp();
         }
     }
-    /** Find full commit ID from short commit ID. */
+
+    /** Checkout continued.
+     *
+     * @param args Passed on from checkout.
+     */
+    private static void checkout2(String... args) {
+        Index ind = Utils.readObject(_index, gitlet.Index.class);
+        Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
+        String checkoutSha = args[1];
+        if (checkoutSha.length() != 4 * 10) {
+            if (!branchList.branches().containsKey(args[1])) {
+                System.out.println("No such branch exists.");
+                System.exit(0);
+            } else if (branchList.currentBranch().equals(args[1])) {
+                System.out.println("No need to checkout the current branch.");
+                System.exit(0);
+            }
+            checkoutSha = branchList.branches().get(args[1]);
+        }
+        Commit ckoCommit = Utils.readObject(Utils.join(od, checkoutSha),
+                gitlet.Commit.class);
+        ArrayList<String> dirFiles
+                = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
+        for (String s : dirFiles) {
+            if (!ind.blobs().containsKey(s)
+                    && ckoCommit.blobs().containsKey(s)) {
+                System.out.println("There is an untracked file in the way; "
+                        + "delete it, or add and commit it first.");
+                System.exit(0);
+            } else if (!ckoCommit.blobs().containsKey(s)
+                    && ind.blobs().containsKey(s)) {
+                File f = Utils.join(CWD, s);
+                f.delete();
+            }
+        }
+        for (String s : ckoCommit.blobs().keySet()) {
+            String[] pargs = {"checkout", checkoutSha, "--", s};
+            checkout(pargs);
+        }
+        ind.writeLog(ckoCommit.logs());
+        ind.clearStage();
+        ind.setBlobs(ckoCommit.blobs());
+        if (args[1].length() != 4 * 10) {
+            branchList.setBranch(args[1]);
+        } else if (args[1].length() == 4 * 10) {
+            branchList.updateBranch(args[1]);
+        }
+        Utils.writeObject(_branchList, branchList);
+        Utils.writeContents(_head, checkoutSha);
+        Utils.writeObject(_index, ind);
+    }
+
+    /** Find full commit ID from short commit ID.
+     *
+     * @param shID passed in short ID.
+     * @return Long ID.
+     */
     private static String fullID(String shID) {
         String commitID = shID;
         ArrayList<String> pID =
@@ -548,7 +568,7 @@ public class Main {
      * @param args Args passed into command. */
     private static void reset(String... args) {
         String commitID = args[1];
-        if (commitID.length() < 40) {
+        if (commitID.length() < 4 * 10) {
             commitID = fullID(commitID);
         }
         File commitFile = Utils.join(od, commitID);
@@ -556,24 +576,7 @@ public class Main {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
-//        Index ind = Utils.readObject(_index, gitlet.Index.class);
-//        Commit ckoCommit = Utils.readObject(Utils.join(od, commitID),
-//                gitlet.Commit.class);
-//        ArrayList<String> dirFiles
-//                = new ArrayList<String>(Utils.plainFilenamesIn(CWD));
-//        for (String s : dirFiles) {
-//            if (!ind.blobs().containsKey(s)
-//                    && ckoCommit.blobs().containsKey(s)) {
-//                System.out.println("There is an untracked file in the way; "
-//                        + "delete it, or add and commit it first.");
-//                System.exit(0);
-//            }
-//        }
-        //Branch branchList = Utils.readObject(_branchList, gitlet.Branch
-        // .class);
-        //String curr = branchList.currentBranch();
         String[] a = {"checkout", commitID};
-        //branchList.updateBranch(commitID);
         checkout(a);
     }
     /** Merges two branches.
@@ -614,7 +617,7 @@ public class Main {
             } else {
                 incOp();
             }
-        }else if (args[0].equals("db")) {
+        } else if (args[0].equals("db")) {
             return;
         } else {
             System.out.println("No command with that name exists.");

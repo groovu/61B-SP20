@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.Serializable;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,43 +33,46 @@ public class Index implements Serializable {
      * @param b Blobs to be added.
      * @param args File name of blobs. */
     void put(Blob b, String args) {
-        //_blobs.put(args[1], b.sha());
         if (_blobs.containsKey(args)) {
             if (_blobs.get(args).equals(b.sha())) {
                 return;
             }
         }
         _staged.put(args, b.sha());
-        //System.out.println(_removal.toString());
-        //_removal.remove(args);
-        //System.out.println(_removal.toString());
         if (Main.debug()) {
             System.out.println("debug: Added " + args);
             System.out.println("debug: " + _blobs);
         }
     }
-    /** Method that removes file from staging area. */
+
+    /** Method that removes file from staging area.
+     *
+     * @param args to be removed from staging.
+     */
     void removeStage(String... args) {
         _staged.remove(args[1]);
     }
-    /** Method for adding file for removal at commit. */
+
+    /** Method for adding file for removal at commit.
+     *
+     * @param args to be staged for deletion.
+     */
     void removeDelete(String... args) {
         _removal.add(args[1]);
     }
-    /** Method for removing Strings from removal list. */
+
+    /** Method for removing Strings from removal list.
+     *
+     * @param args to be removed from removal.
+     */
     void removeRemove(String args) {
-        //System.out.println("running remove");
         _removal.remove(args);
     }
-    void blobRemove(String... args) {
-        _blobs.remove(args[1]);
-    }
+
     /** Clears the staging area of index after being loaded. */
     void clearStage() {
-        //_staged = new ArrayList<>();
         _staged = new HashMap<>();
         _removal = new ArrayList<>();
-        //_removal.clear();
     }
     /** Method that returns parent of index. */
     String parent() {
@@ -109,7 +111,6 @@ public class Index implements Serializable {
      *
      * @return Returns list of staged files.
      */
-    //List<String> staged() {
     HashMap<String, String> staged() {
         return _staged;
     }
@@ -128,7 +129,11 @@ public class Index implements Serializable {
     HashMap<String, String> blobs() {
         return _blobs;
     }
-    /** Method to set index blobs after checkout. */
+
+    /** Method to set index blobs after checkout.
+     *
+     * @param b blob to be set in index.
+     */
     void setBlobs(HashMap<String, String> b) {
         _blobs = b;
     }
@@ -146,7 +151,6 @@ public class Index implements Serializable {
     private String _parent;
     /** List of Strings that contain staged files for addition. */
     private HashMap<String, String> _staged;
-    //private List<String> _staged;
     /** List of files names that are staged for removal. */
     private ArrayList<String> _removal;
     /** Logs stored in a list. */

@@ -12,17 +12,16 @@ public class Branch implements Serializable {
     /** Bootleg var that makes readObject work. */
     private static final long serialVersionUID = 555555555;
 
-    /** Initial Branch constructor. */
+    /** Initial Branch constructor.
+     *
+     * @param masterSHA Stock input to generate master branch.
+     */
     Branch(String masterSHA) {
         _branches = new HashMap<>();
         _branches.put("master", masterSHA);
         _currentBranch = "master";
     }
-    /** Constructs branch file, to be stored. */
-    Branch(String name, String cmt) {
-        _name = name;
-        _commit = cmt;
-    }
+
 
 
     /** Returns name of branch.
@@ -53,11 +52,19 @@ public class Branch implements Serializable {
             _branches.put(name, sha);
         }
     }
-    /** Method to update branch pointer after commit. */
+
+    /** Method to update branch pointer after commit.
+     *
+     * @param sha Sha to be updated.
+     */
     void updateBranch(String sha) {
         _branches.put(_currentBranch, sha);
     }
-    /** Method to remove branch. */
+
+    /** Method to remove branch.
+     *
+     * @param name Name of branch to be removed.
+     */
     void removeBranch(String name) {
         _branches.remove(name);
     }

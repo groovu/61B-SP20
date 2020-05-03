@@ -3,7 +3,10 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /** Class the represents a Commit.
  * @author Cherish Truong
@@ -45,15 +48,21 @@ public class Commit implements Serializable {
                 + " \nDate: " + _time + "\n" + _msg + "\n");
     }
 
+    /** Method that removeBlobs from index.
+     *
+     * @param i Current index.
+     */
     void removeBlobs(Index i) {
         for (String remove : i.removal()) {
             i.blobs().remove(remove);
         }
     }
+    /** Method that adds blobs to index.
+     *
+     * @param i Current index.
+     */
     void addBlobs(Index i) {
-        //for (String add : i.staged()) {
-        i.staged().forEach((k, v)
-                -> i.blobs().put(k, v));
+        i.staged().forEach((k, v) -> i.blobs().put(k, v));
     }
 
     /** Commit constructor using Index.
@@ -74,27 +83,51 @@ public class Commit implements Serializable {
         _logs.add("===\n" + "commit " + _sha1
                 + " \nDate: " + _time + "\n" + _msg + "\n");
     }
-    /** Returns logs of commit. */
+
+    /** Returns logs of commit.
+     *
+     * @return List of logs.
+     */
     List<String> logs() {
         return _logs;
     }
-    /** Returns hashmap that maps Blob SHAs to File names. */
+
+    /** Returns hashmap that maps Blob SHAs to File names.
+     *
+     * @return HashMap of blobs.  File names to sha.
+     */
     HashMap<String, String> blobs() {
         return _blobs;
     }
-    /** Returns the parent of the commit. */
+
+    /** Returns the parent of the commit.
+     *
+     * @return Name of parent.
+     */
     String parent() {
         return _parent;
     }
-    /** Returns the sha1 of the commit. */
+
+    /** Returns the sha1 of the commit.
+     *
+     * @return SHA of commit.
+     */
     String sha() {
         return _sha1;
     }
-    /** Returns the commit msg. */
+
+    /** Returns the commit msg.
+     *
+     * @return Msg of commit.
+     */
     String msg() {
         return _msg;
     }
-    /** Returns commit time. */
+
+    /** Returns commit time.
+     *
+     * @return Time of commit.
+     */
     String time() {
         return _time;
     }
