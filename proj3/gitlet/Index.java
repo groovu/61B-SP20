@@ -106,12 +106,19 @@ public class Index implements Serializable {
     void setLog(List<String> log) {
         _logs = log;
     }
-    /** Sets parent log from init commit.*/
+
+    /** Sets parent log from init commit.
+     *
+     * @param pLog Parent log from commit.
+     */
     void setParentLog(List<String> pLog) {
         _parentLog = pLog;
     }
 
-    /** Gets parent log of index. */
+    /** Gets parent log of index.
+     *
+     * @return Returns the current parentlog of index.
+     */
     List<String> parentLog() {
         return _parentLog;
     }

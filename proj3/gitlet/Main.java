@@ -3,7 +3,13 @@ package gitlet;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *  @author Cherish Truong
@@ -592,7 +598,8 @@ public class Main {
      * @param args Args passed into command. */
     private static void merge(String... args) {
         mergeErr(args);
-        // find LCA.
+
+        /** // find LCA.
 
         // if LCA = curr, checkout curr then print "Current branch
         // fast-forwarded".
@@ -636,6 +643,7 @@ public class Main {
         // sometimes you can have two LCAs.
         // choose the LCA that is the closest to the current branch.
         // if the distnace is the same, then choose either of them.
+         */
 
     }
 
@@ -645,7 +653,7 @@ public class Main {
      * @return String if LCA.
      */
     private static String findLCA(String... args) {
-        String LCA = "";
+        String lca = "";
         Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
         String givenBranch = branchList.branches().get(args[1]);
         File givenFile = Utils.join(od, givenBranch);
@@ -656,7 +664,7 @@ public class Main {
         List<String> currPLog = ind.parentLog();
         System.out.println(givenPLog.toString());
         System.out.println(currPLog.toString());
-        return LCA;
+        return lca;
     }
     /** Error check for merge.
      *
