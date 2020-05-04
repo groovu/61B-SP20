@@ -83,8 +83,14 @@ public class Commit implements Serializable {
         _msg = args[1];
         _sha1 = Utils.sha1(_time + _parent + _msg + _blobs.toString());
         _logs = ind.log();
-        _logs.add("===\n" + "commit " + _sha1
-                + " \nDate: " + _time + "\n" + _msg + "\n");
+        if (args[0].equals("merge")) {
+            _logs.add("===\n" + "commit " + _sha1
+                    + " \nMerge: " + args[2] + " " + args[3]
+                    + " \nDate: " + _time + "\n" + _msg + "\n");
+        } else {
+            _logs.add("===\n" + "commit " + _sha1
+                    + " \nDate: " + _time + "\n" + _msg + "\n");
+        }
         _parentLog = ind.parentLog();
         _parentLog.add(_sha1);
     }

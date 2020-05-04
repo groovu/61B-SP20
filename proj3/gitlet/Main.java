@@ -596,7 +596,9 @@ public class Main {
     }
     /** Merges two branches.
      * @param args Args passed into command. */
-    private static void merge(String... args) {
+    private static void merge(String... args) throws IOException {
+        boolean conflict = false;
+
         mergeErr(args);
         String lca = findLCA(args);
 
@@ -628,13 +630,24 @@ public class Main {
              * same, removed, removed? same as two?  left out.
              */
             if ((lcaVal.equals(givVal) && !lcaVal.equals(curVal))
-                || (!(lcaVal.equals(givVal)) && (givVal.equals(curVal)))) {
+                || (!lcaVal.equals(givVal) && givVal.equals(curVal))) {
                 continue;
             }
             if (lcaVal.equals(curVal) && givVal == null) {
-                //remove
-            } else if (lcaVal.equals())
-
+                //remove and untrack.
+                String[] r = {"rm", file};
+                rm(r);
+            }
+            if (lcaVal.equals(curVal) && !lcaVal.equals(givVal)) {
+                //stage for addition.
+                String[] c = {"checkout", givenSha, "--", file};
+                checkout(c);
+                String[] a = {"add", file};
+                add(a);
+            }
+            if (!lcaVal.equals(curVal) && !curVal.equals(givVal)) {
+                //conflict.
+            }
         }
 
 
@@ -675,6 +688,16 @@ public class Main {
         // choose the LCA that is the closest to the current branch.
         // if the distnace is the same, then choose either of them.
          */
+        String msg =
+                "Merged " + args[1] + " into " + branchList.currentBranch() + ".";
+        String sevenCur = curSha.substring(0, 7);
+        String sevenGiv = givenSha.substring(0, 7);
+        String[] mergeArgs = {"merge", msg, sevenCur, sevenGiv};
+        commit(mergeArgs);
+        if (conflict) {
+            System.out.println("Encountered a merge conflict.");
+        }
+
 
     }
     private static void specialMergeCheck(String lca, String given,
@@ -717,7 +740,6 @@ public class Main {
                 break;
             }
         }
-
         return lca;
     }
     /** Error check for merge.
