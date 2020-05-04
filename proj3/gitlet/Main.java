@@ -185,6 +185,8 @@ public class Main {
 
         initInd.setParentLog(initCommit.parentLog());
 
+        initInd.setMergeLog(initCommit.mergeLog());
+
         Utils.writeObject(_index, initInd);
         Utils.writeContents(_head, initCommit.sha());
         Utils.writeObject(_branchList, initBranch);
@@ -264,6 +266,8 @@ public class Main {
         i.setParent(cmt.sha());
 
         i.setParentLog(cmt.parentLog());
+
+        i.setMergeLog(cmt.mergeLog());
 
         Utils.writeObject(_index, i);
 
@@ -525,6 +529,9 @@ public class Main {
         }
         ind.writeLog(ckoCommit.logs());
         ind.setParentLog(ckoCommit.parentLog());
+
+        ind.setMergeLog(ckoCommit.mergeLog());
+
         ind.clearStage();
         ind.setBlobs(ckoCommit.blobs());
         if (args[1].length() != 4 * 10) {
@@ -617,7 +624,13 @@ public class Main {
             String givVal = givBlob.get(file);
             String curVal = curBlob.get(file);
             if (curVal == null && (givVal == null || lcaVal.equals(givVal))) {
-                continue;
+                File lcaFile = Utils.join(CWD, file);
+                if (lcaFile.exists()) {
+                    String[] s = {"rm", file};
+                    rm(s);
+                } else {
+                    continue;
+                }
             }
             if (curVal.equals(givVal)) {
                 continue;
@@ -649,8 +662,7 @@ public class Main {
         }
         String msg = "Merged " + args[1] + " into " + branchList.currentBranch()
                 + ".";
-        String[] mergeArgs = {"merge", msg, curSha.substring(0, 7),
-                givenSha.substring(0, 7)};
+        String[] mergeArgs = {"merge", msg, curSha, givenSha};
         commit(mergeArgs);
         if (conflict) {
             System.out.println("Encountered a merge conflict.");
@@ -684,6 +696,7 @@ public class Main {
      */
     private static String findLCA(String... args) {
         String lca = "";
+        boolean mergeShared = false;
         Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
         String givenBranch = branchList.branches().get(args[1]);
         File givenFile = Utils.join(od, givenBranch);
@@ -692,6 +705,11 @@ public class Main {
 
         Index ind = Utils.readObject(_index, gitlet.Index.class);
         List<String> currPLog = ind.parentLog();
+
+        List<String> mergeLog = ind.mergeLog();
+//        if (mergeLog.size() != 0) {
+
+
 
         int minSize = Math.min(currPLog.size(), givenPLog.size());
         for (int i = 0; i < minSize; i += 1) {

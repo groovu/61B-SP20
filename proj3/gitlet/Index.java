@@ -172,4 +172,19 @@ public class Index implements Serializable {
     private List<String> _logs;
     /** Parent log stored in a list. */
     private List<String> _parentLog;
+
+    /** Log of merges. */
+    private List<String> _mergeLog;
+
+    /** Set merge log.
+     * @param mLog merge log to added. */
+    void setMergeLog(List<String> mLog) {
+        _mergeLog = mLog;
+    }
+
+    /** Get merge log.
+     * @return Log of merges. */
+    List<String> mergeLog() {
+        return _mergeLog;
+    }
 }

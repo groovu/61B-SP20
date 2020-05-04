@@ -49,6 +49,8 @@ public class Commit implements Serializable {
 
         _parentLog = new ArrayList<>();
         _parentLog.add(_sha1);
+
+        _mergeLog = new ArrayList<>();
     }
 
     /** Method that removeBlobs from index.
@@ -85,8 +87,10 @@ public class Commit implements Serializable {
         _logs = ind.log();
         if (args[0].equals("merge")) {
             _logs.add("===\n" + "commit " + _sha1
-                    + " \nMerge: " + args[2] + " " + args[3]
+                    + " \nMerge: " + args[2].substring(0, 7) + " "
+                    + args[3].substring(0, 7)
                     + " \nDate: " + _time + "\n" + _msg + "\n");
+            //_mergeLog.add(args[3]);
         } else {
             _logs.add("===\n" + "commit " + _sha1
                     + " \nDate: " + _time + "\n" + _msg + "\n");
@@ -164,5 +168,20 @@ public class Commit implements Serializable {
     private List<String> _logs;
     /** Parent log stored in a list. */
     private List<String> _parentLog;
+
+    /** Log of merges. */
+    private List<String> _mergeLog;
+
+    /** Set merge log.
+     * @param mLog merge log to added. */
+    void setMergeLog(List<String> mLog) {
+        _mergeLog = mLog;
+    }
+
+    /** Get merge log.
+     * @return Log of merges. */
+    List<String> mergeLog() {
+        return _mergeLog;
+    }
 
 }
