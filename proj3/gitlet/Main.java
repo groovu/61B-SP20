@@ -598,16 +598,47 @@ public class Main {
      * @param args Args passed into command. */
     private static void merge(String... args) {
         mergeErr(args);
+        String lca = findLCA(args);
 
-        /** // find LCA.
+        Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
+        Index ind = Utils.readObject(_index, gitlet.Index.class);
+        String lcaSha = branchList.branches().get(lca);
+        String givenSha = branchList.branches().get(args[1]);
+        String curSha = branchList.branches().get(branchList.currentBranch());
 
-        // if LCA = curr, checkout curr then print "Current branch
-        // fast-forwarded".
-        // if LCA = given, merge complete, print
-        // "Given branch is an ancestor of the current branch."
+        specialMergeCheck(lca, givenSha, curSha);
+
+        Commit lcaCommit = Utils.readObject(Utils.join(od, lcaSha),
+                gitlet.Commit.class);
+        Commit givCommit = Utils.readObject(Utils.join(od, givenSha),
+                gitlet.Commit.class);
+
+        HashMap<String, String> lcaBlob = lcaCommit.blobs();
+        HashMap<String, String> givBlob = givCommit.blobs();
+        HashMap<String, String> curBlob = ind.blobs();
+
+        for (String file : lcaBlob.keySet()) {
+            String lcaVal = lcaBlob.get(file);
+            String givVal = givBlob.get(file);
+            String curVal = curBlob.get(file);
+            /** leave alone
+             * same, dif, same
+             * same, dif1, dif1
+             * same, dne, same; same as first? left out
+             * same, removed, removed? same as two?  left out.
+             */
+            if ((lcaVal.equals(givVal) && !lcaVal.equals(curVal))
+                || (!(lcaVal.equals(givVal)) && (givVal.equals(curVal)))) {
+                continue;
+            }
+            if (lcaVal.equals(curVal) && givVal == null) {
+                //remove
+            } else if (lcaVal.equals())
+
+        }
 
 
-
+        /**
         // files modified in given branch but not curr branch since LCA
         // should be checked out from given branch.
         // modified means lca.fil != givenbranch.file
@@ -646,6 +677,19 @@ public class Main {
          */
 
     }
+    private static void specialMergeCheck(String lca, String given,
+                                            String curr) {
+        if (lca.equals(given)) {
+            System.out.println("Given branch is an ancestor of the current " +
+                    "branch.");
+            System.exit(0);
+        } else if (lca.equals(curr)) {
+            String[] a = {"checkout", given};
+            checkout(a);
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
+        }
+    }
 
     /** Find LCA between current branch and given branch.
      *
@@ -662,8 +706,18 @@ public class Main {
 
         Index ind = Utils.readObject(_index, gitlet.Index.class);
         List<String> currPLog = ind.parentLog();
-        System.out.println(givenPLog.toString());
-        System.out.println(currPLog.toString());
+
+        int minSize = Math.min(currPLog.size(), givenPLog.size());
+        for (int i = 0; i < minSize; i += 1) {
+            String currParent = currPLog.get(i);
+            String givenParent = givenPLog.get(i);
+            if (currParent.equals(givenParent)) {
+                lca = currParent;
+            } else {
+                break;
+            }
+        }
+
         return lca;
     }
     /** Error check for merge.
@@ -673,12 +727,25 @@ public class Main {
     private static void mergeErr(String... args) {
         Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
         String current = branchList.currentBranch();
-        if (current.equals(args[1])) {
+        Index ind = Utils.readObject(_index, gitlet.Index.class);
+        if (!ind.staged().isEmpty() || !ind.removal().isEmpty()) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        } else if (current.equals(args[1])) {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         } else if (!branchList.branches().containsKey(args[1])) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
+        } else {
+            File cmtF = Utils.join(od, branchList.branches().get(args[1]));
+            Commit cmt = Utils.readObject(cmtF, gitlet.Commit.class);
+            boolean unt = untracked(ind, cmt);
+            if (unt) {
+                System.out.println("There is an untracked file in the way; "
+                        + "delete it, or add and commit it first.");
+                System.exit(0);
+            }
         }
     }
 
