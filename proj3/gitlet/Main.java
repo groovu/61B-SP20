@@ -514,7 +514,7 @@ public class Main {
                         + "delete it, or add and commit it first.");
                 System.exit(0);
             } else if (!ckoCommit.blobs().containsKey(s)
-                    && ind.blobs().containsKey(s)) {
+                    && ind.blobs().containsKey(s) && !args[0].equals("merge")) {
                 File f = Utils.join(CWD, s);
                 f.delete();
             }
@@ -598,113 +598,76 @@ public class Main {
      * @param args Args passed into command. */
     private static void merge(String... args) throws IOException {
         boolean conflict = false;
-
         mergeErr(args);
-        String lca = findLCA(args);
-
+        String lcaSha = findLCA(args);
         Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
         Index ind = Utils.readObject(_index, gitlet.Index.class);
-        String lcaSha = branchList.branches().get(lca);
         String givenSha = branchList.branches().get(args[1]);
         String curSha = branchList.branches().get(branchList.currentBranch());
-
-        specialMergeCheck(lca, givenSha, curSha);
-
+        specialMergeCheck(lcaSha, givenSha, curSha);
         Commit lcaCommit = Utils.readObject(Utils.join(od, lcaSha),
                 gitlet.Commit.class);
         Commit givCommit = Utils.readObject(Utils.join(od, givenSha),
                 gitlet.Commit.class);
-
         HashMap<String, String> lcaBlob = lcaCommit.blobs();
         HashMap<String, String> givBlob = givCommit.blobs();
         HashMap<String, String> curBlob = ind.blobs();
-
         for (String file : lcaBlob.keySet()) {
             String lcaVal = lcaBlob.get(file);
             String givVal = givBlob.get(file);
             String curVal = curBlob.get(file);
-            /** leave alone
-             * same, dif, same
-             * same, dif1, dif1
-             * same, dne, same; same as first? left out
-             * same, removed, removed? same as two?  left out.
-             */
-            if ((lcaVal.equals(givVal) && !lcaVal.equals(curVal))
-                || (!lcaVal.equals(givVal) && givVal.equals(curVal))) {
+            if (curVal == null && (givVal == null || lcaVal.equals(givVal))) {
+                continue;
+            }
+            if (curVal.equals(givVal)) {
                 continue;
             }
             if (lcaVal.equals(curVal) && givVal == null) {
-                //remove and untrack.
                 String[] r = {"rm", file};
                 rm(r);
             }
-            if (lcaVal.equals(curVal) && !lcaVal.equals(givVal)) {
-                //stage for addition.
-                String[] c = {"checkout", givenSha, "--", file};
+            if (lcaVal.equals(curVal) && !lcaVal.equals(givVal)
+                    && givVal != null) {
+                String[] c = {"merge", givenSha, "--", file};
                 checkout(c);
                 String[] a = {"add", file};
                 add(a);
             }
             if (!lcaVal.equals(curVal) && !curVal.equals(givVal)) {
-                //conflict.
+                System.out.println("");
             }
         }
-
-
-        /**
-        // files modified in given branch but not curr branch since LCA
-        // should be checked out from given branch.
-        // modified means lca.fil != givenbranch.file
-
-        //files modified in currbranch, but not in given branch stays. (cause
-        // its the same in LCA?)
-
-        // files modified in curr and given the same way (same modified
-        // contents) stay the same after merge.
-
-        // if file is removed from curr and given, but file exists in CWD,
-        // stays in CWD.
-
-        // files not in LCA, but only in curr stay.
-
-        // files not in LCA, but only in given, are checkedout and staged.
-
-        // files in LCA, unmodified in curr, but deleted in given, should be
-        // removed and untracked.
-
-        // files in LCA, missing in curr, but unmodified in given, should
-        // stay missing.
-
-        // files modified in curr and given are in conflict.
-        // ex. both modified, one modified and other deleted,
-        // ex. not in LCA, but in curr and given with dif contents.
-        // conflict files are combined, in a specific format.
-
-        //once files are staged, commit with log message Merged given into curr.
-        //if conflict exists, print "Encountered merge conflict." to terminal.
-        // merge commits record parents differently. head of curr and given.
-
-        // sometimes you can have two LCAs.
-        // choose the LCA that is the closest to the current branch.
-        // if the distnace is the same, then choose either of them.
-         */
-        String msg =
-                "Merged " + args[1] + " into " + branchList.currentBranch() + ".";
-        String sevenCur = curSha.substring(0, 7);
-        String sevenGiv = givenSha.substring(0, 7);
-        String[] mergeArgs = {"merge", msg, sevenCur, sevenGiv};
+        for (String file : givBlob.keySet()) {
+            String lcaVal = lcaBlob.get(file);
+            String curVal = curBlob.get(file);
+            if (lcaVal == null && curVal == null) {
+                String[] c = {"merge", givenSha, "--", file};
+                checkout(c);
+                String[] a = {"add", file};
+                add(a);
+            }
+        }
+        String msg = "Merged " + args[1] + " into " + branchList.currentBranch()
+                + ".";
+        String[] mergeArgs = {"merge", msg, curSha.substring(0, 7),
+                givenSha.substring(0, 7)};
         commit(mergeArgs);
         if (conflict) {
             System.out.println("Encountered a merge conflict.");
         }
-
-
     }
+
+    /** Method that checks for special merge conditions.
+     *
+     * @param lca Sha of least common ancestor.
+     * @param given Sha of given branch.
+     * @param curr Sha of current branch.
+     */
     private static void specialMergeCheck(String lca, String given,
                                             String curr) {
         if (lca.equals(given)) {
-            System.out.println("Given branch is an ancestor of the current " +
-                    "branch.");
+            System.out.println("Given branch is an ancestor of the current "
+                    + "branch.");
             System.exit(0);
         } else if (lca.equals(curr)) {
             String[] a = {"checkout", given};
