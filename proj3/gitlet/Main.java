@@ -1,5 +1,6 @@
 package gitlet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -152,6 +153,8 @@ public class Main {
                 String[] a = {"1", args[2]};
                 findLCA(a);
             }
+        } else if (args[1].equals("mlog")) {
+            System.out.println(ind.mergeLog().toString());
         } else {
             System.out.println("blobs, remove, stage");
         }
@@ -647,17 +650,22 @@ public class Main {
                 add(a);
             }
             if (!lcaVal.equals(curVal) && !curVal.equals(givVal)) {
-                System.out.println("");
+                conflict = true;
+                conflictFile(curVal, givVal, file);
             }
         }
         for (String file : givBlob.keySet()) {
             String lcaVal = lcaBlob.get(file);
             String curVal = curBlob.get(file);
+            String givVal = givBlob.get(file);
             if (lcaVal == null && curVal == null) {
                 String[] c = {"merge", givenSha, "--", file};
                 checkout(c);
                 String[] a = {"add", file};
                 add(a);
+            } else if (lcaVal == null && !givVal.equals(curVal)) {
+                conflict = true;
+                conflictFile(curVal, givVal, file);
             }
         }
         String msg = "Merged " + args[1] + " into " + branchList.currentBranch()
@@ -667,6 +675,66 @@ public class Main {
         if (conflict) {
             System.out.println("Encountered a merge conflict.");
         }
+    }
+    /** Method that deals with makes conflict file. */
+    private static void conflictFile(String curSha, String givSha,
+                                     String fname) throws IOException {
+        File curF = null;
+        File givF = null;
+        if (curSha != null) {
+            curF = Utils.join(od, curSha);
+        }
+        if (givSha != null) {
+            givF = Utils.join(od, givSha);
+        }
+        if (curF == null && givF == null) {
+            return;
+        }
+
+        Blob curB = null;
+        Blob givB = null;
+
+        String head = "<<<<<<< HEAD\n";
+        String mid = "=======\n";
+        String end = ">>>>>>>\n";
+        String nil = "";
+        byte[] curCont = null;
+        byte[] givCont = null;
+        File cwdF = null;
+
+        // cur mod, given missing.  cur is in cwd. read file and overwrite
+        // cur mod, given mod.  cur is in cwd, read file and overwrite.
+        if (curF.exists()) {
+            curB = Utils.readObject(curF, gitlet.Blob.class);
+            cwdF = Utils.join(CWD, fname);
+            curCont = curB.contents();
+            if (givF != null) {
+                givB = Utils.readObject(givF, gitlet.Blob.class);
+                givCont = givB.contents();
+            } else {
+                givCont = nil.getBytes();
+            }
+        } else {
+            File get = Utils.join(od, givSha);
+            cwdF = Utils.join(CWD, fname);
+            cwdF.createNewFile();
+            curCont = nil.getBytes();
+            givB = Utils.readObject(givF, gitlet.Blob.class);
+            givCont = givB.contents();
+        }
+        ByteArrayOutputStream newCont = new ByteArrayOutputStream();
+        newCont.write(head.getBytes());
+        newCont.write(curCont);
+        newCont.write(mid.getBytes());
+        newCont.write(givCont);
+        newCont.write(end.getBytes());
+        Utils.writeContents(cwdF, newCont.toByteArray());
+        // cur missing, given mod.  given not in cwd. checkout file and
+        // overwrite?
+        String[] a = {"add", fname};
+        add(a);
+        //System.out.println(newCont.toString());
+
     }
 
     /** Method that checks for special merge conditions.
@@ -696,7 +764,6 @@ public class Main {
      */
     private static String findLCA(String... args) {
         String lca = "";
-        boolean mergeShared = false;
         Branch branchList = Utils.readObject(_branchList, gitlet.Branch.class);
         String givenBranch = branchList.branches().get(args[1]);
         File givenFile = Utils.join(od, givenBranch);
@@ -707,18 +774,22 @@ public class Main {
         List<String> currPLog = ind.parentLog();
 
         List<String> mergeLog = ind.mergeLog();
-//        if (mergeLog.size() != 0) {
-
-
-
-        int minSize = Math.min(currPLog.size(), givenPLog.size());
-        for (int i = 0; i < minSize; i += 1) {
-            String currParent = currPLog.get(i);
-            String givenParent = givenPLog.get(i);
-            if (currParent.equals(givenParent)) {
-                lca = currParent;
-            } else {
-                break;
+        if (mergeLog.size() != 0) {
+            for (String s : mergeLog) {
+                if (givenPLog.contains(s)) {
+                    lca = s;
+                }
+            }
+        } else {
+            int minSize = Math.min(currPLog.size(), givenPLog.size());
+            for (int i = 0; i < minSize; i += 1) {
+                String currParent = currPLog.get(i);
+                String givenParent = givenPLog.get(i);
+                if (currParent.equals(givenParent)) {
+                    lca = currParent;
+                } else {
+                    break;
+                }
             }
         }
         return lca;
