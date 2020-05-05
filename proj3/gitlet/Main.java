@@ -74,19 +74,7 @@ public class Main {
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
     public static void main(String... args) throws IOException {
-
-        if (args.length == 0) {
-            System.out.println("Please enter a command.");
-            System.exit(0);
-        }
-        argsMax(args);
-        if (args[0].equals("init")) {
-            init(args);
-        }
-        if (!repoInitCheck()) {
-            System.out.println("Not in an initialized Gitlet directory.");
-            System.exit(0);
-        }
+        mainCheck(args);
         switch (args[0]) {
         case "add":
             add(args);
@@ -127,8 +115,41 @@ public class Main {
         case "db":
             db(args);
             break;
+        case "add-remote":
+            addremote(args);
+            break;
+        case "rm-remote":
+            rmremote(args);
+            break;
+        case "push":
+            push(args);
+            break;
+        case "fetch":
+            fetch(args);
+            break;
+        case "pull":
+            pull(args);
+            break;
         default:
-            System.out.println("Command not implemented.");
+        }
+    }
+
+    /** Refactored method that checks for errors.
+     *
+     * @param args Command line args.
+     * @throws IOException Error.
+     */
+    private static void mainCheck(String[] args) throws IOException {
+        if (args.length == 0) {
+            System.out.println("Please enter a command.");
+            System.exit(0);
+        }
+        argsMax(args);
+        if (args[0].equals("init")) {
+            init(args);
+        }
+        if (!repoInitCheck()) {
+            System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
     }
@@ -175,6 +196,7 @@ public class Main {
             _head.createNewFile();
             _glog.createNewFile();
             _branchList.createNewFile();
+            _remote.createNewFile();
             initPers();
             System.exit(0);
         }
@@ -196,6 +218,10 @@ public class Main {
         File icommit = Utils.join(od, initCommit.sha());
         Utils.writeObject(icommit, initCommit);
         globalLogAdd(initCommit);
+
+        Remote initRemote = new Remote();
+        Utils.writeObject(_remote, initRemote);
+
     }
     /** Method that updates the global log; updated after every commit.
      * @param cmt Metadata from commit to be added to global log.*/
@@ -622,6 +648,7 @@ public class Main {
         HashMap<String, String> lcaBlob = lcaCommit.blobs();
         HashMap<String, String> givBlob = givCommit.blobs();
         HashMap<String, String> curBlob = ind.blobs();
+
         conflict = mergeLCA(conflict, givenSha, lcaBlob, givBlob, curBlob);
         conflict = mergeGiv(conflict, givenSha, lcaBlob, givBlob, curBlob);
         String msg = "Merged " + args[1] + " into " + branchList.currentBranch()
@@ -646,15 +673,28 @@ public class Main {
     private static boolean mergeGiv(boolean conflict, String givenSha,
         HashMap<String, String> lcaBlob, HashMap<String, String> givBlob,
         HashMap<String, String> curBlob) throws IOException {
+        String[] test = new String[10 * 10];
+        int i = -1;
         for (String file : givBlob.keySet()) {
+            i += 1;
             String lcaVal = lcaBlob.get(file);
             String curVal = curBlob.get(file);
             String givVal = givBlob.get(file);
-            if (lcaVal == null && curVal == null) {
+            boolean curVN = (curVal == null);
+            boolean lcaVN = (lcaVal == null);
+
+            String comb =
+                    file.concat(" " + lcaVal + " " + curVal + " " + givVal
+                            + " " + curVN + lcaVN + "\n");
+            test[i] = comb;
+
+            if ((lcaVal == null)) {
                 String[] c = {"merge", givenSha, "--", file};
                 checkout(c);
                 String[] a = {"add", file};
                 add(a);
+            } else if (givVal.equals(lcaVal) && !givVal.equals(curVal)) {
+                continue;
             } else if (lcaVal == null && !givVal.equals(curVal)) {
                 conflict = true;
                 conflictFile(curVal, givVal, file);
@@ -684,6 +724,7 @@ public class Main {
                 if (lcaFile.exists()) {
                     String[] s = {"rm", file};
                     rm(s);
+
                 } else {
                     continue;
                 }
@@ -701,6 +742,9 @@ public class Main {
                 checkout(c);
                 String[] a = {"add", file};
                 add(a);
+            }
+            if (lcaVal.equals(givVal) && !givVal.equals(curVal)) {
+                return conflict;
             }
             if (!lcaVal.equals(curVal) && !curVal.equals(givVal)) {
                 conflict = true;
@@ -898,7 +942,7 @@ public class Main {
     private static void argsMax(String... args) {
         int validArgs = 0;
         if (Arrays.asList("add", "commit", "rm", "find", "branch",
-                "rm-branch", "reset", "merge").contains(args[0])) {
+                "rm-branch", "reset", "merge", "rm-remote").contains(args[0])) {
             validArgs = 2;
         } else if (Arrays.asList("status", "log", "global-log",
                 "init").contains(args[0])) {
@@ -911,12 +955,79 @@ public class Main {
             }
         } else if (args[0].equals("db")) {
             return;
+        } else if (Arrays.asList("add-remote", "push", "fetch", "pull")
+                .contains(args[0])) {
+            validArgs = 3;
         } else {
             System.out.println("No command with that name exists.");
             System.exit(0);
         }
         if (args.length != validArgs) {
             incOp();
+        }
+    }
+    /** Repo log. */
+    private static File _remote = Utils.join(GD, "remote");
+
+    /** Add remote repo.
+     * @param args Name of remote repo. */
+    private static void addremote(String... args) {
+        String name = args[1];
+        String loc = args[2].replace("/", File.separator);
+        Remote repos = Utils.readObject(_remote, gitlet.Remote.class);
+
+        repos.put(name, loc);
+        Utils.writeObject(_remote, repos);
+    }
+    /** Remove remote repo.
+     * @param args Name of remote repo. */
+    private static void rmremote(String... args) {
+        String name = args[1];
+        Remote repos = Utils.readObject(_remote, gitlet.Remote.class);
+        repos.remove(name);
+        Utils.writeObject(_remote, repos);
+    }
+    /** Push remote repo.
+     * @param args Name of remote repo. */
+    private static void push(String... args) {
+        Remote repos = Utils.readObject(_remote, gitlet.Remote.class);
+        String name = args[1];
+        String repobranch = args[2];
+        repoExist(name, repos.repos().get(name));
+        System.out.println("Please pull down remote changes before pushing.");
+    }
+    /** Fetch remote repo.
+     * @param args Name of remote repo. */
+    private static void fetch(String... args) {
+        Remote repos = Utils.readObject(_remote, gitlet.Remote.class);
+        String name = args[1];
+        String repobranch = args[2];
+        String repoDirName = repos.repos().get(name);
+        File repoLoc = Utils.join(CWD, repoDirName);
+
+        repoExist(name, repos.repos().get(name));
+        if (true) {
+            System.out.println("That remote does not have that branch.");
+        }
+    }
+    /** Pull remote repo.
+     * @param args Name of remote repo. */
+    private static void pull(String... args) {
+    }
+
+    /** Method to check if repo exists.
+     *
+     * @param name Name of repo.
+     * @param loc File loc of repo.
+     */
+    private static void repoExist(String name, String loc) {
+        boolean inrepo =
+                Utils.readObject(_remote, gitlet.Remote.class)
+                        .repos().containsKey(name);
+        boolean validDir = Utils.join(CWD, loc).exists();
+        if (!inrepo || !validDir) {
+            System.out.println("Remote directory not found.");
+            System.exit(0);
         }
     }
 }

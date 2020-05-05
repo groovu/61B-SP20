@@ -162,6 +162,10 @@ testing/src/*
 !testing/src/notwug.txt
 !testing/src/wug.txt
 !testing/src/wug2.txt
+!testing/src/test3.txt
+!testing/src/test1.txt
+!testing/src/test2.txt
+!testing/src/zerot.txt
 scratch
 f.txt
 g.txt

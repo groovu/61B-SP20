@@ -4,6 +4,8 @@ import ucb.junit.textui;
 import org.junit.Test;
 
 
+
+
 /** The suite of all JUnit tests for the gitlet package.
  *  @author
  */
@@ -20,7 +22,6 @@ public class UnitTest {
     public void filesInDir() {
         return;
     }
-
 
 }
 
