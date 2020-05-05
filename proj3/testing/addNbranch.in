@@ -1,0 +1,36 @@
+# Testing add and status.
+> init
+<<<
++ test3.txt test3.txt
+> add test3.txt
+<<<
+> status
+=== Branches ===
+*master
+
+=== Staged Files ===
+test3.txt
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<
+> branch yellow
+<<<
+> status
+=== Branches ===
+*master
+yellow
+
+=== Staged Files ===
+test3.txt
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+<<<

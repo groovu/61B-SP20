@@ -1,0 +1,17 @@
+# Testing checkout
+> init
+<<<
++ test1.txt test1.txt
++ test2.txt test2.txt
+> add test1.txt
+<<<
+> add test2.txt
+<<<
+> commit "test1 and test2"
+<<<
++ test1.txt test2.txt
+# Should revert to old verse.
+> checkout -- test1.txt
+<<<
+= test1.txt test1.txt
+= test2.txt test2.txt

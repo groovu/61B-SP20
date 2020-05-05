@@ -156,7 +156,12 @@ Session.vim
 ## .gitlet test folder ##
 .gitlet
 test.txt
-testing
+testing/samples
+testing/src/*
+!testing/src/a.txt
+!testing/src/notwug.txt
+!testing/src/wug.txt
+!testing/src/wug2.txt
 scratch
 f.txt
 g.txt

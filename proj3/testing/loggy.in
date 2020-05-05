@@ -1,0 +1,69 @@
+# Checking multiple logs.
+> init
+<<<
++ zerot.txt zerot.txt
+> add zerot.txt
+<<<
+> commit "just added zerot"
+<<<
++ zulu.txt test3.txt
+> add zulu.txt
+<<< 
+> commit "Zulu added"
+<<< 
+> status 
+=== Branches ===
+*master
+
+=== Staged Files ===
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<
++ zama.txt test1.txt
+> add zama.txt
+<<<
+> status
+=== Branches ===
+*master
+
+=== Staged Files ===
+zama.txt
+
+=== Removed Files ===
+
+=== Modifications Not Staged For Commit ===
+
+=== Untracked Files ===
+
+<<<
+> commit "adding zama"
+<<<
+D peep "commit [a-f0-9]+"
+D zoot "Date: \w\w\w \w\w\w \d+ \d\d:\d\d:\d\d \d\d\d\d [-+]\d\d\d\d"
+> log
+===
+${peep}
+${zoot}
+adding zama
+
+===
+${peep}
+${zoot}
+Zulu added
+
+===
+${peep}
+${zoot}
+just added zerot
+
+===
+${peep}
+${zoot}
+initial commit
+
+<<<*

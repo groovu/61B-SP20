@@ -622,6 +622,59 @@ public class Main {
         HashMap<String, String> lcaBlob = lcaCommit.blobs();
         HashMap<String, String> givBlob = givCommit.blobs();
         HashMap<String, String> curBlob = ind.blobs();
+        conflict = mergeLCA(conflict, givenSha, lcaBlob, givBlob, curBlob);
+        conflict = mergeGiv(conflict, givenSha, lcaBlob, givBlob, curBlob);
+        String msg = "Merged " + args[1] + " into " + branchList.currentBranch()
+                + ".";
+        String[] mergeArgs = {"merge", msg, curSha, givenSha};
+        commit(mergeArgs);
+        if (conflict) {
+            System.out.println("Encountered a merge conflict.");
+        }
+    }
+
+    /** Split merge that works with given branch files.
+     *
+     * @param conflict C.
+     * @param givenSha G.
+     * @param lcaBlob L.
+     * @param givBlob G.
+     * @param curBlob C.
+     * @return If there is a conflict.
+     * @throws IOException Error.
+     */
+    private static boolean mergeGiv(boolean conflict, String givenSha,
+        HashMap<String, String> lcaBlob, HashMap<String, String> givBlob,
+        HashMap<String, String> curBlob) throws IOException {
+        for (String file : givBlob.keySet()) {
+            String lcaVal = lcaBlob.get(file);
+            String curVal = curBlob.get(file);
+            String givVal = givBlob.get(file);
+            if (lcaVal == null && curVal == null) {
+                String[] c = {"merge", givenSha, "--", file};
+                checkout(c);
+                String[] a = {"add", file};
+                add(a);
+            } else if (lcaVal == null && !givVal.equals(curVal)) {
+                conflict = true;
+                conflictFile(curVal, givVal, file);
+            }
+        }
+        return conflict;
+    }
+    /** Split merge that works with given LCA files.
+     *
+     * @param conflict C.
+     * @param givenSha G.
+     * @param lcaBlob L.
+     * @param givBlob G.
+     * @param curBlob C.
+     * @return If there is a conflict.
+     * @throws IOException Error.
+     */
+    private static boolean mergeLCA(boolean conflict, String givenSha,
+        HashMap<String, String> lcaBlob, HashMap<String, String> givBlob,
+        HashMap<String, String> curBlob) throws IOException {
         for (String file : lcaBlob.keySet()) {
             String lcaVal = lcaBlob.get(file);
             String givVal = givBlob.get(file);
@@ -654,29 +707,16 @@ public class Main {
                 conflictFile(curVal, givVal, file);
             }
         }
-        for (String file : givBlob.keySet()) {
-            String lcaVal = lcaBlob.get(file);
-            String curVal = curBlob.get(file);
-            String givVal = givBlob.get(file);
-            if (lcaVal == null && curVal == null) {
-                String[] c = {"merge", givenSha, "--", file};
-                checkout(c);
-                String[] a = {"add", file};
-                add(a);
-            } else if (lcaVal == null && !givVal.equals(curVal)) {
-                conflict = true;
-                conflictFile(curVal, givVal, file);
-            }
-        }
-        String msg = "Merged " + args[1] + " into " + branchList.currentBranch()
-                + ".";
-        String[] mergeArgs = {"merge", msg, curSha, givenSha};
-        commit(mergeArgs);
-        if (conflict) {
-            System.out.println("Encountered a merge conflict.");
-        }
+        return conflict;
     }
-    /** Method that deals with makes conflict file. */
+
+    /** Method that deals with makes conflict file.
+     *
+     * @param curSha C.
+     * @param givSha G.
+     * @param fname F.
+     * @throws IOException E.
+     */
     private static void conflictFile(String curSha, String givSha,
                                      String fname) throws IOException {
         File curF = null;
@@ -702,8 +742,7 @@ public class Main {
         byte[] givCont = null;
         File cwdF = null;
 
-        // cur mod, given missing.  cur is in cwd. read file and overwrite
-        // cur mod, given mod.  cur is in cwd, read file and overwrite.
+
         if (curF.exists()) {
             curB = Utils.readObject(curF, gitlet.Blob.class);
             cwdF = Utils.join(CWD, fname);
@@ -729,11 +768,9 @@ public class Main {
         newCont.write(givCont);
         newCont.write(end.getBytes());
         Utils.writeContents(cwdF, newCont.toByteArray());
-        // cur missing, given mod.  given not in cwd. checkout file and
-        // overwrite?
+
         String[] a = {"add", fname};
         add(a);
-        //System.out.println(newCont.toString());
 
     }
 
