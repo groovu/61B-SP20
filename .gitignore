@@ -153,4 +153,6 @@ Session.vim
 .netrwhist
 *~
 
+ignore
+
 

@@ -1,4 +1,0 @@
-# Check that the initial position is right.
-#* java -ea loa.Main
-dump
-quit
