@@ -6,6 +6,5 @@ Features the following commands: init, add, commit, rm, log, global-log, find, s
 ![2021-04-20 20-32-51](https://user-images.githubusercontent.com/43489192/115493722-23985500-a219-11eb-8aea-d5c844d756a1.gif)
 
 # todo 
-Demo showing more features
-
+Polish demo and show more features.
 Rewrite in another language?
